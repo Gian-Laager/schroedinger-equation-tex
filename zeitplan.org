@@ -1,0 +1,54 @@
+* Research
+
+* Step Potential Mathematisch Vereinfachen
+- Unbekannte?
+- Series expansions?
+
+* Software Architecture
+
+* Step Potential in c++ hinzufügen
+- Integral lösen?
+- Series expansion Welche Ordnung?
+
+* Sommer Ferien 30.4.
+
+* Plot
+** program
+- gnuplot?
+- matplotlib?
+
+- Mean Squared
+- Wellen funktion
+- lambda, ro
+
+- Momentum Operator?
+- Eigen states of energy?
+
+** UI
+- dear imGUI
+- parameter
+- plot button
+
+
+* Fourier Potential Mathematisch Vereinfachen
+- Airy functions?
+- Integral?
+
+* Time dependent Step?
+
+* Probe Kapitel
+
+* Ende Sommer Ferien
+
+* Time dependent Fourier?
+
+* Bug Fixes
+
+* Optimieren
+- Benchmarks
+- Genauigkeit?
+- parallel?
+
+* Bug Fixes
+
+* Arbeit
