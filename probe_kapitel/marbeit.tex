@@ -62,6 +62,8 @@
 
 \providecommand{\rustinline}{\lstinline[language=Rust,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
+\setcitestyle{numbers,open={[},close={]}}
+
 \begin{document}
 
 \begin{titlepage}
@@ -102,7 +104,7 @@ Or more general
 \end{math}
 \end{center}
 
-The time independent version that is going to be used later, it ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ODE instead of a PDE.
+The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ODE instead of a PDE.
 \begin{center}
 \begin{math}
   E \psi (x)=\hat{H} \psi(x)
@@ -117,7 +119,7 @@ or
 
 Even with the time independent equation it is very difficult to get analytical solutions, because of this there are mainly three approaches to
 approximate solutions of $\psi(x)$, perturbation theory, density functional field theory and WKB approximation. Perturbation theory's goal is to give an analytical approximation which means it
-is extremely difficult to implement it for a computer. WKB on the other hand is much better since it is to some degree a step by step manual.
+is extremely difficult to implement for a computer. WKB on the other hand is much better since it is to some degree a step by step manual.
 \section{Rust}
 Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented para dimes. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
 be able to write concurrent code without deadlocks and data races. This means calculations can utilize the full potential of the CPU without countless hours of debugging.
@@ -368,7 +370,7 @@ At the moment the code is only available on \url{https://github.com/Gian-Laager/
 \end{appendix}
 \chapter*{Bildquellen}
 %
-Wo nicht anders angegeben, sind die Bilder aus dieser Arbeit selbst erstellt worden. Das Titelbild stammt aus.
+Wo nicht anders angegeben, sind die Bilder aus dieser Arbeit selbst erstellt worden.
 %
 \bibliographystyle{plainnatromer}
 \bibliography{marbeit}
