@@ -72,7 +72,7 @@ Gian Laager\\
 \today
 \vspace{0.05\textheight}
 \begin{center}
-	\includegraphics[width=.7\textwidth]{titelbild.jpg}
+	\includegraphics[width=.7\textwidth]{wave_func_square.pdf}
 \end{center}
 \vspace{0.05\textheight}
 Maturaarbeit\\
@@ -84,15 +84,12 @@ Referent: Beat Temperli
 
 \pagenumbering{roman}   % i, ii, iii, iv, ...
 
-\chapter*{Dank}
-Mein ausserordentlicher Dank gilt Fritz Muster für das Korrekturlesen. Ebenso danke ich Heiri Müller und Otto Normalverbraucher für ihre hilfreichen Korrespondenzen mit mir.
-
 \tableofcontents %Inhaltsverzeichnis
 
 \chapter{Introduction}\pagenumbering{arabic}  % 1, 2, 3, 4, ...
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
-behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $H$.
+behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.
 \begin{center}
 \begin{math}
   i\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\left[-{\frac {\hbar ^{2}}{2m}}{\frac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
@@ -101,14 +98,14 @@ behave like waves he developed a wave equation which describes how the waves mov
 Or more general
 \begin{center}
 \begin{math}
-  i\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=H \Psi(x,t)
+  i\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
 \end{math}
 \end{center}
 
-The time independent version that is going to be used later ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ODE instead of a PDE.
+The time independent version that is going to be used later, it ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ODE instead of a PDE.
 \begin{center}
 \begin{math}
-  E \psi (x)=H \psi(x)
+  E \psi (x)=\hat{H} \psi(x)
 \end{math}
 \end{center}
 or
@@ -122,7 +119,7 @@ Even with the time independent equation it is very difficult to get analytical s
 approximate solutions of $\psi(x)$, perturbation theory, density functional field theory and WKB approximation. Perturbation theory's goal is to give an analytical approximation which means it
 is extremely difficult to implement it for a computer. WKB on the other hand is much better since it is to some degree a step by step manual.
 \section{Rust}
-Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented para dimes. It is much safer to work with while it promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
+Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented para dimes. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
 be able to write concurrent code without deadlocks and data races. This means calculations can utilize the full potential of the CPU without countless hours of debugging.
 
 Personally I like programming languages that support functional para dimes when I'm programming something that uses a lot of math since functional programming languages are designed according to mathematical concepts that also govern the problem. This usually results in rather neat solutions.
@@ -133,7 +130,7 @@ Rust as of the time of writing this document is not yet standardized meaning the
 \section{Approximation Scheme}
 \label{meth:wkb:approximation-scheme}
 There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
-solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{Perturbation theory is inefficient compared to other approximation
+solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
 methods when calculated on a computer} \citep[Introduction]{van2014density}.
 
 The second is Density functional field theory, it has evolved over the years and is used heavily in chemistry to calculate properties of molecules and is also applicable for the time dependent Schrödinger
@@ -142,7 +139,7 @@ equation. It is something that might be interesting to add to the program in the
 
 The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
 Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
-understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. This is not a physically correct explanation because one can not assume that $\hbar$ is small since it has units, but there is another interpretation that is physically more valid that will be discussed in the validity section (\ref{meth:wkb:valid}).
+understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. This is not a physically correct explanation because one can not assume that $\hbar$ is small since it has units, but there is another interpretation that is physically more valid that will be discussed in section~\ref{meth:wkb:valid}.
 
 \subsection{Example}
 This example is from~\cite[An example]{wiki:wkb}.
@@ -163,7 +160,7 @@ resulting in the equation
 \label{eq:wkbexpand}
   \epsilon^{2}{1 \over \delta^{2}}(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)})) = Q(x)
 \end{equation}
-As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, this then~\ref{eq:wkbexpand} can be written as
+As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
 \begin{equation}
 \label{eq:wkbapprox}
  \frac{\epsilon^2}{\delta^2}S_0'^2 + \frac{2\epsilon^2}{\delta}S_0'S_1' + \frac{\epsilon^2}{\delta}S_0'' = Q(x)
@@ -177,7 +174,7 @@ this means that our approximate solution of $y$ is
 \[
 y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left[{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right]+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left[-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right]
 \]
-here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ as will later in section~\ref{...} be discussed, important to have the right value for which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
+here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
 
 \subsection{Validity}
 \label{meth:wkb:valid}
@@ -214,7 +211,8 @@ Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-1)(x+1)(x-2)$.
 The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at $(guess, f(guess))$ the next guess will be where
 the tangent intersects the x-Axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula-Falsi.
 
-\begin{rustcode}
+\pagebreak
+\begin{rustcode}\nopagebreak
 pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
     where
         F: Fn(f64) -> f64,
@@ -249,6 +247,7 @@ The limit can very easily be approximated with
 were $\delta$ needs to be small yet not so small that it exceeds the 16 digit precision of double. I chose $\delta = \sqrt{2^{-52}}$, because $\epsilon = 2^{-52}$ is the smallest double precision floating point number where
 $1 + \epsilon \ne 1$. The square root ensures that still enough precision remains. After some further research the function should be implemented the same way as described by Boost~(C++~library).
 
+\pagebreak
 \begin{rustcode}
 pub fn derivative<F, R>(f: &F, x: f64) -> R
     where
@@ -267,9 +266,9 @@ The same principles apply to integrals as to derivative it would not be a great 
 derivatives since integrals can not be broken down in to many smaller integrals that can be computed easily instead it needs to be solved as is.
 
 One approach would be to use the same method as with the derivative, take the definition with the limit and use a small value but this method can be improved in this case, since integrals calculate
-areas under curves a trapeze is more efficient and accurate.
+areas under curves a trapeze is more efficient and accurate then the rectangle that results from the definition.
 
-\begin{figure}
+\begin{figure}[h]
   \centering
 	\includegraphics[width=0.7\textwidth]{Integration_trapezoid.pdf}
 	\caption{Illustration of integration with trapeze from \cite{wiki:integration-methods}.}
@@ -283,9 +282,8 @@ Figure \ref{fig:integration-ilust} shows visually how the methods work, each blu
 One trapeze would be fairly inaccurate to calculate the area under the function but as the area from $a$ to $b$ is subdivided further the result become better and better.
 
 The general structure of the algorithm can very easily be run in parallel since it doesn't matter in which order the segments are added together and the segments also don't dependent on one another.
-In rust this is implemented using rayon. Is an implementation for parallel iterators meaning that normal data structures that implement (\textbf{LOOK UP TRAIT}) can be run in parallel \emph{just} by
-changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety the borrow checker will complain and the code wont compile.
-\pagebreak
+In rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
+changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety but in this case the borrow checker will throw an error and the code wont compile.
 
 \begin{rustcode}
 pub trait ReToC: Sync {
@@ -300,7 +298,7 @@ pub struct Point {
 These functions were implemented very early and need some refractory. Such that functions with states, like wave functions that store parameters, can be integrated there is a trait
 \rustinline{ReToC}. \rustinline{ReToC} describes a function $f: \mathbb{R} \to \mathbb{C}$ (\rustinline{Fn(f64) -> Complex64}).
 
-\rustinline{Point} both the input (x) and the output (y) of a function.
+\rustinline{Point} stores both the input (x) and the output (y) of a function.
 
 \begin{rustcode}
 pub fn evaluate_function_between(f: &dyn ReToC, a: f64, b: f64, n: usize) -> Vec<Point> {
@@ -318,6 +316,7 @@ pub fn evaluate_function_between(f: &dyn ReToC, a: f64, b: f64, n: usize) -> Vec
 \rustinline{ReToC} can be passed to \rustinline{evaluate_function_between}
 it calculates \rustinline{n} points between an interval from \rustinline{a} to \rustinline{b} and returns a vector of \rustinline{Point}.
 
+\pagebreak
 \begin{rustcode}
 pub fn trapezoidal_approx(start: &Point, end: &Point) -> Complex64 {
     return complex(end.x - start.x, 0.0) * (start.y + end.y) / complex(2.0, 0.0);
@@ -354,11 +353,9 @@ pub fn integrate(points: Vec<Point>, batch_size: usize) -> Complex64 {
     return parallel + rest;
 }
 \end{rustcode}
-The actual integration happens in \rustinline{integrate}, calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
+The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
 take more time to create a new thread then to actually do the calculation, this has to be further investigated and 1000 might not be optimal. The calculations performed per thread are called a batch,
-after all batches have been calculated the boundaries between batches also has to be considered there for they are added in the end with \rustinline{rest}
-
-
+after all batches have been calculated the boundaries between batches also has to be considered therefor they are added in the end with \rustinline{rest}
 
 %
 \begin{appendix} %Anhang falls nötig
