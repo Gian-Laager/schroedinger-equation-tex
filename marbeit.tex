@@ -12,12 +12,14 @@
 \usepackage{url} %für die gute Darstellung von Internet-Links
 \usepackage{hyperref} %für die gute Darstellung von Internet-Links
 % \usepackage[ngerman]{babel} %deutsches Sprachpaket
-\usepackage[english]{babel} %deutsches Sprachpaket
+\usepackage[english,ngerman]{babel} %deutsches Sprachpaket
 \usepackage[round]{natbib} %für vereinfachte:wen/Querverweise
 \usepackage{listings} % für Quelltext mit Syntax-Highlighting
 \usepackage{listings-rust}
 \usepackage{hyperref}
 \usepackage{svg}
+\usepackage{XCharter}
+\usepackage[T1]{fontenc}
 \usepackage{tikz} %für tikz-Grafiken
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
@@ -63,6 +65,7 @@
 \providecommand{\rustinline}{\lstinline[language=Rust,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
 \setcitestyle{numbers,open={[},close={]}}
+\normalfont{}
 
 \begin{document}
 
@@ -104,7 +107,7 @@ Or more general
 \end{math}
 \end{center}
 
-The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ODE instead of a PDE.
+The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a partial differential equation.
 \begin{center}
 \begin{math}
   E \psi (x)=\hat{H} \psi(x)
@@ -155,12 +158,12 @@ where $\epsilon = -{\hbar^{2} \over 2m}$ and $Q(x) = E - V(x)$.
 
 Replace $y$ with
 \[
-  y(x) = exp({1 \over \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)})
+  y(x) = \exp \left({1 \over \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
 \]
 resulting in the equation
 \begin{equation}
 \label{eq:wkbexpand}
-  \epsilon^{2}{1 \over \delta^{2}}(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)})) = Q(x)
+  \epsilon^{2}{1 \over \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
 \end{equation}
 As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
 \begin{equation}
@@ -174,7 +177,7 @@ If we go further and solve for $S_{0}$ and $S_{1}$ we will get that
 \end{align}
 this means that our approximate solution of $y$ is
 \[
-y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left[{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right]+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left[-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right]
+y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left({\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left(-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
 \]
 here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
 
@@ -230,7 +233,7 @@ pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
 }
 \end{rustcode}
 
-In rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision} the function will return if
+In Rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision} the function will return if
 $|{f(x_{n}) \over f'(x_{n})}|$ is less than \rustinline{precision}.
 
 From the structure of the algorithm it is very tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary jumps and the precision can (at least in theory) be $0$ without causing a stack overflow.
@@ -284,7 +287,7 @@ Figure \ref{fig:integration-ilust} shows visually how the methods work, each blu
 One trapeze would be fairly inaccurate to calculate the area under the function but as the area from $a$ to $b$ is subdivided further the result become better and better.
 
 The general structure of the algorithm can very easily be run in parallel since it doesn't matter in which order the segments are added together and the segments also don't dependent on one another.
-In rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
+In Rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
 changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety but in this case the borrow checker will throw an error and the code wont compile.
 
 \begin{rustcode}
