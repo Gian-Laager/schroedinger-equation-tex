@@ -1,5 +1,5 @@
 \documentclass[11pt,DIV=10,final]{scrreprt} %11pt legt die generelle Schriftgrösse fest, DIV die Seitenaufteilung (Seitenränder): lieber viele Seiten als zu kleine Seitenränder!
-%ändert man "final" zu "draft", werden speicheraufwändige Elemente nicht eingebunden: Genau das richtige für die Plagiatsprüfung
+%ändert man "final" zu "draft'', werden speicheraufwändige Elemente nicht eingebunden: Genau das richtige für die Plagiatsprüfung
 
 %*************** Paket-Einbindungen: ******************
 \usepackage[utf8]{inputenc} %damit man auch Umlaute eingeben kann
@@ -12,13 +12,12 @@
 \usepackage{url} %für die gute Darstellung von Internet-Links
 \usepackage{hyperref} %für die gute Darstellung von Internet-Links
 % \usepackage[ngerman]{babel} %deutsches Sprachpaket
-\usepackage[english,ngerman]{babel} %deutsches Sprachpaket
+\usepackage[ngerman,english]{babel} %deutsches Sprachpaket
 \usepackage[round]{natbib} %für vereinfachte:wen/Querverweise
 \usepackage{listings} % für Quelltext mit Syntax-Highlighting
 \usepackage{listings-rust}
 \usepackage{hyperref}
 \usepackage{svg}
-\usepackage{XCharter}
 \usepackage[T1]{fontenc}
 \usepackage{tikz} %für tikz-Grafiken
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
@@ -65,7 +64,6 @@
 \providecommand{\rustinline}{\lstinline[language=Rust,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
 \setcitestyle{numbers,open={[},close={]}}
-\normalfont{}
 
 \begin{document}
 
@@ -89,9 +87,19 @@ Referent: Beat Temperli
 
 \pagenumbering{roman}   % i, ii, iii, iv, ...
 
-\tableofcontents %Inhaltsverzeichnis
+\tableofcontents
 
 \chapter{Introduction}\pagenumbering{arabic}  % 1, 2, 3, 4, ...
+Richard Feynmann one of the core people behind our modern theory of quantum mechanics repeatedly said: ``I think I can safely say that nobody understands quantum mechanics.''.
+Nothing behaves like in our every day lives. Everything is just a probability and nothing certaint.
+Even Schrödinger the inventor of the equation that governs all of those weird phenomena rejected the idea that there a just probabilities.
+
+In this paper we will try to understand this world a little bit better by looking at wave functions in a simplified universe.
+This universe only has 1 dimension and there will not be any sense of time. This means we will be able to actually see how the wave function looks like in a graph. In our universe it's a little bit more complicated since humans unfortunately can't think about 6 dimension.
+
+
+
+\chapter{Preliminary}
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
 behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.

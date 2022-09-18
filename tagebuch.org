@@ -1,0 +1,4 @@
+#+title: Tagebuch
+
+* 24.8.22 19:30 -
+- Start implementation according to Hall
