@@ -1,0 +1,15 @@
+#+title: Cli
+
+* Usage
+shroedinger_approx [parameters]
+
+* Parameters
+** Required
+- -E | --nenergy :: choose nth energy level. Must be a positive integer
+- -m | --mass :: mass of the system. Can be any floating point number (negative masses might not be reasonable)).
+- -o :: path to output directory (default ~output/~)
+
+** Optional
+- -s :: separate all the parts of the wave function
+- --view-factor :: determines how much of the wave function will be plotted should be a float >1. In detail if $a$ is the smallest solution to $V(a) = E$ and $b$ is the largest solution to $V(b) = E$ then the wave function will be plotted in the interval $(a - (b - a) * VIEW_FACTOR, b + (b - a) * VIEW_FACTOR)$
+- --app

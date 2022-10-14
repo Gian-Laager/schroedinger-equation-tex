@@ -18,8 +18,8 @@
 \usepackage{listings-rust}
 \usepackage{hyperref}
 \usepackage{svg}
-\usepackage[T1]{fontenc}
 \usepackage{tikz} %für tikz-Grafiken
+
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
 %************** Zusätzliche Einstellungen und eigene Befehle:  **********
@@ -58,30 +58,56 @@
 	extendedchars=true,
 	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1,
 	#1}}{}
+
+\lstnewenvironment{bashcode}[1][] % für abgesetzten rust code
+{\lstset{
+	language=bash,
+	%backgroundcolor=\color[HTML]{E8F2F2},
+	basicstyle=\small\ttfamily,
+	keywordstyle=\color{blue},
+	commentstyle=\color{brown},
+	%numberstyle=\tiny,
+	%frame=leftline,
+	%xleftmargin=.04\textwidth,
+	inputencoding=utf8,
+	extendedchars=true,
+	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1,
+	#1}}{}
 	
 \providecommand{\cppinline}{\lstinline[language=C++,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
 \providecommand{\rustinline}{\lstinline[language=Rust,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
-\setcitestyle{numbers,open={[},close={]}}
+\providecommand{\bashinline}{\lstinline[language=bash,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
+
+% \setcitestyle{numbers,open={[},close={]}}
+% \newcommand{\mi}{\mathrm{i}} %% roman "i"
+\newcommand{\mi}{{i\mkern1mu}}
+\newcommand{\compconj}[1]{%
+  \overline{#1}%
+}
+
+\newcommand{\deriv}[2]{%
+  \frac{d#1}{d#2}
+}
 
 \begin{document}
 
 \begin{titlepage}
 \mbox{}\vspace{0.1\textheight}
 \begin{center}
-\textbf{\Huge Approximating Solutions of the time independent Schrödinger equation}\\[3ex]
+\textbf{\Huge Approximating Solutions of the Time Independent Schrödinger Equation}\\[3ex]
 Gian Laager\\
 \today
 \vspace{0.05\textheight}
 \begin{center}
-	\includegraphics[width=.7\textwidth]{wave_func_square.pdf}
+	\includegraphics[width=.7\textwidth]{plots/wave_func_square.pdf}
 \end{center}
 \vspace{0.05\textheight}
 Maturaarbeit\\
 Kantonsschule Glarus\\
 Betreuer: Linus Romer\\
-Referent: Beat Temperli
+Referent: Elena Borisova
 \end{center}
 \end{titlepage}
 
@@ -95,8 +121,13 @@ Nothing behaves like in our every day lives. Everything is just a probability an
 Even Schrödinger the inventor of the equation that governs all of those weird phenomena rejected the idea that there a just probabilities.
 
 In this paper we will try to understand this world a little bit better by looking at wave functions in a simplified universe.
-This universe only has 1 dimension and there will not be any sense of time. This means we will be able to actually see how the wave function looks like in a graph. In our universe it's a little bit more complicated since humans unfortunately can't think about 6 dimension.
+This universe only has 1 dimension and there will not be any sense of time. This means we will be able to actually see how the wave function looks like in a graph.
 
+\section{Goals}
+The goal of this Maturaarbeit is to write a program, \bashinline{schroeding-approx} that calculates solutions to the time independent Schrödinger equation in 1 dimension for a large verity of potentials.
+We assume that the wave function, $\Psi(x)$ will diverge to 0 as $x$ goes to infinity.
+
+The program uses Planck units which means $c = \hbar = G = 1$
 
 
 \chapter{Preliminary}
@@ -105,17 +136,18 @@ In 1926 Erwin Schrödinger changed our understanding of quantum physics with the
 behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.
 \begin{center}
 \begin{math}
-  i\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\left[-{\frac {\hbar ^{2}}{2m}}{\frac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
+  \mi\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\left[-{\frac {\hbar ^{2}}{2m}}{\frac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
 \end{math}
 \end{center}
 Or more general
 \begin{center}
 \begin{math}
-  i\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
+  \mi\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
 \end{math}
 \end{center}
 
-The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a partial differential equation.
+The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a
+partial differential equation.
 \begin{center}
 \begin{math}
   E \psi (x)=\hat{H} \psi(x)
@@ -132,79 +164,54 @@ Even with the time independent equation it is very difficult to get analytical s
 approximate solutions of $\psi(x)$, perturbation theory, density functional field theory and WKB approximation. Perturbation theory's goal is to give an analytical approximation which means it
 is extremely difficult to implement for a computer. WKB on the other hand is much better since it is to some degree a step by step manual.
 \section{Rust}
-Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented para dimes. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
+Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented paradigms. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
 be able to write concurrent code without deadlocks and data races. This means calculations can utilize the full potential of the CPU without countless hours of debugging.
 
-Personally I like programming languages that support functional para dimes when I'm programming something that uses a lot of math since functional programming languages are designed according to mathematical concepts that also govern the problem. This usually results in rather neat solutions.
+Functional programming languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
 
 Rust as of the time of writing this document is not yet standardized meaning the code provided might no longer be correct with one of the newer Rust versions.
 
+In case you aren't familiar with Rust you it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
+
+\section{Complex Numbers}
+In quantum mechanics it's customary to work with complex numbers. Complex numbers are an extension to the real numbers, since Rust will do most of the heavy lifting here are the most important things that you should know
+\begin{align*}
+  \mi^{2} = -1 \\
+  z = a + b \mi \\
+  \operatorname{Re}(z) = a \\
+  \operatorname{Im}(z) = b \\
+  \compconj{z} = a - b \mi \\
+  \|z\|^{2} = a^{2} + b^{2} \\
+  e^{a+b\mi} = e^{a} \left( \cos(b) + \mi \sin(b) \right)
+\end{align*}
+
+$\mi$ is the imaginary unit,
+$z$ is the general form of a complex number where $\{a,b\} \in \mathbb{R}$,
+$\compconj{z}$ is the complex conjugate
+and $\|z\|^{2}$ is the norm square of $z$.
+The last equation is the Euler's formula, it rotates a number in the complex plane by $b$ radians.
+
+The complex plane is similar to the real number line, every complex number can be represented on this plane where $\operatorname{Re}(z)$ is the x-coordinate and $\operatorname{Im}(z)$ is the y-coordinate.
+
+\section{Gnuplot}
+Gnuplot is a cross platform plotting program that is very simple to use. \bashinline{schroedinger-approx} will output a file \bashinline{data.txt}, you can plot the function by typing \bashinline{gnuplot}
+and then typing
+\begin{bashcode}
+call "plot.gnuplot"
+\end{bashcode}
+to plot the real part of the wave function, or
+\begin{bashcode}
+call "plot_3d.gnuplot"
+\end{bashcode}
+to see the full complex wave function.
+
+If you'd like to learn more about Gnuplot you can read there user manual on \url{http://www.gnuplot.info/}
+
 \chapter{Methods}
-\section{Approximation Scheme}
-\label{meth:wkb:approximation-scheme}
-There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
-solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
-methods when calculated on a computer} \citep[Introduction]{van2014density}.
-
-The second is Density functional field theory, it has evolved over the years and is used heavily in chemistry to calculate properties of molecules and is also applicable for the time dependent Schrödinger
-equation. It is something that might be interesting to add to the program in the future.
-\\
-
-The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
-Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
-understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. This is not a physically correct explanation because one can not assume that $\hbar$ is small since it has units, but there is another interpretation that is physically more valid that will be discussed in section~\ref{meth:wkb:valid}.
-
-\subsection{Example}
-This example is from~\cite[An example]{wiki:wkb}.
-
-Lets solve the ordinary differential equation
-\[
-  \epsilon^{2} {d^{2}y \over dx^{2}} = Q(x)y
-\]
-where $Q(x)$ is an arbitrary function that is not $Q(x) = 0$ and $\epsilon$ is small. Note that this example relates to the Schrödinger equation
-where $\epsilon = -{\hbar^{2} \over 2m}$ and $Q(x) = E - V(x)$.
-
-Replace $y$ with
-\[
-  y(x) = \exp \left({1 \over \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
-\]
-resulting in the equation
-\begin{equation}
-\label{eq:wkbexpand}
-  \epsilon^{2}{1 \over \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
-\end{equation}
-As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
-\begin{equation}
-\label{eq:wkbapprox}
- \frac{\epsilon^2}{\delta^2}S_0'^2 + \frac{2\epsilon^2}{\delta}S_0'S_1' + \frac{\epsilon^2}{\delta}S_0'' = Q(x)
-\end{equation}
-If we go further and solve for $S_{0}$ and $S_{1}$ we will get that
-\begin{align}
-	S_0(x) = \pm \int_{x_0}^x \sqrt{Q(t)}\,dt \\
-	S_1(x) = -\frac{1}{4}\ln Q(x) + k_1
-\end{align}
-this means that our approximate solution of $y$ is
-\[
-y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left({\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left(-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
-\]
-here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
-
-\subsection{Validity}
-\label{meth:wkb:valid}
-\textit{\textbf{Dieser abschnitt ist momentan nur fürs Probe Kapitel muss ich noch besser nach Rechnen und genau verstehen}}
-
-The approximation that was made in equation~\ref{eq:wkbexpand} to~\ref{eq:wkbapprox} that we ignored the terms of $n > 2$ and assumed that they are small.
-\[
-\epsilon \left|{\frac {dQ}{dx}}\right|\ll Q(x)^{2}
-\]
-
-Without the assumption that $\hbar$ is infact \textit{small} the equation can also be interpreted such that the potential $V(x)$ has to vary slowly compared to $(V(x) - E)^{2}$.
-
-During calculations I noticed that it is crucial what values $x_{0}$ has sinse some times the results can not be valid.
 
 \section{Newtons Method}
 Newton's method, also called the Newton-Raphson method, is a root-finding algorithm that uses the first few terms of the Taylor series of a function $f(x)$ in the vicinity of a suspected root
-\citep{math:newton}. It makes a sequence of approximations of a root $x_{n}$ that in sure tent cases converges to the exact value where
+\citep{math:newton}. It makes a sequence of approximations of a root $x_{n}$ that in certain cases converges to the exact value where
 \[
   \lim _{n \to \infty}f(x_{n}) = 0
 \]
@@ -215,10 +222,10 @@ The sequence is defined as
   x_{n+1}=x_{n}-{f(x_{n}) \over f'(x_{n})}
 \end{align*}
 
-Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-1)(x+1)(x-2)$.
+Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-2)(x-1)(x+1)$.
 \begin{figure}
-	\includegraphics[width=\textwidth]{newtons-method.pdf}
-	\caption{Illustration of Newtons method, $f(x) = (x-1)(x+1)(x-2)$.}
+	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
+	\caption{Illustration of Newtons method, $f(x) = (x-1)(x-2)(x+1)$.}
 	\label{fig:newton-ilust}
 \end{figure}
 The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at $(guess, f(guess))$ the next guess will be where
@@ -283,7 +290,7 @@ areas under curves a trapeze is more efficient and accurate then the rectangle t
 
 \begin{figure}[h]
   \centering
-	\includegraphics[width=0.7\textwidth]{Integration_trapezoid.pdf}
+	\includegraphics[width=0.7\textwidth]{plots/Integration_trapezoid.pdf}
 	\caption{Illustration of integration with trapeze from \cite{wiki:integration-methods}.}
 	\label{fig:integration-ilust}
 \end{figure}
@@ -370,6 +377,195 @@ The actual integration happens in \rustinline{integrate}, it calculates the area
 take more time to create a new thread then to actually do the calculation, this has to be further investigated and 1000 might not be optimal. The calculations performed per thread are called a batch,
 after all batches have been calculated the boundaries between batches also has to be considered therefor they are added in the end with \rustinline{rest}
 
+\section{Transition Regions}
+The approximation that will be used splits $\Psi(x)$ into multiple parts that do not match perfectly together.
+
+\begin{figure}[h]\label{fig:cos_taylor}
+  \centering
+  \includegraphics[width=.9\textwidth]{plots/cos_taylor.pdf}
+  \caption{Example for joining functions}
+\end{figure}
+
+Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now we have to join the two functions at $x = \pi / 2$ such that its a mathematically smooth transition.
+\begin{align}
+  \label{joint:f}
+  f(x) = 1 - \frac{x^{2}}{2} \\
+  \label{joint:g}
+  g(x) = \frac{(x - \pi)^{2}}{2} -  1
+\end{align}
+
+As a first guess lets join $f(x)$ and $g(x)$ with a step function, this means that the joint function $h(x)$ will be
+\[
+  h(x) =  \left\{
+    \begin{array}{ll}
+           f(x) & x < \frac{\pi}{2} \\
+           g(x) & x > \frac{\pi}{2}
+    \end{array}
+    \right..
+\]
+This gives us~\ref{fig:joint-step} which is obviously not smooth.
+\begin{figure}[H]\label{fig:joint-step}
+  \centering
+  \includegraphics[width=.9\textwidth]{plots/step_joint.pdf}
+  \caption{Plot of h(x) with step joint}
+\end{figure}
+
+If we use the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum} with
+\begin{align*}
+    \delta = 0.5 \\
+    \alpha = \frac{\pi}{2} - \frac{\delta}{2} \\
+    \chi(x) = \sin^{2}\left(x \frac{\pi}{2}\right)
+\end{align*}
+this results in
+\[
+  h(x) =  \left\{
+    \begin{array}{ll}
+      f(x) & x < \alpha \\
+      g(x) & x > \alpha + \delta \\
+      f(x) + (g(x) - f(x))\chi(\frac{x-\alpha}{\delta}) & else
+    \end{array}
+    \right.
+\]
+which is mathematically smooth as we can see in figure~\ref{fig:joint-cos-hall} (proof in Appendix~\ref{proof:joint}).
+\begin{figure}[H]\label{fig:joint-cos-hall}
+  \centering
+  \includegraphics[width=.9\textwidth]{plots/hall_joint.pdf}
+  \caption{Plot of h(x) with Hall joint}
+\end{figure}
+
+\subsection{Implementation in Rust}
+In the program we can define a struct \rustinline{Joint} that implements \rustinline{Func<f64, Complex64>}. As in the example we need two functions $f(x)$ and $g(x)$ which we will rename to \rustinline{left} and \rustinline{right}. We will also need a variable $\alpha$ and $\delta$ which will be named \rustinline{cut} and \rustinline{delta}.
+\begin{rustcode}
+#[derive(Clone)]
+pub struct Joint {
+    pub left: Arc<dyn Func<f64, Complex64>>,
+    pub right: Arc<dyn Func<f64, Complex64>>,
+    pub cut: f64,
+    pub delta: f64,
+}
+
+impl Func<f64, Complex64> for Joint {
+    fn eval(&self, x: f64) -> Complex64 {
+        let chi = |x: f64| f64::sin(x * f64::consts::PI / 2.0).powi(2);
+        let left_val = left.eval(x);
+        return left_val + (right.eval(x) - left_val) * chi((x - self.cut) / self.delta)
+    }
+}
+\end{rustcode}
+
+In the proof we assume that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code we will not check this requirement since it would have a major impact on performance to check the derivative on every point.
+
+\section{Energy Levels}
+Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the Maslov-corrected Bhor-Sommerfeld condition which states that
+\begin{align}
+  n \in \mathbb{N}_{0}\\
+  C = \left\{x \in \mathbb{R}~|~V(x) < E \right\}\\
+  \int_{C}\sqrt{2m(E - V(x))}dx = 2\pi(n + 1/2)
+\end{align}\emph{this condition does not (in most cases) give the exact energy levels}~\citep{hall2013quantum}.
+It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation.
+
+To solve this problem for an arbitrary potential in a computer the set $C$ and the fact that $n$ has to be a non negative integer is not really helpful, but the condition can be rewritten to
+\begin{align}
+  p(x) = \left\{\begin{array}{ll}
+                  \sqrt{2m(E - V(x))} & V(x) < E \\
+                  0 & else
+                \end{array}
+                      \right. \\\label{eq:prog_cond}
+  \frac{1}{2\pi}\int_{-\infty}^{\infty}p(x) dx - \frac{1}{2} \mod{1} = 0
+\end{align}
+Unfortunately~\ref{eq:prog_cond} is not continuous which means that Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
+specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
+
+\section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
+There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
+solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
+methods when calculated on a computer} \citep[Introduction]{van2014density}.
+
+The second is Density functional field theory, it has evolved over the years and is used heavily in chemistry to calculate properties of molecules and is also applicable for the time dependent Schrödinger
+equation. It is something that might be interesting to add to the program in the future.
+\\
+
+The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
+Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
+understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}.
+\\
+
+WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solution. The tree parts are described as
+\begin{align}
+\label{eq:wkb:momentum}
+  p(x) = \sqrt{2m(|E - V(x)|)} \\
+\label{eq:wkb:t}
+  V(t) - E = 0 \\
+\label{eq:wkb:exp}
+  \psi^{WKB}_{exp}(x)= e^{\delta\mi} {c_{1} \over 2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
+\label{eq:wkb:osz}
+  \psi^{WKB}_{osz} (x)= {c_{1} \over \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\mi + \delta \mi\right) \\
+  u_{1} = -2 m \frac{dV}{dx}(t) \\
+\label{eq:airy}
+  \psi^{Airy}(x) = e^{(t - x + \delta)\mi} {c_{1} \sqrt{\pi} \over \sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
+\end{align}
+
+Since equation \ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
+
+\begin{figure}[h]\label{fig:wave_parts}
+  \centering
+  \includegraphics[width=.9\textwidth]{plots/square5half.pdf}
+  \caption{Left half of wave function with $N_{Energy} = 5 \Rightarrow E = 11.0$, $m = 2$, $V(x) = x^{2}$}
+\end{figure}
+In figure \ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponential decaying part $\psi^{WKB}_{exp} (x)$, equation \ref{eq:wkb:exp} is a modified version of the
+original version as described in \cite[p. 317, eq. 15.25]{hall2013quantum} where $b$ and $a$ are different solutions for $t$ of equation~\ref{eq:wkb:t}. The absolute symbol makes it possible to not
+differentiate between the case where $x < t$ and $x > t$. Further on a factor of $e^{\delta\mi}$ was added such that the imaginary part of $\psi^{WKB}_{exp}(x)$ is the same as in $\psi^{WKB}_{osz}(x)$.
+
+The blue part on the right is $\psi^{WKB}_{osz}(x)$. Again equation \ref{eq:wkb:osz} was expanded to result in the more general complex solution and it also works for both $\psi_{1}$ and $\psi_{2}$ in
+\cite[p. 316-317, Claim 15.7]{hall2013quantum}. \cite{hall2013quantum} assumes that $\delta = \pi / 4$ which doesn't work in the simple case of $V(x) = x^{2}$, in figure \ref{fig:wave_parts} $\delta = 0$ was used. This will be further discussed in section \ref{...}.
+
+\subsection{Example}
+This example is from~\cite[An example]{wiki:wkb}.
+
+Lets solve the ordinary differential equation
+\[
+  \epsilon^{2} {d^{2}y \over dx^{2}} = Q(x)y
+\]
+where $Q(x)$ is an arbitrary function that is not $Q(x) = 0$ and $\epsilon$ is small. Note that this example relates to the Schrödinger equation
+where $\epsilon = -{\hbar^{2} \over 2m}$ and $Q(x) = E - V(x)$.
+
+Replace $y$ with
+\[
+  y(x) = \exp \left({1 \over \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
+\]
+resulting in the equation
+\begin{equation}
+\label{eq:wkbexpand}
+  \epsilon^{2}{1 \over \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
+\end{equation}
+As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
+\begin{equation}
+\label{eq:wkbapprox}
+ \frac{\epsilon^2}{\delta^2}S_0'^2 + \frac{2\epsilon^2}{\delta}S_0'S_1' + \frac{\epsilon^2}{\delta}S_0'' = Q(x)
+\end{equation}
+If we go further and solve for $S_{0}$ and $S_{1}$ we will get that
+\begin{align}
+	S_0(x) = \pm \int_{x_0}^x \sqrt{Q(t)}\,dt \\
+	S_1(x) = -\frac{1}{4}\ln Q(x) + k_1
+\end{align}
+this means that our approximate solution of $y$ is
+\[
+y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left({\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left(-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
+\]
+here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
+
+\subsection{Validity}
+\label{meth:wkb:valid}
+\textit{\textbf{Dieser abschnitt ist momentan nur fürs Probe Kapitel muss ich noch besser nach Rechnen und genau verstehen}}
+
+The approximation that was made in equation~\ref{eq:wkbexpand} to~\ref{eq:wkbapprox} that we ignored the terms of $n > 2$ and assumed that they are small.
+\[
+\epsilon \left|{\frac {dQ}{dx}}\right|\ll Q(x)^{2}
+\]
+
+Without the assumption that $\hbar$ is infact \textit{small} the equation can also be interpreted such that the potential $V(x)$ has to vary slowly compared to $(V(x) - E)^{2}$.
+
+During calculations I noticed that it is crucial what values $x_{0}$ has sinse some times the results can not be valid.
 %
 \begin{appendix} %Anhang falls nötig
 %
@@ -377,13 +573,55 @@ after all batches have been calculated the boundaries between batches also has t
 At the moment the code is only available on \url{https://github.com/Gian-Laager/Schroedinger-Approximation}
 
 \chapter{Detailed Calculations}
-% TODO
+\section{Proofs}
+\subsection{Smoothness of Transitionfunction}\label{proof:joint}
+Given that
+\begin{align}
+  f: \mathbb{R} \rightarrow \mathbb{C} \\
+  g: \mathbb{R} \rightarrow \mathbb{C} \\
+  \{f, g\} \in C^{1} \\
+  \{\alpha, \delta\} \in \mathbb{C}
+\end{align}
+define \hspace*{\fill}~\citep{hall2013quantum}
+\begin{align}
+  \chi(x) = \sin^{2}\left(\frac{\pi(x - \alpha)}{2\delta}\right) \\
+  (f \sqcup g)(x) = f(x) + (g(x) - f(x)) \chi(x)
+\end{align}
+and proof that
+\begin{align}
+  \label{eq:deriv-f}
+  \frac{d(f \sqcup g)}{dx}(\alpha) = \frac{df}{dx}(\alpha) \\
+  \label{eq:deriv-g}
+  \frac{d(f \sqcup g)}{dx}(\alpha + \delta) = \frac{dg}{dx}(\alpha + \delta).
+\end{align}
+Calculate derivatives
+\begin{align}
+  \deriv{\chi}{x}(x) = \frac{\pi}{2 \delta} \sin\left(\frac{\pi (x - \alpha)}{\delta}\right)\\
+  \deriv{(f \sqcup g)}{x}(x) = \deriv{f}{x}(x) + \left(\deriv{g}{x}(x) - \deriv{f}{x}(x)\right)\chi(x) + (g(x) - f(x))\deriv{\chi}{x}(x).
+\end{align}
+Note that
+\begin{align}
+  \deriv{\chi}{x}(\alpha) = 0 \\
+  \chi(\alpha) = 0 \\
+  \deriv{\chi}{x}(\alpha + \delta) = 0 \\
+  \chi(\alpha + \delta) = 1
+\end{align}
+therefor
+\begin{align}
+  \deriv{(f \sqcup g)}{x}(\alpha) = \deriv{f}{x}(\alpha) + 0 \left(\deriv{g}{x}(\alpha) - \deriv{f}{x}(\alpha)\right) + 0 (g(x) - f(x)) = \deriv{f}{x}(\alpha)
+\end{align}
+and
+\begin{align}
+  \deriv{(f \sqcup g)}{x}(\alpha + \delta) = \deriv{f}{x}(\alpha + \delta) + 1 \left(\deriv{g}{x}(\alpha + \delta) - \deriv{f}{x}(\alpha + \delta)\right) + 0 (g(x) - f(x)) \\
+  \deriv{(f \sqcup g)}{x}(\alpha + \delta) = \deriv{f}{x}(\alpha + \delta) + \deriv{g}{x}(\alpha + \delta) - \deriv{f}{x}(\alpha + \delta) = \deriv{g}{x}(\alpha + \delta)~\blacksquare.
+\end{align}
+
 \end{appendix}
 \chapter*{Bildquellen}
 %
 Wo nicht anders angegeben, sind die Bilder aus dieser Arbeit selbst erstellt worden.
 %
-\bibliographystyle{plainnatromer}
+\bibliographystyle{apa}
 \bibliography{marbeit}
 
 %
