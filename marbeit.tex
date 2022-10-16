@@ -19,6 +19,7 @@
 \usepackage{hyperref}
 \usepackage{svg}
 \usepackage{tikz} %für tikz-Grafiken
+\usepackage{paracol}
 
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
@@ -46,6 +47,21 @@
 \lstnewenvironment{rustcode}[1][] % für abgesetzten rust code
 {\lstset{
 	language=Rust,
+	%backgroundcolor=\color[HTML]{E8F2F2},
+	basicstyle=\small\ttfamily,
+	keywordstyle=\color{blue},
+	commentstyle=\color{brown},
+	numbers=left,
+	%numberstyle=\tiny,
+	%frame=leftline,
+	%xleftmargin=.04\textwidth,
+	inputencoding=utf8,
+	extendedchars=true,
+	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1,
+	#1}}{}
+
+\lstnewenvironment{wslcode}[1][] % für abgesetzten rust code
+{\lstset{
 	%backgroundcolor=\color[HTML]{E8F2F2},
 	basicstyle=\small\ttfamily,
 	keywordstyle=\color{blue},
@@ -131,6 +147,7 @@ The program uses Planck units which means $c = \hbar = G = 1$
 
 
 \chapter{Preliminary}
+
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
 behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.
@@ -208,6 +225,17 @@ to see the full complex wave function.
 If you'd like to learn more about Gnuplot you can read there user manual on \url{http://www.gnuplot.info/}
 
 \chapter{Methods}
+\section{Program Architecture}
+The program has multiple interfaces or traits as they are called in Rust that give the program some abstraction.
+\begin{figure}[H]
+  \label{fig:uml-arch}
+  \centering
+  \includegraphics[width=\textwidth]{program_architecture.pdf}
+  \caption{UML diagram of program architecture}
+\end{figure}
+Since current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} we have to define our own trait for functions \rustinline{Func<A, R>} where \rustinline{A} is the type of the argument and \rustinline{R} is the return type. Later we will use this trait to implement functions for integration,evaluation and more useful utilities.
+
+\rustinline{WaveFunction} is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart}. With the \rustinline{range} function we can check when they are valid.
 
 \section{Newtons Method}
 Newton's method, also called the Newton-Raphson method, is a root-finding algorithm that uses the first few terms of the Taylor series of a function $f(x)$ in the vicinity of a suspected root
@@ -223,7 +251,7 @@ The sequence is defined as
 \end{align*}
 
 Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-2)(x-1)(x+1)$.
-\begin{figure}
+\begin{figure}[H]
 	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
 	\caption{Illustration of Newtons method, $f(x) = (x-1)(x-2)(x+1)$.}
 	\label{fig:newton-ilust}
@@ -254,32 +282,36 @@ $|{f(x_{n}) \over f'(x_{n})}|$ is less than \rustinline{precision}.
 From the structure of the algorithm it is very tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary jumps and the precision can (at least in theory) be $0$ without causing a stack overflow.
 
 \section{Derivatives}
-The precision gained by calculating derivatives analytically would come with a massive overhead both in development and in performance, one would have to implement all the rules of differentiation and create some representation of an actual function to which those rules could be applied. I wrote an implementation of this in Go and not much accuracy can actually be gained.
+Derivatives can be calculated numerically as in the C++ library Boost \citep{boost:calculating-derivative}.
+The author implemented a analytical system for derivatives in Go. From that experience the
+benefit is negligible compared to the increase in performance and in development time since
+every function is a special object.
 
-A much easier approach is to approximate it. The definition of a derivative of a function $f(x)$ is
-\[
-  {df \over dx} = \lim_{h \to 0}{f(x + h) - f(x) \over h}
-\]
-The limit can very easily be approximated with
-\[
-  {f(x + \frac{\delta}{2}) - f(x - \frac{\delta}{2}) \over \delta}
-\]
-were $\delta$ needs to be small yet not so small that it exceeds the 16 digit precision of double. I chose $\delta = \sqrt{2^{-52}}$, because $\epsilon = 2^{-52}$ is the smallest double precision floating point number where
-$1 + \epsilon \ne 1$. The square root ensures that still enough precision remains. After some further research the function should be implemented the same way as described by Boost~(C++~library).
-
-\pagebreak
 \begin{rustcode}
-pub fn derivative<F, R>(f: &F, x: f64) -> R
-    where
-        F: Fn(f64) -> R,
-        R: Sub<R, Output=R> + Div<f64, Output=R>,
+pub fn derivative<F, R>(func: &F, x: f64) -> R
+where
+    F: Fn(f64) -> R + ?Sized,
+    R: Sub<R, Output = R> + Div<f64, Output = R> + Mul<f64, Output = R> + Add<R, Output = R>,
 {
-    let epsilon = f64::epsilon().sqrt();
-    (f(x + epsilon / 2.0) - f(x - epsilon / 2.0)) / epsilon
+    let dx = f64::epsilon().sqrt();
+    let dx1 = dx;
+    let dx2 = dx1 * 2.0;
+    let dx3 = dx1 * 3.0;
+
+    let m1 = (func(x + dx1) - func(x - dx1)) / 2.0;
+    let m2 = (func(x + dx2) - func(x - dx2)) / 4.0;
+    let m3 = (func(x + dx3) - func(x - dx3)) / 6.0;
+
+    let fifteen_m1 = m1 * 15.0;
+    let six_m2 = m2 * 6.0;
+    let ten_dx1 = dx1 * 10.0;
+
+    return ((fifteen_m1 - six_m2) + m3) / ten_dx1;
 }
 \end{rustcode}
-
-\rustinline{f64::epsilon()} this is the difference between `1.0` and the next larger representable number~\citep{rust:f64:epsilon}. \rustinline{derivative} is implemented not only for \rustinline{f64} but for all types that support subtraction and division by \rustinline{f64} this means it can also be used for closures with real inputs and complex outputs.
+\rustinline{f64::epsilon().sqrt()} is approximately $0.000000014901161$.
+\rustinline{f64::epsilon()} is the smallest double precision floating point number where $1 +
+\epsilon \ne 1$. this has been chosen for $dx$ because it should be fairly precise.
 
 \section{Integration}
 The same principles apply to integrals as to derivative it would not be a great benefit to implement an analytic integration system. Integrals would also be much more difficult to implement than
@@ -476,6 +508,106 @@ To solve this problem for an arbitrary potential in a computer the set $C$ and t
 Unfortunately~\ref{eq:prog_cond} is not continuous which means that Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
 specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
 
+The implementation is quite strait forward we evaluate \ref{eq:prog_cond} for a number of energies and then check for discontinuities.
+\begin{rustcode}
+pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: (f64, f64)) -> f64 {
+    const ENERGY_STEP: f64 = 10.0;
+    const CHECKS_PER_ENERGY_STEP: usize = INTEG_STEPS;
+    let sommerfeld_cond = SommerfeldCond { mass, pot, view };
+
+    let mut energy = 0.0;
+    let mut i = 0;
+
+    loop {
+        let vals = evaluate_function_between(
+            &sommerfeld_cond,
+            energy,
+            energy + ENERGY_STEP,
+            CHECKS_PER_ENERGY_STEP,
+        );
+        let mut int_solutions = vals
+            .iter()
+            .zip(vals.iter().skip(1))
+            .collect::<Vec<(&Point<f64, f64>, &Point<f64, f64>)>>()
+            .par_iter()
+            .filter(|(p1, p2)| (p1.y - p2.y).abs() > 0.5 || p1.y.signum() != p2.y.signum())
+            .map(|ps| ps.1)
+            .collect::<Vec<&Point<f64, f64>>>();
+        int_solutions.sort_by(|p1, p2| cmp_f64(&p1.x, &p2.x));
+        if i + int_solutions.len() > n {
+            return int_solutions[n - i].x;
+        }
+        energy += ENERGY_STEP - (ENERGY_STEP / (CHECKS_PER_ENERGY_STEP as f64 + 1.0));
+        i += int_solutions.len();
+    }
+}
+\end{rustcode}
+First we check over the interval \rustinline{(0.0, ENERGY_STEP)} if there are not enough zeros we check the next interval of energies and so on until we found $n$ zeros.
+It's also possible that \ref{eq:prog_cond} is negative before the 0th energy there for we also have to check for normal zeros by comparing the signs of the values.
+
+The struct \rustinline{SommerfeldCond} is a \rustinline{Func<f64, f64>} that evaluates~\ref{eq:prog_cond}.
+
+\subsection{Accuracy}
+For a benchmark we will use
+\begin{align*}
+  m = 1 \\
+  V(x) = x^{2} \\
+  (-\infty, \infty) \approx (-200, 200).
+\end{align*}
+To get the actual values we will use Wolfram Language with WolframScript a programing language similar to Wolframalpha that can calculate the integral analytically.
+In Rust we can rewrite \rustinline{main} to
+\begin{rustcode}
+fn main() {
+    let output_dir = Path::new("output");
+
+    let values = (0..=50)
+        .into_iter()
+        .map(|n: usize| Point::<usize, f64> {
+            x: n,
+            y: energy::nth_energy(n, 1.0, &potentials::square, APPROX_INF),
+        })
+        .collect::<Vec<Point<usize, f64>>>();
+
+    std::env::set_current_dir(&output_dir).unwrap();
+    File::create("energy.txt")
+        .unwrap()
+        .write_all(plot::to_gnuplot_string(values).as_bytes())
+        .unwrap();
+}
+\end{rustcode}
+This will output all energy levels from $n = 0$ to $n = 50$.
+We can implement the same thing WolframScript
+
+\begin{wslcode}
+m = 1
+V[x_] = x^2
+
+nthEnergy[n_] = Module[{energys, energy},
+    sommerfeldIntegral[en_] = Integrate[Sqrt[2*m*(en - V[x])],
+                                            {x, -Sqrt[en], Sqrt[en]}]
+    energys =  Solve[sommerfeldIntegral[en] == 2*Pi*(n + 1/2), en] // N;
+    energy = en /. energys[[1]];
+    energy
+    ]
+
+energys = Table[{n, N@nthEnergy[n]}, {n, 0, 50}]
+
+csv = ExportString[energys, "CSV"]
+csv = StringReplace[csv, "," -> " "]
+Export["output/energies_exact.dat", csv]
+\end{wslcode}
+These programs will output two files \bashinline{energy.txt}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
+WolframScript. As a ruff estimate we would expect an error of $\pm \frac{10}{64000} \approx \pm 1.56 * 10^{-4}$, because the program checks for energies with that step size.
+
+\begin{figure}[H]\label{fig:energy-error}
+  \centering
+  \includegraphics[width=\textwidth]{plots/energy_error.pdf}
+  \caption{Absolute error of energy levels in square potential}
+\end{figure}
+When we plot the absolute error we get figure~\ref{fig:energy-error}. The error is a little higher than expected which is probably due to errors in the integral. Still the algorithm should be precise
+enough. If you'd like you could pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
+
+
 \section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
 There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
 solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
@@ -616,12 +748,127 @@ and
   \deriv{(f \sqcup g)}{x}(\alpha + \delta) = \deriv{f}{x}(\alpha + \delta) + \deriv{g}{x}(\alpha + \delta) - \deriv{f}{x}(\alpha + \delta) = \deriv{g}{x}(\alpha + \delta)~\blacksquare.
 \end{align}
 
+\chapter{Data Files}
+\section{Energies}
+\begin{paracol}{2}
+
+\bashinline{energy.txt}\label{dat:energy-rs}
+\begin{lstlisting}
+0 1.4143970999546869
+1 4.2427225425397275
+2 7.071360490007656
+3 9.89984218503414
+4 12.727855127619105
+5 15.55633682264559
+6 18.384818517672073
+7 21.213143965139928
+8 24.041938165049302
+9 26.870419860075785
+10 29.69843279777794
+11 32.52722700257012
+12 35.35570869759661
+13 38.18372163529877
+14 41.012203335208056
+15 43.84099753511743
+16 46.66901047281958
+17 49.49733591540462
+18 52.32628637263825
+19 55.15445556278185
+20 57.98309351024977
+21 60.811106452834736
+22 63.64005690518555
+23 66.46853860021204
+24 69.29639528547274
+25 72.1247207329406
+26 74.95335868040853
+27 77.78168412299357
+28 80.61047832778574
+29 83.43927252769512
+30 86.26697296051438
+31 89.09561090798232
+32 91.92378010300872
+33 94.75288680780098
+34 97.58121225038602
+35 100.40938144541242
+36 103.23739438311458
+37 106.06587607814106
+38 108.89435777316754
+39 111.72299572551829
+40 114.55178992542766
+41 117.38027162045414
+42 120.2082845630391
+43 123.0364537531827
+44 125.86493544820918
+45 128.69341714323565
+46 131.52174259070352
+47 134.35053679061292
+48 137.17854972831506
+49 140.0071876806658
+50 142.83566937569228
+\end{lstlisting}
+\switchcolumn{}
+\bashinline{energies_exact.dat}\label{dat:energy-wsl}
+\begin{lstlisting}
+0 1.4142135623730951
+1 4.242640687119286
+2 7.0710678118654755
+3 9.899494936611665
+4 12.727922061357857
+5 15.556349186104047
+6 18.38477631085024
+7 21.213203435596427
+8 24.041630560342618
+9 26.870057685088806
+10 29.698484809834998
+11 32.526911934581186
+12 35.35533905932738
+13 38.18376618407357
+14 41.01219330881976
+15 43.84062043356595
+16 46.66904755831214
+17 49.49747468305833
+18 52.32590180780452
+19 55.15432893255071
+20 57.9827560572969
+21 60.81118318204309
+22 63.63961030678928
+23 66.46803743153548
+24 69.29646455628166
+25 72.12489168102785
+26 74.95331880577405
+27 77.78174593052023
+28 80.61017305526643
+29 83.43860018001261
+30 86.2670273047588
+31 89.095454429505
+32 91.92388155425118
+33 94.75230867899738
+34 97.58073580374356
+35 100.40916292848975
+36 103.23759005323595
+37 106.06601717798213
+38 108.89444430272833
+39 111.72287142747452
+40 114.5512985522207
+41 117.3797256769669
+42 120.20815280171308
+43 123.03657992645928
+44 125.86500705120547
+45 128.69343417595167
+46 131.52186130069785
+47 134.35028842544403
+48 137.17871555019022
+49 140.00714267493643
+50 142.83556979968262
+\end{lstlisting}
+\end{paracol}
+
 \end{appendix}
 \chapter*{Bildquellen}
 %
 Wo nicht anders angegeben, sind die Bilder aus dieser Arbeit selbst erstellt worden.
 %
-\bibliographystyle{apa}
+\bibliographystyle{plainnatromer}
 \bibliography{marbeit}
 
 %
