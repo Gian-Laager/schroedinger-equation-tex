@@ -21,6 +21,7 @@
 \usepackage{tikz} %für tikz-Grafiken
 \usepackage{paracol}
 
+
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
 %************** Zusätzliche Einstellungen und eigene Befehle:  **********
@@ -98,7 +99,7 @@
 
 % \setcitestyle{numbers,open={[},close={]}}
 % \newcommand{\mi}{\mathrm{i}} %% roman "i"
-\newcommand{\mi}{{i\mkern1mu}}
+\newcommand{\mi}{{\text{i}}}
 \newcommand{\compconj}[1]{%
   \overline{#1}%
 }
@@ -141,12 +142,12 @@ This universe only has 1 dimension and there will not be any sense of time. This
 
 \section{Goals}
 The goal of this Maturaarbeit is to write a program, \bashinline{schroeding-approx} that calculates solutions to the time independent Schrödinger equation in 1 dimension for a large verity of potentials.
-We assume that the wave function, $\Psi(x)$ will diverge to 0 as $x$ goes to infinity.
+We assume that the wave function, $\Psi(x)$ will converges to 0 as $x$ goes to $\pm \infty$.
 
-The program uses Planck units which means $c = \hbar = G = 1$
 
 
 \chapter{Preliminary}
+
 
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
@@ -199,14 +200,13 @@ In quantum mechanics it's customary to work with complex numbers. Complex number
   \operatorname{Im}(z) = b \\
   \compconj{z} = a - b \mi \\
   \|z\|^{2} = a^{2} + b^{2} \\
-  e^{a+b\mi} = e^{a} \left( \cos(b) + \mi \sin(b) \right)
+  e^{\theta \mi} = \cos(\theta) + \mi \sin(\theta)
 \end{align*}
-
 $\mi$ is the imaginary unit,
 $z$ is the general form of a complex number where $\{a,b\} \in \mathbb{R}$,
 $\compconj{z}$ is the complex conjugate
 and $\|z\|^{2}$ is the norm square of $z$.
-The last equation is the Euler's formula, it rotates a number in the complex plane by $b$ radians.
+The last equation is the Euler's formula, it rotates a number in the complex plane by $\theta$ radians.
 
 The complex plane is similar to the real number line, every complex number can be represented on this plane where $\operatorname{Re}(z)$ is the x-coordinate and $\operatorname{Im}(z)$ is the y-coordinate.
 
@@ -223,6 +223,22 @@ call "plot_3d.gnuplot"
 to see the full complex wave function.
 
 If you'd like to learn more about Gnuplot you can read there user manual on \url{http://www.gnuplot.info/}
+
+\section{Planck Units}
+By using Planck units the equations get a little bit easier.
+Working in Planck units means that all fundamental constants are equal to 1.
+\[
+  c = k_{B} = G = \hbar = 1.
+\]
+This means that the constants will usually cancel out.
+
+To convert to SI units we can just multiply powers of the constants such that there unit results in one of the base units.
+
+\begin{align*}
+l_{\text{Planck}} = l_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{3}}}  && \sqrt{\cfrac{G \hbar}{c^{3}}}  \approx 1.616255(18) \cdot 10^{-35}~\text{m}   \\
+m_{\text{Planck}} = m_{\text{SI}} \sqrt{\cfrac{\hbar c}{G}}      && \sqrt{\cfrac{\hbar c}{G}}      \approx  2.176434(24) \cdot 10^{-8}~\text{kg} \\
+t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{\hbar G }{c^{5}}} && \sqrt{\cfrac{\hbar G }{c^{5}}} \approx 5.391247(60) \cdot 10^{-44}~\text{s}
+\end{align*}
 
 \chapter{Methods}
 \section{Program Architecture}
@@ -698,7 +714,49 @@ The approximation that was made in equation~\ref{eq:wkbexpand} to~\ref{eq:wkbapp
 Without the assumption that $\hbar$ is infact \textit{small} the equation can also be interpreted such that the potential $V(x)$ has to vary slowly compared to $(V(x) - E)^{2}$.
 
 During calculations I noticed that it is crucial what values $x_{0}$ has sinse some times the results can not be valid.
-%
+
+\section{Turning Points}
+A point $x$ where $V(x) = E$ is called a turning point. We assume that the WKB function is a good approximation in the region where
+\begin{align}
+  \label{eq:valid}
+  -\frac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
+\end{align}
+In order to do the actual calculation we need a range were the Airy function is valid.
+From equation~\ref{eq:valid} we can infer that the Airy function is valid where
+\begin{align}
+  \label{eq:valid-airy}
+  -\frac{1}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
+\end{align}
+We can assume that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on.
+
+The left boundary point must have a positive and the right a negative derivative. This means we can solve for roots and group them together by there derivatives.
+\\
+In order to find all roots we will use a modification of Newtons method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newtons method wont be able to find $x_{0}$ again.
+
+Further on since we check for roots inside the interval of \rustinline{APPROX_INF} we don't
+have a good first guess where the turning point might be. Because of this we will make $1000$
+guesses evenly distributed over the interval and invent a system that can rate how good of a
+guess this point could be.
+Newtons method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big. We will assume that $f'(x) = 1$ is optimal.
+As a rating we will use
+\[
+  \label{eq:rating-newton}
+  \sigma(x) = {|f(x)| \over -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)}
+\]
+where lower is better. This function is just an educated guess, but it has to have some properties, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
+\[lim_{\deriv{f}{x} \to 0} \sigma(x) = \infty\]
+If $f(x) = 0$ we found an actual root in the first guess meaning that $\sigma(x)$ should be 0.
+Formula~\ref{eq:rating-newton} doesn't satisfy this property since it's undefined if $f'(x) = 0$ and $f(x) = 0$, but we can extend it's definition such that
+\[
+  \sigma(x) = \left\{
+    \begin{array}{ll}
+    {|f(x)| \over -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)} & f(x) \ne 0~\text{and}~\deriv{f}{x} \ne 0 \\
+    0 & \text{else}
+    \end{array}\right.
+\]
+
+
+
 \begin{appendix} %Anhang falls nötig
 %
 \chapter{Source Code}
