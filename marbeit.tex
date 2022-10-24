@@ -154,13 +154,13 @@ In 1926 Erwin Schrödinger changed our understanding of quantum physics with the
 behave like waves he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.
 \begin{center}
 \begin{math}
-  \mi\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\left[-{\frac {\hbar ^{2}}{2m}}{\frac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
+  \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\left[-{\cfrac {\hbar ^{2}}{2m}}{\cfrac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
 \end{math}
 \end{center}
 Or more general
 \begin{center}
 \begin{math}
-  \mi\hbar {\frac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
+  \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
 \end{math}
 \end{center}
 
@@ -174,7 +174,7 @@ partial differential equation.
 or
 \begin{center}
 \begin{math}
-  -{\hbar^{2} \over 2m}  {d^{2} \psi \over dx^{2}} (x) + V(x) \psi(x) = E \psi(x)
+  -{\cfrac{\hbar^{2}}{2m}}  \cfrac{d^{2} \psi}{dx^{2}} (x) + V(x) \psi(x) = E \psi(x)
 \end{math}
 \end{center}
 
@@ -233,12 +233,14 @@ Working in Planck units means that all fundamental constants are equal to 1.
 This means that the constants will usually cancel out.
 
 To convert to SI units we can just multiply powers of the constants such that there unit results in one of the base units.
-
 \begin{align*}
-l_{\text{Planck}} = l_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{3}}}  && \sqrt{\cfrac{G \hbar}{c^{3}}}  \approx 1.616255(18) \cdot 10^{-35}~\text{m}   \\
-m_{\text{Planck}} = m_{\text{SI}} \sqrt{\cfrac{\hbar c}{G}}      && \sqrt{\cfrac{\hbar c}{G}}      \approx  2.176434(24) \cdot 10^{-8}~\text{kg} \\
-t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{\hbar G }{c^{5}}} && \sqrt{\cfrac{\hbar G }{c^{5}}} \approx 5.391247(60) \cdot 10^{-44}~\text{s}
+l_{\text{Planck}} = l_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{3}}}  && 1~\text{m}_{\text{Planck}}  \approx 1.616255(18) \cdot 10^{-35}~\text{m}  && \text{\citep{CODATAValuePlanckLength}} \\
+m_{\text{Planck}} = m_{\text{SI}} \sqrt{\cfrac{c \hbar}{G}}      && 1~\text{kg}_{\text{Planck}} \approx  2.176434(24) \cdot 10^{-8}~\text{kg} && \text{\citep{CODATAValuePlanckMass}} \\
+t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{5}}} && 1~\text{s}_{\text{Planck}}  \approx 5.391247(60) \cdot 10^{-44}~\text{s}  && \text{\citep{CODATAValuePlanckTime}}
 \end{align*}
+\hspace*{\fill}~\citep[Table 1]{gaarder2016gravitational} \\
+\\
+The program will take all of its in- and outputs in Planck units.
 
 \chapter{Methods}
 \section{Program Architecture}
@@ -263,7 +265,7 @@ Newton's method, also called the Newton-Raphson method, is a root-finding algori
 The sequence is defined as
 \begin{align*}
   x_{0}=a \\*
-  x_{n+1}=x_{n}-{f(x_{n}) \over f'(x_{n})}
+  x_{n+1}=x_{n}-\cfrac{f(x_{n})}{f'(x_{n})}
 \end{align*}
 
 Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-2)(x-1)(x+1)$.
@@ -293,7 +295,7 @@ pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
 \end{rustcode}
 
 In Rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision} the function will return if
-$|{f(x_{n}) \over f'(x_{n})}|$ is less than \rustinline{precision}.
+$\|cfrac{f(x_{n})}{f'(x_{n})}|$ is less than \rustinline{precision}.
 
 From the structure of the algorithm it is very tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary jumps and the precision can (at least in theory) be $0$ without causing a stack overflow.
 
@@ -345,7 +347,7 @@ areas under curves a trapeze is more efficient and accurate then the rectangle t
 
 Figure \ref{fig:integration-ilust} shows visually how the methods work, each blue trapeze from start ($a$) to end ($b$) has an area of
 \[
-\int _{a}^{b}f(x)\,dx\approx (b-a)f\left({\frac {a+b}{2}}\right).
+\int _{a}^{b}f(x)\,dx\approx (b-a)f\left({\cfrac {a+b}{2}}\right).
 \]
 One trapeze would be fairly inaccurate to calculate the area under the function but as the area from $a$ to $b$ is subdivided further the result become better and better.
 
@@ -437,17 +439,17 @@ The approximation that will be used splits $\Psi(x)$ into multiple parts that do
 Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now we have to join the two functions at $x = \pi / 2$ such that its a mathematically smooth transition.
 \begin{align}
   \label{joint:f}
-  f(x) = 1 - \frac{x^{2}}{2} \\
+  f(x) = 1 - \cfrac{x^{2}}{2} \\
   \label{joint:g}
-  g(x) = \frac{(x - \pi)^{2}}{2} -  1
+  g(x) = \cfrac{(x - \pi)^{2}}{2} -  1
 \end{align}
 
 As a first guess lets join $f(x)$ and $g(x)$ with a step function, this means that the joint function $h(x)$ will be
 \[
   h(x) =  \left\{
     \begin{array}{ll}
-           f(x) & x < \frac{\pi}{2} \\
-           g(x) & x > \frac{\pi}{2}
+           f(x) & x < \cfrac{\pi}{2} \\
+           g(x) & x > \cfrac{\pi}{2}
     \end{array}
     \right..
 \]
@@ -461,8 +463,8 @@ This gives us~\ref{fig:joint-step} which is obviously not smooth.
 If we use the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum} with
 \begin{align*}
     \delta = 0.5 \\
-    \alpha = \frac{\pi}{2} - \frac{\delta}{2} \\
-    \chi(x) = \sin^{2}\left(x \frac{\pi}{2}\right)
+    \alpha = \cfrac{\pi}{2} - \cfrac{\delta}{2} \\
+    \chi(x) = \sin^{2}\left(x \cfrac{\pi}{2}\right)
 \end{align*}
 this results in
 \[
@@ -470,7 +472,7 @@ this results in
     \begin{array}{ll}
       f(x) & x < \alpha \\
       g(x) & x > \alpha + \delta \\
-      f(x) + (g(x) - f(x))\chi(\frac{x-\alpha}{\delta}) & else
+      f(x) + (g(x) - f(x))\chi(\cfrac{x-\alpha}{\delta}) & else
     \end{array}
     \right.
 \]
@@ -519,7 +521,7 @@ To solve this problem for an arbitrary potential in a computer the set $C$ and t
                   0 & else
                 \end{array}
                       \right. \\\label{eq:prog_cond}
-  \frac{1}{2\pi}\int_{-\infty}^{\infty}p(x) dx - \frac{1}{2} \mod{1} = 0
+  \cfrac{1}{2\pi}\int_{-\infty}^{\infty}p(x) dx - \cfrac{1}{2} \mod{1} = 0
 \end{align}
 Unfortunately~\ref{eq:prog_cond} is not continuous which means that Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
 specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
@@ -613,7 +615,7 @@ csv = StringReplace[csv, "," -> " "]
 Export["output/energies_exact.dat", csv]
 \end{wslcode}
 These programs will output two files \bashinline{energy.txt}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
-WolframScript. As a ruff estimate we would expect an error of $\pm \frac{10}{64000} \approx \pm 1.56 * 10^{-4}$, because the program checks for energies with that step size.
+WolframScript. As a ruff estimate we would expect an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 * 10^{-4}$, because the program checks for energies with that step size.
 
 \begin{figure}[H]\label{fig:energy-error}
   \centering
@@ -645,12 +647,12 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
 \label{eq:wkb:t}
   V(t) - E = 0 \\
 \label{eq:wkb:exp}
-  \psi^{WKB}_{exp}(x)= e^{\delta\mi} {c_{1} \over 2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
+  \psi^{WKB}_{exp}(x)= e^{\delta\mi} \cfrac{c_{1}}{2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
 \label{eq:wkb:osz}
-  \psi^{WKB}_{osz} (x)= {c_{1} \over \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\mi + \delta \mi\right) \\
-  u_{1} = -2 m \frac{dV}{dx}(t) \\
+  \psi^{WKB}_{osz} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\mi + \delta \mi\right) \\
+  u_{1} = -2 m \cfrac{dV}{dx}(t) \\
 \label{eq:airy}
-  \psi^{Airy}(x) = e^{(t - x + \delta)\mi} {c_{1} \sqrt{\pi} \over \sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
+  \psi^{Airy}(x) = e^{(t - x + \delta)\mi} \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
 \end{align}
 
 Since equation \ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
@@ -672,33 +674,33 @@ This example is from~\cite[An example]{wiki:wkb}.
 
 Lets solve the ordinary differential equation
 \[
-  \epsilon^{2} {d^{2}y \over dx^{2}} = Q(x)y
+  \epsilon^{2} \cfrac{d^{2}y}{dx^{2}} = Q(x)y
 \]
 where $Q(x)$ is an arbitrary function that is not $Q(x) = 0$ and $\epsilon$ is small. Note that this example relates to the Schrödinger equation
-where $\epsilon = -{\hbar^{2} \over 2m}$ and $Q(x) = E - V(x)$.
+where $\epsilon = -\cfrac{\hbar^{2} }{ 2m}$ and $Q(x) = E - V(x)$.
 
 Replace $y$ with
 \[
-  y(x) = \exp \left({1 \over \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
+  y(x) = \exp \left(\cfrac{1 }{ \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
 \]
 resulting in the equation
 \begin{equation}
 \label{eq:wkbexpand}
-  \epsilon^{2}{1 \over \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + {1 \over \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
+  \epsilon^{2}\cfrac{1 }{ \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + \cfrac{1 }{ \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
 \end{equation}
 As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
 \begin{equation}
 \label{eq:wkbapprox}
- \frac{\epsilon^2}{\delta^2}S_0'^2 + \frac{2\epsilon^2}{\delta}S_0'S_1' + \frac{\epsilon^2}{\delta}S_0'' = Q(x)
+ \cfrac{\epsilon^2}{\delta^2}S_0'^2 + \cfrac{2\epsilon^2}{\delta}S_0'S_1' + \cfrac{\epsilon^2}{\delta}S_0'' = Q(x)
 \end{equation}
 If we go further and solve for $S_{0}$ and $S_{1}$ we will get that
 \begin{align}
 	S_0(x) = \pm \int_{x_0}^x \sqrt{Q(t)}\,dt \\
-	S_1(x) = -\frac{1}{4}\ln Q(x) + k_1
+	S_1(x) = -\cfrac{1}{4}\ln Q(x) + k_1
 \end{align}
 this means that our approximate solution of $y$ is
 \[
-y(x)\approx c_{1}Q^{-{\frac {1}{4}}}(x)\exp \left({\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\frac {1}{4}}}(x)\exp \left(-{\frac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
+y(x)\approx c_{1}Q^{-{\cfrac {1}{4}}}(x)\exp \left({\cfrac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\cfrac {1}{4}}}(x)\exp \left(-{\cfrac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
 \]
 here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
 
@@ -708,7 +710,7 @@ here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to 
 
 The approximation that was made in equation~\ref{eq:wkbexpand} to~\ref{eq:wkbapprox} that we ignored the terms of $n > 2$ and assumed that they are small.
 \[
-\epsilon \left|{\frac {dQ}{dx}}\right|\ll Q(x)^{2}
+\epsilon \left|{\cfrac {dQ}{dx}}\right|\ll Q(x)^{2}
 \]
 
 Without the assumption that $\hbar$ is infact \textit{small} the equation can also be interpreted such that the potential $V(x)$ has to vary slowly compared to $(V(x) - E)^{2}$.
@@ -719,13 +721,13 @@ During calculations I noticed that it is crucial what values $x_{0}$ has sinse s
 A point $x$ where $V(x) = E$ is called a turning point. We assume that the WKB function is a good approximation in the region where
 \begin{align}
   \label{eq:valid}
-  -\frac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
+  -\cfrac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
 \end{align}
 In order to do the actual calculation we need a range were the Airy function is valid.
 From equation~\ref{eq:valid} we can infer that the Airy function is valid where
 \begin{align}
   \label{eq:valid-airy}
-  -\frac{1}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
+  -\cfrac{1}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
 \end{align}
 We can assume that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on.
 
@@ -741,7 +743,7 @@ Newtons method works well if the value of $f(x)$ is small and $f'(x)$ is neither
 As a rating we will use
 \[
   \label{eq:rating-newton}
-  \sigma(x) = {|f(x)| \over -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)}
+  \sigma(x) = \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)}
 \]
 where lower is better. This function is just an educated guess, but it has to have some properties, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
 \[lim_{\deriv{f}{x} \to 0} \sigma(x) = \infty\]
@@ -750,12 +752,57 @@ Formula~\ref{eq:rating-newton} doesn't satisfy this property since it's undefine
 \[
   \sigma(x) = \left\{
     \begin{array}{ll}
-    {|f(x)| \over -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)} & f(x) \ne 0~\text{and}~\deriv{f}{x} \ne 0 \\
+    \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)} & f(x) \ne 0~\text{and}~\deriv{f}{x} \ne 0 \\
     0 & \text{else}
     \end{array}\right.
 \]
 
+\begin{figure}[H]\label{fig:simga-heat}
+  \centering
+  \includegraphics[width=0.9\textwidth]{plots/newton_rating_func.pdf}
+  \caption{Logarithmic heat diagram of $\sigma(x)$, darker/bluer is better}
+\end{figure}
+As we can see in figure~\ref{fig:simga-heat} where darker/bluer values are better than yellow/red areas that $\sigma(x)$ indeed has all of the desired properties.
+\\
+\\
+After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newtons method with it. We do this process 256 times by default. In theory we could therefor use the WKB approximation for potentials with up to 256 turning points.
 
+\begin{rustcode}
+fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
+    let phase_clone = phase.clone();
+    let validity_func = Arc::new(move |x: f64| {
+        1.0 / (2.0 * phase_clone.mass).sqrt() * derivative(&|t| (phase_clone.potential)(t), x).abs()
+            - ((phase_clone.potential)(x) - phase_clone.energy).pow(2)
+    });
+    let mut zeros = NewtonsMethodFindNewZero::new(validity_func, ACCURACY, 1e4 as usize);
+
+    (0..MAX_TURNING_POINTS).into_iter().for_each(|_| {
+        let modified_func = |x| zeros.modified_func(x);
+
+        let guess = make_guess(&modified_func, view, 1000);
+        guess.map(|g| zeros.next_zero(g));
+    });
+
+    let view = if view.0 < view.1 {
+        view
+    } else {
+        (view.1, view.0)
+    };
+    let unique_zeros = zeros
+        .get_previous_zeros()
+        .iter()
+        .filter(|x| **x > view.0 && **x < view.1)
+        .map(|x| *x)
+        .collect::<Vec<f64>>();
+    return unique_zeros;
+}
+\end{rustcode}
+Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{NewtonsMethodFindNewZero} is the modified version of Newtons method where all the roots are stored and its implemention of \rustinline{Func<f64, f64>} is just defined as
+\[
+  \cfrac{f(x)}{\prod\limits_{r \in Z} (x - r)}
+\]
+Where the set $Z$ is the set of all the zeros that have been found previously.
+After the 256 iterations we filter out all the zeros that aren't in the view.
 
 \begin{appendix} %Anhang falls nötig
 %
@@ -774,19 +821,19 @@ Given that
 \end{align}
 define \hspace*{\fill}~\citep{hall2013quantum}
 \begin{align}
-  \chi(x) = \sin^{2}\left(\frac{\pi(x - \alpha)}{2\delta}\right) \\
+  \chi(x) = \sin^{2}\left(\cfrac{\pi(x - \alpha)}{2\delta}\right) \\
   (f \sqcup g)(x) = f(x) + (g(x) - f(x)) \chi(x)
 \end{align}
 and proof that
 \begin{align}
   \label{eq:deriv-f}
-  \frac{d(f \sqcup g)}{dx}(\alpha) = \frac{df}{dx}(\alpha) \\
+  \cfrac{d(f \sqcup g)}{dx}(\alpha) = \cfrac{df}{dx}(\alpha) \\
   \label{eq:deriv-g}
-  \frac{d(f \sqcup g)}{dx}(\alpha + \delta) = \frac{dg}{dx}(\alpha + \delta).
+  \cfrac{d(f \sqcup g)}{dx}(\alpha + \delta) = \cfrac{dg}{dx}(\alpha + \delta).
 \end{align}
 Calculate derivatives
 \begin{align}
-  \deriv{\chi}{x}(x) = \frac{\pi}{2 \delta} \sin\left(\frac{\pi (x - \alpha)}{\delta}\right)\\
+  \deriv{\chi}{x}(x) = \cfrac{\pi}{2 \delta} \sin\left(\cfrac{\pi (x - \alpha)}{\delta}\right)\\
   \deriv{(f \sqcup g)}{x}(x) = \deriv{f}{x}(x) + \left(\deriv{g}{x}(x) - \deriv{f}{x}(x)\right)\chi(x) + (g(x) - f(x))\deriv{\chi}{x}(x).
 \end{align}
 Note that
