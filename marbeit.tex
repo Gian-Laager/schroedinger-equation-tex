@@ -21,7 +21,6 @@
 \usepackage{tikz} %für tikz-Grafiken
 \usepackage{paracol}
 
-
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
 %************** Zusätzliche Einstellungen und eigene Befehle:  **********
@@ -132,9 +131,31 @@ Referent: Elena Borisova
 
 \tableofcontents
 
+\pagebreak[4]
+
+{\noindent \bfseries \Huge Vorwort}
+\\[3ex]
+Der Rest der Arbeit wird in Englisch sein aber ich habe mich entschieden eine kleine Zusammenfassung zu schreiben, so dass jeder zumindest die Grundlagen meiner Arbeit versteht.
+Zu begin des 20. Jahrhunderts gab es einen Umschwung in der Physik, Quanten Mechanik wurde entdeckt. Diese neue Theorie kann nicht mehr präzise voraussagen machen wie es zuvor der Fall war.
+Man kann nur noch sagen mit welcher Wahrscheinlichkeit etwas passiert und ein Partikel kann an zwei Orten gleichzeitig sein.
+
+Vielleicht haben Sie schon einmal von Schrödingers Katze gehört. Dies war ein Gedankenexperiment von Schrödinger um auf zu zeigen wie absurd seine Theorie wirklich ist und dass sie nicht stimmen könne.
+Stell dir vor du schliesst deine Katze in eine Box ein. In dieser Box ist ein Atom das entweder zerfallen kann oder nicht. Dazu gibt es einen Detektor der misst ob das Atom zerfallen ist, in diesem Fall
+wird ein Gift frei gelassen und die Katze stirbt.
+Das Problem ist jetzt aber, dass dieses Atom den Regeln der Quanten Mechanik folgt und deshalb gleichzeitig bereits zerfallen ist und nicht zerfallen ist, die einzig logische Schlussfolgerung ist deshalb,
+dass \emph{die Katze gleichzeitig Tod und am leben ist}.
+
+In der Realität funktioniert es wahrscheinlich jedoch nicht so. Heisst das Universum ``entscheidet'' ob die Katze gestorben ist oder nicht, jedoch weiss man bis Heute nicht wann das Universum ``entscheidet''.
+
+Damit die Katze gleichzeitig Tod und Lebendig sein kann brauchen wir die Wellenfunktion. Sie beschreibt alles was in unserem Universum gerade passiert und ``speichert'' wie wahrscheinlich es ist, dass die Katze tot ist.
+
+In meiner Maturaarbeit habe ich ein Programm geschrieben das genau diese Wellenfunktion ausrechnet in einem sehr vereinfachten Universum. Weil ich schon lange mal wissen möchte wie genau dieses bizarre Objekt aussieht. Auf der Titel Seite ist eine dieser Wellenfunktionen abgebildet.
+
+\pagebreak[4]
+
 \chapter{Introduction}\pagenumbering{arabic}  % 1, 2, 3, 4, ...
 Richard Feynmann one of the core people behind our modern theory of quantum mechanics repeatedly said: ``I think I can safely say that nobody understands quantum mechanics.''.
-Nothing behaves like in our every day lives. Everything is just a probability and nothing certaint.
+Nothing behaves like in our every day lives. Everything is just a probability and nothing certain.
 Even Schrödinger the inventor of the equation that governs all of those weird phenomena rejected the idea that there a just probabilities.
 
 In this paper we will try to understand this world a little bit better by looking at wave functions in a simplified universe.
@@ -190,6 +211,17 @@ Functional programming languages are especially useful for mathematical problems
 Rust as of the time of writing this document is not yet standardized meaning the code provided might no longer be correct with one of the newer Rust versions.
 
 In case you aren't familiar with Rust you it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
+
+\section{Interpretation of Quantum Mechanics}
+The author believes in the many worlds interpretation of Hugh Everett. \emph{The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
+the fundamental entity, obeying at all times a deterministic wave equation.} \citep[p. 115]{dewitt2015many}. This means that the observer is also quantum mechanical and gets entangled with one particular
+state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is some what different to the popular explanation of many worlds but has the same results and is, at least to the author
+more reasonable.
+
+An important point for the author also was that the theory accepts quantum mechanics as it is and doesn't make unreasonable assumption such as that the observer plays an important role.
+
+On top of that this interpretation also discards the need for an ``observation'' in the program which would also be mathematically impossible \citep[p. 111]{dewitt2015many}.
+
 
 \section{Complex Numbers}
 In quantum mechanics it's customary to work with complex numbers. Complex numbers are an extension to the real numbers, since Rust will do most of the heavy lifting here are the most important things that you should know
