@@ -27,27 +27,25 @@
 \setkomafont{sectioning}{\rmfamily\bfseries\boldmath} % verwende für die Titel die selbe Schriftart wie für Fliesstext
 
 \tikzset{>=stealth} % schönere Pfeilspitzen in TikZ-Grafiken
-
-\lstnewenvironment{cppcode}[1][] % für abgesetzten C++ Code
-{\lstset{
-	language=C++,
-	%backgroundcolor=\color[HTML]{E8F2F2},
+\lstset{
+	backgroundcolor=\color[HTML]{E8F2F2},
+    breaklines=ture,
 	basicstyle=\small\ttfamily,
 	keywordstyle=\color{blue},
-	commentstyle=\color{brown}, 
+	commentstyle=\color{brown},
 	numbers=left,
 	%numberstyle=\tiny,
 	%frame=leftline,
 	%xleftmargin=.04\textwidth,
 	inputencoding=utf8,
 	extendedchars=true,
-	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1,
-	#1}}{}
+	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1}
 
 \lstnewenvironment{rustcode}[1][] % für abgesetzten rust code
 {\lstset{
 	language=Rust,
-	%backgroundcolor=\color[HTML]{E8F2F2},
+	backgroundcolor=\color[HTML]{E8F2F2},
+    breaklines=ture,
 	basicstyle=\small\ttfamily,
 	keywordstyle=\color{blue},
 	commentstyle=\color{brown},
@@ -62,8 +60,9 @@
 
 \lstnewenvironment{wslcode}[1][] % für abgesetzten rust code
 {\lstset{
-	%backgroundcolor=\color[HTML]{E8F2F2},
+	backgroundcolor=\color[HTML]{E8F2F2},
 	basicstyle=\small\ttfamily,
+    breaklines=ture,
 	keywordstyle=\color{blue},
 	commentstyle=\color{brown},
 	numbers=left,
@@ -78,7 +77,8 @@
 \lstnewenvironment{bashcode}[1][] % für abgesetzten rust code
 {\lstset{
 	language=bash,
-	%backgroundcolor=\color[HTML]{E8F2F2},
+	backgroundcolor=\color[HTML]{E8F2F2},
+    breaklines=ture,
 	basicstyle=\small\ttfamily,
 	keywordstyle=\color{blue},
 	commentstyle=\color{brown},
@@ -996,6 +996,97 @@ and
 50 142.83556979968262
 \end{lstlisting}
 \end{paracol}
+
+\chapter{Source Code}
+The source code is also available on the authors GitHub \\
+\url{https://github.com/Gian-Laager/Schroedinger-Approximation}\\[3ex]
+
+{\noindent \large \bfseries src/main.rs}
+\lstinputlisting[language=Rust]{code/src/main.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/airy.rs}
+\lstinputlisting[language=Rust]{code/src/airy.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/airy\_wave\_func.rs}
+\lstinputlisting[language=Rust]{code/src/airy_wave_func.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/check.rs}
+\lstinputlisting[language=Rust]{code/src/check.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/energy.rs}
+\lstinputlisting[language=Rust]{code/src/energy.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/integrals.rs}
+\lstinputlisting[language=Rust]{code/src/integrals.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/main.rs}
+\lstinputlisting[language=Rust]{code/src/main.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/newtons\_method.rs}
+\lstinputlisting[language=Rust]{code/src/newtons_method.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/plot.rs}
+\lstinputlisting[language=Rust]{code/src/plot.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/potentials.rs}
+\lstinputlisting[language=Rust]{code/src/potentials.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/tui.rs}
+\lstinputlisting[language=Rust]{code/src/tui.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/turning\_points.rs}
+\lstinputlisting[language=Rust]{code/src/turning_points.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/utils.rs}
+\lstinputlisting[language=Rust]{code/src/utils.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/wave\_function\_builder.rs}
+\lstinputlisting[language=Rust]{code/src/wave_function_builder.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries src/wkb\_wave\_func.rs}
+\lstinputlisting[language=Rust]{code/src/wkb_wave_func.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries lib/build.sh}
+\lstinputlisting[language=bash]{code/lib/build.sh}
+
+\vspace*{3ex}
+{\noindent \large \bfseries lib/go.mod}
+\lstinputlisting[]{code/lib/go.mod}
+
+\vspace*{3ex}
+{\noindent \large \bfseries lib/main.go}
+\lstinputlisting[language=Go]{code/lib/main.go}
+
+\vspace*{3ex}
+{\noindent \large \bfseries build.rs}
+\lstinputlisting[language=Rust]{code/build.rs}
+
+\vspace*{3ex}
+{\noindent \large \bfseries Cargo.toml}
+\lstinputlisting[language=Rust]{code/Cargo.toml}
+
+\vspace*{3ex}
+{\noindent \large \bfseries energy.wsl}
+\lstinputlisting[]{code/energy.wsl}
+
+\vspace*{3ex}
+{\noindent \large \bfseries exact.wsl}
+\lstinputlisting[]{code/exact.wsl}
 
 \end{appendix}
 \chapter*{Bildquellen}
