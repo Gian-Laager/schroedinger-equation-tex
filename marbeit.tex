@@ -156,7 +156,7 @@ In meiner Maturaarbeit habe ich ein Programm geschrieben das genau diese Wellenf
 \chapter{Introduction}\pagenumbering{arabic}  % 1, 2, 3, 4, ...
 Richard Feynmann one of the core people behind our modern theory of quantum mechanics repeatedly said: ``I think I can safely say that nobody understands quantum mechanics.''.
 Nothing behaves like in our every day lives. Everything is just a probability and nothing certain.
-Even Schrödinger the inventor of the equation that governs all of those weird phenomena rejected the idea that there a just probabilities.
+Even Schrödinger the inventor of the equation that governs all of those weird phenomena rejected the idea that there are just probabilities.
 
 In this paper we will try to understand this world a little bit better by looking at wave functions in a simplified universe.
 This universe only has 1 dimension and there will not be any sense of time. This means we will be able to actually see how the wave function looks like in a graph.
@@ -210,11 +210,11 @@ Functional programming languages are especially useful for mathematical problems
 
 Rust as of the time of writing this document is not yet standardized meaning the code provided might no longer be correct with one of the newer Rust versions.
 
-In case you aren't familiar with Rust you it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
+In case you aren't familiar with Rust, it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
 
 \section{Interpretation of Quantum Mechanics}
-The author believes in the many worlds interpretation of Hugh Everett. \emph{The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
-the fundamental entity, obeying at all times a deterministic wave equation.} \citep[p. 115]{dewitt2015many}. This means that the observer is also quantum mechanical and gets entangled with one particular
+The author believes in the many worlds interpretation of Hugh Everett. \emph{``The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
+the fundamental entity, obeying at all times a deterministic wave equation.''} \citep[p. 115]{dewitt2015many}. This means that the observer is also quantum mechanical and gets entangled with one particular
 state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is some what different to the popular explanation of many worlds but has the same results and is, at least to the author
 more reasonable.
 
@@ -307,7 +307,7 @@ Visually this looks like figure~\ref{fig:newton-ilust} $f(x) = (x-2)(x-1)(x+1)$.
 	\label{fig:newton-ilust}
 \end{figure}
 The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at $(guess, f(guess))$ the next guess will be where
-the tangent intersects the x-Axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula-Falsi.
+the tangent intersects the x-Axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula falsi.
 
 \pagebreak
 \begin{rustcode}\nopagebreak
@@ -330,6 +330,22 @@ In Rust the sequence is implemented with a function that takes a closure \rustin
 $\|cfrac{f(x_{n})}{f'(x_{n})}|$ is less than \rustinline{precision}.
 
 From the structure of the algorithm it is very tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary jumps and the precision can (at least in theory) be $0$ without causing a stack overflow.
+
+\section{Regula Falsi with Bisection}
+Newtons method fails if the first guess is at a maximum, since the step would go to infinity. For this case we can first use a bisection search to detect a sign change.
+We need to do a bisection search since Regula falsi requires two guesses.
+
+The algorithm itself is quite simple. To start we need
+\begin{align}
+  f(x): \mathbb{R} \to \mathbb{R} \\
+  \{a \in \mathbb{R}~|~f(a) \le 0\} \\
+  \{b \in \mathbb{R}~|~f(b) \ge 0\}.
+\end{align}
+Then we can draw a line between the two points $(a, f(a))$ and $(b, f(b))$. Then $a$ becomes
+the x-value where the line intersects the x-axis becomes the new $b$, when we do the process
+again with the new $b$ we will get our new value for $a$. We can repeat this process until we
+cross a fresh hold for the accuracy and the result will be the last inter section of the line
+with the x-axis.
 
 \section{Derivatives}
 Derivatives can be calculated numerically as in the C++ library Boost \citep{boost:calculating-derivative}.
@@ -537,6 +553,7 @@ impl Func<f64, Complex64> for Joint {
 
 In the proof we assume that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code we will not check this requirement since it would have a major impact on performance to check the derivative on every point.
 
+\chapter{Calculation}
 \section{Energy Levels}
 Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the Maslov-corrected Bhor-Sommerfeld condition which states that
 \begin{align}
@@ -689,65 +706,32 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
 
 Since equation \ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
 
-\begin{figure}[h]\label{fig:wave_parts}
+\begin{figure}[H]\label{fig:wave_parts}
   \centering
   \includegraphics[width=.9\textwidth]{plots/square5half.pdf}
   \caption{Left half of wave function with $N_{Energy} = 5 \Rightarrow E = 11.0$, $m = 2$, $V(x) = x^{2}$}
 \end{figure}
-In figure \ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponential decaying part $\psi^{WKB}_{exp} (x)$, equation \ref{eq:wkb:exp} is a modified version of the
+In figure~\ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponential decaying part $\psi^{WKB}_{exp} (x)$, equation \ref{eq:wkb:exp} is a modified version of the
 original version as described in \cite[p. 317, eq. 15.25]{hall2013quantum} where $b$ and $a$ are different solutions for $t$ of equation~\ref{eq:wkb:t}. The absolute symbol makes it possible to not
 differentiate between the case where $x < t$ and $x > t$. Further on a factor of $e^{\delta\mi}$ was added such that the imaginary part of $\psi^{WKB}_{exp}(x)$ is the same as in $\psi^{WKB}_{osz}(x)$.
 
 The blue part on the right is $\psi^{WKB}_{osz}(x)$. Again equation \ref{eq:wkb:osz} was expanded to result in the more general complex solution and it also works for both $\psi_{1}$ and $\psi_{2}$ in
 \cite[p. 316-317, Claim 15.7]{hall2013quantum}. \cite{hall2013quantum} assumes that $\delta = \pi / 4$ which doesn't work in the simple case of $V(x) = x^{2}$, in figure \ref{fig:wave_parts} $\delta = 0$ was used. This will be further discussed in section \ref{...}.
 
-\subsection{Example}
-This example is from~\cite[An example]{wiki:wkb}.
-
-Lets solve the ordinary differential equation
-\[
-  \epsilon^{2} \cfrac{d^{2}y}{dx^{2}} = Q(x)y
-\]
-where $Q(x)$ is an arbitrary function that is not $Q(x) = 0$ and $\epsilon$ is small. Note that this example relates to the Schrödinger equation
-where $\epsilon = -\cfrac{\hbar^{2} }{ 2m}$ and $Q(x) = E - V(x)$.
-
-Replace $y$ with
-\[
-  y(x) = \exp \left(\cfrac{1 }{ \delta} \sum_{n=0}^{\infty}{\delta^{n}S_{n}(x)}\right)
-\]
-resulting in the equation
-\begin{equation}
-\label{eq:wkbexpand}
-  \epsilon^{2}\cfrac{1 }{ \delta^{2}}\left(\sum_{n=0}^{\infty}{\delta^{n}S'_{n}(x)} + \cfrac{1 }{ \delta}\left(\sum_{n=0}^{\infty}{\delta^{n}S''_{n}(x)}\right)\right) = Q(x)
-\end{equation}
-As an approximation set the upper bound of the sum to be $2$ instead of $\infty$, then~\ref{eq:wkbexpand} can be written as
-\begin{equation}
-\label{eq:wkbapprox}
- \cfrac{\epsilon^2}{\delta^2}S_0'^2 + \cfrac{2\epsilon^2}{\delta}S_0'S_1' + \cfrac{\epsilon^2}{\delta}S_0'' = Q(x)
-\end{equation}
-If we go further and solve for $S_{0}$ and $S_{1}$ we will get that
-\begin{align}
-	S_0(x) = \pm \int_{x_0}^x \sqrt{Q(t)}\,dt \\
-	S_1(x) = -\cfrac{1}{4}\ln Q(x) + k_1
-\end{align}
-this means that our approximate solution of $y$ is
-\[
-y(x)\approx c_{1}Q^{-{\cfrac {1}{4}}}(x)\exp \left({\cfrac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)+c_{2}Q^{-{\cfrac {1}{4}}}(x)\exp \left(-{\cfrac {1}{\epsilon }}\int _{x_{0}}^{x}{\sqrt {Q(t)}}\,dt\right)
-\]
-here $c_{1}$, $c_{2}$ depend on the boundary conditions and can also be used to renormalize the function. $x_{0}$ will later be discussed in section~\textit{\textbf{(...)}}. It is important to have the right value for $x_{0}$ which depends on $V(x)$ and $E$ although I have not yet manged to find out the connection.
-
 \subsection{Validity}
-\label{meth:wkb:valid}
-\textit{\textbf{Dieser abschnitt ist momentan nur fürs Probe Kapitel muss ich noch besser nach Rechnen und genau verstehen}}
+When we look at the derivation of WKB we will see that equations \ref{eq:wkb:exp} and \ref{eq:wkb:osz} can only be valid if
+\begin{align*}
+  p(x) = \sqrt{V(x) - E} \\
+  \left|\frac{dp}{dx}(x)\right| \ll p^{2}(x)
+\end{align*}
+as~\cite{zwiebach2018lecture} showed in his lecture.
+But this would mean that WKB is only valid iff $V(x) > E$ because $p^{2}(x)$ would be negative otherwise.
+If this is the case this would imply that~\ref{eq:wkb:exp} can't be valid.
 
-The approximation that was made in equation~\ref{eq:wkbexpand} to~\ref{eq:wkbapprox} that we ignored the terms of $n > 2$ and assumed that they are small.
+We will assume that this contradiction is wrong and assume that WKB is valid if
 \[
-\epsilon \left|{\cfrac {dQ}{dx}}\right|\ll Q(x)^{2}
+  \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| < |V(x) - E|
 \]
-
-Without the assumption that $\hbar$ is infact \textit{small} the equation can also be interpreted such that the potential $V(x)$ has to vary slowly compared to $(V(x) - E)^{2}$.
-
-During calculations I noticed that it is crucial what values $x_{0}$ has sinse some times the results can not be valid.
 
 \section{Turning Points}
 A point $x$ where $V(x) = E$ is called a turning point. We assume that the WKB function is a good approximation in the region where
@@ -829,12 +813,25 @@ fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
     return unique_zeros;
 }
 \end{rustcode}
-Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{NewtonsMethodFindNewZero} is the modified version of Newtons method where all the roots are stored and its implemention of \rustinline{Func<f64, f64>} is just defined as
-\[
+Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{NewtonsMethodFindNewZero} is the modified version of Newtons method where all the roots are stored and its
+implementation of \rustinline{Func<f64, f64>} is just defined as
+\begin{align}
+  \label{eq:newton-modified}
   \cfrac{f(x)}{\prod\limits_{r \in Z} (x - r)}
-\]
+\end{align}
 Where the set $Z$ is the set of all the zeros that have been found previously.
 After the 256 iterations we filter out all the zeros that aren't in the view.
+Equation~\ref{eq:newton-modified} is implemented in \rustinline{NewtonsMethodFindNewZero}.
+Unfortunately this procedure can't be implement asynchronously since you have to know all
+previous zeros before you can find a new one.
+
+Once we found the zeros we need to group them as previously mentioned the derivative of the
+validity function (\ref{eq:valid-airy}) must be positive if the boundary point is on the left
+and negative when its on the right side of the turning point.
+It could be the case that if the turning point is in the view that one of the boundary points
+is actually outside the view. For this we can use Regula falsi combined with bisection.
+We will do this for both the left and right most turning point if there was only one boundary
+found.
 
 \begin{appendix} %Anhang falls nötig
 %
