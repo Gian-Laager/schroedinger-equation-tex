@@ -90,9 +90,9 @@
 	literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1,
 	#1}}{}
 	
-\providecommand{\cppinline}{\lstinline[language=C++,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
 \providecommand{\rustinline}{\lstinline[language=Rust,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
+
 
 \providecommand{\bashinline}{\lstinline[language=bash,basicstyle=\ttfamily,keywordstyle=\color{blue},commentstyle=\color{brown}, literate={ä}{{\"a}}1 {à}{{\`a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1 {è}{{\`e}}1 {é}{{\'e}}1]} % für Inline-C++ Code
 
@@ -733,6 +733,8 @@ We will assume that this contradiction is wrong and assume that WKB is valid if
   \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| < |V(x) - E|
 \]
 
+\subsection{Implementation}
+
 \section{Turning Points}
 A point $x$ where $V(x) = E$ is called a turning point. We assume that the WKB function is a good approximation in the region where
 \begin{align}
@@ -833,10 +835,67 @@ is actually outside the view. For this we can use Regula falsi combined with bis
 We will do this for both the left and right most turning point if there was only one boundary
 found.
 
+
+\section{Wave Function}
+To combine all of the different wave function parts we will create the \rustinline{WaveFunction} struct.
+First lets define the \rustinline{WaveFunctionPart} trait.
+\begin{rustcode}
+pub trait WaveFunctionPart: Func<f64, Complex64> + Sync + Send {
+    fn range(&self) -> (f64, f64);
+    fn as_func(&self) -> Box<dyn Func<f64, Complex64>>;
+}
+\end{rustcode}
+All that we need is a range in which the function is valid.
+Also~\cite[p. 317]{hall2013quantum} states that the oscillating parts of WKB might have to negated, because of this we will also introduce the \rustinline{WaveFunctionPartWithOp} trait.
+In addition to the wave function itself it will also store and operation as negate for example.
+\begin{rustcode}
+pub trait WaveFunctionPartWithOp: WaveFunctionPart {
+    fn get_op(&self) -> Box<fn(Complex64) -> Complex64>;
+    fn with_op(&self, op: fn(Complex64) -> Complex64) -> Box<dyn WaveFunctionPartWithOp>;
+    fn as_wave_function_part(&self) -> Box<dyn WaveFunctionPart>;
+}
+\end{rustcode}
+The two functions \rustinline{as_wave_function_part} and \rustinline{as_func} are to emulate trait up casting because in the current version of Rust this is still an experimental feature.
+\\
+\\
+\rustinline{ApproxPart} will be the implementation of \rustinline{WaveFunctionPartWithOp} that handles a wave function part that contains a \rustinline{AiryWaveFunction} and a \rustinline{WkbWaveFunction}.
+As suggested by~\cite{hall2013quantum} we will add joints between the WKB and Airy functions.
+
+\rustinline{PureWkb} can be used if there are no turning points. It just stores a \rustinline{WkbWaveFunction}. This version is just for completeness since it might be very inaccurate to only use a
+WKB function. This functionallity was just introduced for completeness.
+
+To construct a new \rustinline{WaveFunction} we will first calculate the energy with \rustinline{energy::nth_energy}. After this we can calculate the new view by running Newtons method on $V(x) - E$ to
+find the outer most turning points, then the view will be defined by \rustinline{t * view_factor} where \rustinline{t} is the turning point.
+
+Once we've calculated the view, we can calculate all the turning points with the \rustinline{AiryWaveFunction} constructor that will also give us all the Airy parts we will need later.
+If there were no turning points found in the view we can construct two \rustinline{WkbWaveFunction} and connect them in the middle of the view. Because the sign of the wave function might not
+match have to find a the best operation from
+\begin{rustcode}
+pub fn identity(c: Complex64) -> Complex64 {
+    c
+}
+
+pub fn conjugate(c: Complex64) -> Complex64 {
+    c.conj()
+}
+
+pub fn negative(c: Complex64) -> Complex64 {
+    -c
+}
+
+pub fn negative_conj(c: Complex64) -> Complex64 {
+    -c.conj()
+}
+\end{rustcode}
+This will be done in the \rustinline{find_best_op} function where we choose the operation that has the minimal error both with respect to the derivative and the value of the wave function.
+Mathematically we choose the operation $o(x)$ for which
+\[
+  |o(\psi_{0}(x)) - \psi_{1}(x)|^{2} + \left|o\left(\frac{d}{dx}\psi_{0}(x)\right) - \frac{d}{dx}\psi_{1}(x)\right|^{2}
+\]
+is minimal, $\psi_{0}(x)$ is the wave function to the left and $\psi_{1}(x)$ is the wave function to the right of the middle of the view.
+
 \begin{appendix} %Anhang falls nötig
 %
-\chapter{Source Code}
-At the moment the code is only available on \url{https://github.com/Gian-Laager/Schroedinger-Approximation}
 
 \chapter{Detailed Calculations}
 \section{Proofs}
