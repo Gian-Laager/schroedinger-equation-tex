@@ -952,6 +952,219 @@ be used to construct the previously discussed \rustinline{WaveFunction}.
 Its implementation of \rustinline{Func<f64, Complex64>} will then sum over all the results of
 the individual \rustinline{WaveFunction} structs.
 
+\chapter{Program Manual}
+In the \bashinline{src} directory you will find the \bashinline{main.rs} file.
+After the imports (lines with \rustinline{use}) you can find all the constants that can be
+configured. In the description below, (E) stands for ``expert'' and means that you should use the default unless you really know what you're doing.
+\begin{description}
+    \item[\Large{Concurrency Configurations}] Tune accuracy and performance
+        \begin{description}
+          \item[\small{INTEG\_STEPS}] The number of steps that will be used to integrate over an interval
+          \item[\small{TRAPEZE\_PER\_THREAD (E)}] The number of trapezes that are calculated on a
+                thread in sequence. This number must be smaller then
+                \rustinline{INTEG_STEPS}.
+          \item[\small{NUMBER\_OF\_POINTS}] The number of points that will be written to the output file.
+
+          \item[\small{APPROX\_INF}] This are the values for ``$\pm\infty$''. Where the first number
+                is $-\infty$ and the second number is $\infty$. Most importantly outside of
+                this interval $V(x) > E$.
+        \end{description}
+
+    \item[\Large{Joint configuration}] Adjust the width of joints
+        \begin{description}
+          \item[\small{AIRY\_TRANSITION\_FRACTION (E)}] When a joint between an Airy and a WKB
+                function has to be added, we have to know how wide the joint should be. The
+                width is calculated by taking the distance between the turning point
+                boundaries and multiplying it by this number.
+
+          \item[\small{WKB\_TRANSITION\_FRACTION (E)}] Same as the previous option just at the
+                boundary between two WKB parts. It takes the width of the whole WKB part and
+                multiplies it by this number to get the width of the joint.
+          \item[\small{ENABLE\_WKB\_JOINTS}] If set to \rustinline{true} joints will be added between
+                WKB wave function parts. If set to \rustinline{false} no joints will be added at this boundary. \rustinline{false} is recommended when plotting probabilities.
+
+          \item[\small{ENABLE\_AIRY\_JOINTS}] If set to \rustinline{true} joints will be added
+                at the boundary between Airy and WKB functions. \rustinline{false} no joints
+                will be added at these boundaries.
+        \end{description}
+
+  \item[\Large{Complex Results}] Since~\cite{hall2013quantum} does not work with complex
+        numbers you might get better results when setting all options to \rustinline{false}.
+        \begin{description}
+          \item[\small{COMPLEX\_AIRY}] If set to \rustinline{true} the airy function will output
+                complex numbers. This setting is recommended when using
+                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
+                outputted. Recommended when using \bashinline{plot.gnuplot}.
+
+          \item[\small{COMPLEX\_EXP\_WKB}] If set to \rustinline{true} the exponential WKB part will
+                output complex numbers. This setting is recommended when using
+                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
+                outputted. Recommended when using \bashinline{plot.gnuplot}.
+
+          \item[\small{COMPLEX\_OSZ\_WKB}] If set to \rustinline{true} the oscillating WKB part will
+                output complex numbers. This setting is recommended when using
+                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
+                outputted. Recommended when using \bashinline{plot.gnuplot}.
+        \end{description}
+\end{description}
+
+\section{Wave Function}\label{sec:manual:wave-func}
+When you only have one energy level you should use \rustinline{WaveFunction::new}.
+
+\begin{rustcode}
+    let wave_function = wave_function_builder::WaveFunction::new(
+        &/*potential*/,
+        /*mass*/,
+        /*nth energy*/,
+        APPROX_INF,
+        1.5,
+        ScalingType::/*Scaling*/,
+    );
+\end{rustcode}
+The example above has to placed right after the \rustinline{fn main()} line.
+You have to replace all the commentaries (\rustinline{/*...*/}) with the values you want.
+For the first you can choose a potential from section~\ref{sec:potentials} for this you
+can type \rustinline{potentials::/*potential*/}.
+\\
+For the Mass you can just use a normal float.
+\\
+``nth energy '' must be a positive integer (including 0) and is the nth energy level of the potential.
+\\
+And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-types}.
+
+\section{SuperPosition}
+To construct a super position you can add this to your main function
+\begin{rustcode}
+let wave_function = wave_function_builder::SuperPosition::new(
+    &/*potential*/,
+    /*mass*/,
+    &[
+        (/*nth energy*/, /*phase*/),
+        (/*nth energy*/, /*phase*/),
+        // ...
+    ],
+    APPROX_INF,
+    1.5, // view factor
+    ScalingType::/*scaling*/),
+);
+\end{rustcode}
+Just like in section~\ref{sec:manual:wave-func} you have to replace all the commentaries (\rustinline{/*...*/}) with the values you want.\\
+``potential'' you have to choose a potential from section~\ref{sec:potentials}.
+\\
+``mass'' your mass as a float.
+\\
+``nth energy '' must be a positive integer (including 0) and is the nth energy level of the potential.
+\\
+``phase'' a complex number that the wave function with the corresponding energy will be multiplied by. To make a complex number you can use \rustinline{complex(/*Re*/, /*Im*/)}.
+\\
+``// ...'' you can add as many energies as your computer can handle.
+\\
+And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-types}.
+
+\section{Plotting}
+For all the plotting methods mentioned below you'll need an output directory in which the files will be placed.
+\begin{rustcode}
+let output_dir = Path::new("output");
+\end{rustcode}
+The default is \emph{output}, you can choose any directory name that you'd like. The folder will be located where you ran the program.
+The data calculated by the program will be stored as space separated values like in the example below (the first line will not be in the output file).
+\begin{verbatim}
+  x   Re    Im
+  1.0 2.718 3.141
+  2.0 1.414 1.465
+\end{verbatim}
+Every line is a data point where the first number is the x-coordinate, the second the real part of $\Psi(x)$ and the third the imaginary part of $\Psi(x)$
+
+\subsection{WaveFunction}
+For a \rustinline{WaveFunction} as we've seen in section~\ref{sec:manual:wave-func} you have three options.
+\subsubsection{plot\_wavefunction}
+With \rustinline{plot::plot_wavefunction} the result will be plotted as one function in gnuplot.
+\begin{rustcode}
+plot::plot_wavefunction(&wave_function, output_dir, "data.txt");
+\end{rustcode}
+You can replace \emph{data.txt} with another file name.
+\subsubsection{plot\_wavefunction\_parts}
+\subsubsection{plot\_probability}
+
+
+\section{Potentials}\label{sec:potentials}
+\begin{description}
+\begin{minipage}{\textwidth}
+  \item[square] Normal square potential as used in~\cite{hall2013quantum}.
+        \[
+        x^{2}
+        \]
+        \begin{figure}[H]
+          \centering
+          \includegraphics[width=0.65\textwidth]{plots/square.pdf}
+        \end{figure}
+\end{minipage}
+\begin{minipage}{\textwidth}
+  \item[mexican\_hat] 4th degree polynomial that looks like a mexican hat, with 2 minima.
+        \[
+        (x-4)^{2}(x + 4)^{2}
+        \]
+        \begin{figure}[H]
+          \centering
+          \includegraphics[width=0.65\textwidth]{plots/mexican_hat.pdf}
+        \end{figure}
+\end{minipage}
+\begin{minipage}{\textwidth}
+  \item[double\_mexican\_hat] 6th degree polynomial that has 3 minima.
+        \[
+        (x-4)^{2}x^{2}(x + 4)^{2}
+        \]
+        \begin{figure}[H]
+          \centering
+          \includegraphics[width=0.65\textwidth]{plots/double_mexican_hat.pdf}
+        \end{figure}
+\end{minipage}
+\begin{minipage}{\textwidth}
+  \item[triple\_mexican\_hat] 8th degree polynomial that has 4 minima.
+        \[
+        (x - 6)^{2}(x - 3)^{2}(x + 3)^{2}(x + 6)^{2}
+        \]
+        \begin{figure}[H]
+          \centering
+          \includegraphics[width=0.65\textwidth]{plots/triple_mexican_hat.pdf}
+        \end{figure}
+\end{minipage}
+  \item[smooth\_step] Step function that goes to \rustinline{ENERGY_INF} outside the interval $(-5, 5)$. Joints were added at $\pm 5$ to make the function differentiable.
+\end{description}
+
+\subsection{Custom Potentials}\label{sec:custom-potentials}
+To create a custom potential you'll have to define a function like shown below.
+\begin{rustcode}
+fn my_potential(x: f64) -> f64 {
+    return /*some calculation*/;
+}
+\end{rustcode}
+\rustinline{my_potential} is the name that you can choose and have to use later when you're passing it to \rustinline{WaveFunction::new}.
+\rustinline{/*some calculation*/} can be any Rust code that results in a \rustinline{f64}.
+\\
+\subsubsection{Examples}
+Negative bell curve ($-e^{-x^{2}} + 1$)
+\begin{rustcode}
+fn neg_bell(x: f64) -> f64 {
+    return -(-x.powi(2)).exp();
+}
+\end{rustcode}
+
+\noindent General polynomial (might not work for all configurations)
+\begin{rustcode}
+const COEFFICIENTS: [f64;4] = [a, b, c, d]
+fn polynom(x: f64) -> f64 {
+    let mut result = 0.0;
+    for n in 0..COEFFICIENTS.len() {
+        result += x.powi(n) * COEFFICIENTS[n];
+    }
+    return result;
+}
+\end{rustcode}
+You need to set values for \rustinline{a}, \rustinline{b}, etc. and they need to be floating point numbers or you'll get error E0308. For example \rustinline{1} would cause an error but \rustinline{1.0}
+or \rustinline{3.141} are correct. You can add even more coefficients if you'd like. The 4 in the square brackets is the degree of the polynomial plus 1.
+The potential above would mathematically be $a + b x + c x^{2} + d x^{3}$.
+
 
 \begin{appendix} %Anhang falls nötig
 %
