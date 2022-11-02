@@ -862,7 +862,7 @@ The two functions \rustinline{as_wave_function_part} and \rustinline{as_func} ar
 As suggested by~\cite{hall2013quantum} we will add joints between the WKB and Airy functions.
 
 \rustinline{PureWkb} can be used if there are no turning points. It just stores a \rustinline{WkbWaveFunction}. This version is just for completeness since it might be very inaccurate to only use a
-WKB function. This functionallity was just introduced for completeness.
+WKB function. This functionality was just introduced for completeness.
 
 To construct a new \rustinline{WaveFunction} we will first calculate the energy with \rustinline{energy::nth_energy}. After this we can calculate the new view by running Newtons method on $V(x) - E$ to
 find the outer most turning points, then the view will be defined by \rustinline{t * view_factor} where \rustinline{t} is the turning point.
@@ -893,10 +893,68 @@ Mathematically we choose the operation $o(x)$ for which
   |o(\psi_{0}(x)) - \psi_{1}(x)|^{2} + \left|o\left(\frac{d}{dx}\psi_{0}(x)\right) - \frac{d}{dx}\psi_{1}(x)\right|^{2}
 \]
 is minimal, $\psi_{0}(x)$ is the wave function to the left and $\psi_{1}(x)$ is the wave function to the right of the middle of the view.
+The next step is to introduce joints in the middle of the view. After this we end up with the whole wave function.
+
+In the other case where there actually are turning points, we will iterate over all of them and construct a \rustinline{ApproxPart} from them.
+In order to define a range for the \rustinline{ApproxPart} we will add two more turning points at \rustinline{APPROX_INF.0} and \rustinline{APPROX_INF.1}
+Then we can iterate over all the turning points in triplets and construct a \rustinline{WkbWaveFunction} at the middle turning point.
+Once we've constructed all the \rustinline{WkbWaveFunction}s we can combine them with the \rustinline{AiryWaveFunction}s to construct the \rustinline{ApproxPart}s
+Just like in the case with no turning points we have to find an operation for each \rustinline{ApproxPart} using the \rustinline{find_best_op_wave_func_part} function.
+
+In case \rustinline{ENABLE_WKB_JOINTS} is \rustinline{true} we also have to introduce joints between all the \rustinline{ApproxPart}s.
+\\
+\\
+It has previously been mentioned that $\delta = \pi / 4$ does not work for all potentials. An attempt to correct this is implemented in the \rustinline{calc_phase_offset} function.
+When we consider the point where two \rustinline{WkbWaveFunction} meet the condition
+\[
+  \exp\left(\mi \int_{x}^{t_{0}}\sqrt{2m(|E - V(y)|)} dy + \mi \delta\right) =
+  \exp\left(\mi \int_{x}^{t_{1}}\sqrt{2m(|E - V(y)|)} dy - \mi \delta\right)
+\]
+has to hold for both turning points $t_{0}$ and $t_{1}$.
+To make it simpler lets use
+\begin{align}
+a = \int_{x}^{t_{0}}\sqrt{2m(|E - V(y)|)} dy \\
+b = \int_{x}^{t_{1}}\sqrt{2m(|E - V(y)|)} dy
+\end{align}
+therefor
+\[
+  e^{(a + \delta) \mi} = e^{(b - \delta)\mi}.
+\]
+When we solve for $\delta$ we get
+\[
+  \delta = \frac{b - a}{2}.
+\]
+
+Unfortunately according to~\cite{hall2013quantum} this solution might not be valid in terms
+of the Airy functions and it should be further investigated why $\delta = \pi / 4$ does not
+work in some cases. But at the time of writing this document no explanation has been found
+yet.
+\\
+\\
+Finally since the Schrödinger equation is linear the user can choose from 3 types of scaling.
+Where $a \in \mathbb{C}$.
+\begin{description}\label{sec:scaling-types}
+    \item[None] The solution wont be multiplied by anything.
+    \item[Mul(a)] The solution will be multiplied by $a$.
+  \item[Renormalize(a)] $\Psi(x)$ will be renormalized such that
+        $
+            \int_{-\infty}^{\infty} |a \Psi(x)|^{2} dx = 1
+        $. This can be useful to add a phase to the wave function.
+\end{description}
+
+\section{Super Position}
+Because the super position principal is also applicable to energies it is possible that
+$\Psi(x)$ is a sum of wave functions with different energies.
+
+On the implementation side this means that we can create a struct \rustinline{SuperPosition}
+that is constructed with a list of energy levels and \rustinline{ScalingType} that can
+be used to construct the previously discussed \rustinline{WaveFunction}.
+Its implementation of \rustinline{Func<f64, Complex64>} will then sum over all the results of
+the individual \rustinline{WaveFunction} structs.
+
 
 \begin{appendix} %Anhang falls nötig
 %
-
 \chapter{Detailed Calculations}
 \section{Proofs}
 \subsection{Smoothness of Transitionfunction}\label{proof:joint}
