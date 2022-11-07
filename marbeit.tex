@@ -29,7 +29,7 @@
 \tikzset{>=stealth} % schönere Pfeilspitzen in TikZ-Grafiken
 \lstset{
 	backgroundcolor=\color[HTML]{E8F2F2},
-    breaklines=ture,
+    breaklines=true,
 	basicstyle=\small\ttfamily,
 	keywordstyle=\color{blue},
 	commentstyle=\color{brown},
@@ -706,6 +706,10 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
 
 Since equation \ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
 
+The factor of $1/2$ in equation~\ref{eq:wkb:exp} is analogous to \citep[eq. 92]{robert2020wkb}. This means that it's only valid if the turning points aren't ``too close together''~\citep{robert2020wkb}.
+This will be a problem later when we look at some solutions. \cite{robert2020wkb} also mansions that there are extensions to WKB that can handle these cases. It would be interesting to add those to the
+program in the future.
+
 \begin{figure}[H]\label{fig:wave_parts}
   \centering
   \includegraphics[width=.9\textwidth]{plots/square5half.pdf}
@@ -1084,6 +1088,7 @@ plot::plot_wavefunction(&wave_function, output_dir, "data.txt");
 \end{rustcode}
 You can replace \emph{data.txt} with another file name.
 \subsubsection{plot\_wavefunction\_parts}
+
 \subsubsection{plot\_probability}
 
 
