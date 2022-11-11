@@ -884,103 +884,60 @@ found.
 
 
 \section{Wave Function}
-To combine all of the different wave function parts we will create the \rustinline{WaveFunction} struct.
-First lets define the \rustinline{WaveFunctionPart} trait.
+To combine all the \rustinline{WaveFunctionPart} structs, we will define the
+\rustinline{WaveFunction} struct. Under the hood it will also calculate all the variables
+and construct all the \rustinline{WaveFunctionPart} structs.
+
+First we need to calculate the energy for the given parameters that are passed to the
+constructor. Note the this energy will also be printed to the terminal.
 \begin{rustcode}
-pub trait WaveFunctionPart: Func<f64, Complex64> + Sync + Send {
-    fn range(&self) -> (f64, f64);
-    fn as_func(&self) -> Box<dyn Func<f64, Complex64>>;
-}
+    let energy = energy::nth_energy(n_energy, mass, &potential, approx_inf);
+    println!("{} Energy: {:.9}", Ordinal(n_energy).to_string(), energy);
 \end{rustcode}
-All that we need is a range in which the function is valid.
-Also~\cite[p. 317]{hall2013quantum} states that the oscillating parts of WKB might have to negated, because of this we will also introduce the \rustinline{WaveFunctionPartWithOp} trait.
-In addition to the wave function itself it will also store and operation as negate for example.
+
+Using the energy we can calculate the view. For this we need to find the two outermost turning
+points. This can be done by applying Newtons method to
+\[
+  V(x) - E
+\]
+with initial guesses \rustinline{approx_inf.0} for \rustinline{lower_bound} and
+\rustinline{approx_inf.1} for \rustinline{upper_bound}.
+The view will then be
 \begin{rustcode}
-pub trait WaveFunctionPartWithOp: WaveFunctionPart {
-    fn get_op(&self) -> Box<fn(Complex64) -> Complex64>;
-    fn with_op(&self, op: fn(Complex64) -> Complex64) -> Box<dyn WaveFunctionPartWithOp>;
-    fn as_wave_function_part(&self) -> Box<dyn WaveFunctionPart>;
-}
+(
+    lower_bound * (upper_bound - lower_bound) * view_factor,
+    upper_bound * (upper_bound - lower_bound) * view_factor,
+)
 \end{rustcode}
-The two functions \rustinline{as_wave_function_part} and \rustinline{as_func} are to emulate trait up casting because in the current version of Rust this is still an experimental feature.
-\\
-\\
-\rustinline{ApproxPart} will be the implementation of \rustinline{WaveFunctionPartWithOp} that handles a wave function part that contains a \rustinline{AiryWaveFunction} and a \rustinline{WkbWaveFunction}.
-As suggested by~\cite{hall2013quantum} we will add joints between the WKB and Airy functions.
+If Newtons method fails we will define the view to be \rustinline{approx_inf}.
 
-\rustinline{PureWkb} can be used if there are no turning points. It just stores a \rustinline{WkbWaveFunction}. This version is just for completeness since it might be very inaccurate to only use a
-WKB function. This functionality was just introduced for completeness.
+Once we've got the view, we can calculate all the turning points and there Airy functions along with them, using \rustinline{AiryWaveFunction::new}.
+In the case that there are turning points we can then take go through each turning point and
+also copy it's neighbors. For the outer most turning points we will take
+\rustinline{approx_inf}.
 
-To construct a new \rustinline{WaveFunction} we will first calculate the energy with \rustinline{energy::nth_energy}. After this we can calculate the new view by running Newtons method on $V(x) - E$ to
-find the outer most turning points, then the view will be defined by \rustinline{t * view_factor} where \rustinline{t} is the turning point.
+With these groups of 3 we can construct a \rustinline{WkbWaveFunction} for each of the
+turning points. However there were issues when dividing the oscillating part of the wave
+function was split into two parts with different turning points. According
+to~\cite{hall2013quantum} it should be mathematically indistinguishable when using either of
+the turning points, but there arise discontinuities at the transition region. Because of that
+it has been decided that only the left turning point will be used.
 
-Once we've calculated the view, we can calculate all the turning points with the \rustinline{AiryWaveFunction} constructor that will also give us all the Airy parts we will need later.
-If there were no turning points found in the view we can construct two \rustinline{WkbWaveFunction} and connect them in the middle of the view. Because the sign of the wave function might not
-match have to find a the best operation from
-\begin{rustcode}
-pub fn identity(c: Complex64) -> Complex64 {
-    c
-}
+Unfortunately in this method even though the function is continuous it will not be symmetric
+about the mid point of the oscillating region. This has the effect that the probabilities will
+be lower on the right none the less they should have the same probability.
+Because of the architecture of the program the oscillating part will still be split into two
+distinct regions.
 
-pub fn conjugate(c: Complex64) -> Complex64 {
-    c.conj()
-}
+While iterating over the turning points we can also calculate the ranges in which the
+functions are valid.
 
-pub fn negative(c: Complex64) -> Complex64 {
-    -c
-}
+Once we have all the \rustinline{WkbWaveFunction} instances we need to group them with the \rustinline{AiryWaveFunction} instances. Using those pairs we can finally construct all the
+\rustinline{ApproxPart} instances.
 
-pub fn negative_conj(c: Complex64) -> Complex64 {
-    -c.conj()
-}
-\end{rustcode}
-This will be done in the \rustinline{find_best_op} function where we choose the operation that has the minimal error both with respect to the derivative and the value of the wave function.
-Mathematically we choose the operation $o(x)$ for which
-\[
-  |o(\psi_{0}(x)) - \psi_{1}(x)|^{2} + \left|o\left(\frac{d}{dx}\psi_{0}(x)\right) - \frac{d}{dx}\psi_{1}(x)\right|^{2}
-\]
-is minimal, $\psi_{0}(x)$ is the wave function to the left and $\psi_{1}(x)$ is the wave function to the right of the middle of the view.
-The next step is to introduce joints in the middle of the view. After this we end up with the whole wave function.
-
-In the other case where there actually are turning points, we will iterate over all of them and construct a \rustinline{ApproxPart} from them.
-In order to define a range for the \rustinline{ApproxPart} we will add two more turning points at \rustinline{APPROX_INF.0} and \rustinline{APPROX_INF.1}
-Then we can iterate over all the turning points in triplets and construct a \rustinline{WkbWaveFunction} at the middle turning point.
-Once we've constructed all the \rustinline{WkbWaveFunction}s we can combine them with the \rustinline{AiryWaveFunction}s to construct the \rustinline{ApproxPart}s
-Just like in the case with no turning points we have to find an operation for each \rustinline{ApproxPart} using the \rustinline{find_best_op_wave_func_part} function.
-
-In case \rustinline{ENABLE_WKB_JOINTS} is \rustinline{true} we also have to introduce joints between all the \rustinline{ApproxPart}s.
-\\
-\\
-It has previously been mentioned that $\delta = \pi / 4$ does not work for all potentials. An attempt to correct this is implemented in the \rustinline{calc_phase_offset} function.
-When we consider the point where two \rustinline{WkbWaveFunction} meet the condition
-\[
-  \exp\left(\mi \int_{x}^{t_{0}}\sqrt{2m(|E - V(y)|)} dy + \mi \delta\right) =
-  \exp\left(\mi \int_{x}^{t_{1}}\sqrt{2m(|E - V(y)|)} dy - \mi \delta\right)
-\]
-has to hold for both turning points $t_{0}$ and $t_{1}$.
-To make it simpler lets use
-\begin{align}
-a = \int_{x}^{t_{0}}\sqrt{2m(|E - V(y)|)} dy \\
-b = \int_{x}^{t_{1}}\sqrt{2m(|E - V(y)|)} dy
-\end{align}
-therefor
-\[
-  e^{(a + \delta) \mi} = e^{(b - \delta)\mi}.
-\]
-When we solve for $\delta$ we get
-\[
-  \delta = \frac{b - a}{2}.
-\]
-
-Unfortunately according to~\cite{hall2013quantum} this solution might not be valid in terms
-of the Airy functions and it should be further investigated why $\delta = \pi / 4$ does not
-work in some cases. But at the time of writing this document no explanation has been found
-yet.
-\\
-\\
-Finally since the Schrödinger equation is linear the user can choose from 3 types of scaling.
-Where $a \in \mathbb{C}$.
-\begin{description}\label{sec:scaling-types}
+\begin{minipage}{\textwidth}
+\noindent Finally we need to apply the \rustinline{scaling} which may be one of the following options (where $a \in \mathbb{C}$):
+\begin{description}\label{sec:scaling-type}
     \item[None] The solution wont be multiplied by anything.
     \item[Mul(a)] The solution will be multiplied by $a$.
   \item[Renormalize(a)] $\Psi(x)$ will be renormalized such that
@@ -988,8 +945,18 @@ Where $a \in \mathbb{C}$.
             \int_{-\infty}^{\infty} |a \Psi(x)|^{2} dx = 1
         $. This can be useful to add a phase to the wave function.
 \end{description}
+\end{minipage}
+\\[3ex]
+In the case that no turning points are found WKB will be inaccurate. But for completeness we
+will assume that \rustinline{approx_inf} is a turning point. Then we can insert two
+\rustinline{WkbWaveFunction} instances without the Airy functions. This behavior is
+implemented in \rustinline{PureWkb}.
+Afterwards we apply the same scaling procedure (\ref{sec:scaling-type}) as if there were turning points.
 
-\section{Super Position}
+In this case you'll also get a warning in the terminal that no turning points were found.
+Because the results can be inaccurate.
+
+\subsection{Super Position}
 Because the super position principal is also applicable to energies it is possible that
 $\Psi(x)$ is a sum of wave functions with different energies.
 
