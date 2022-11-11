@@ -991,35 +991,12 @@ configured. In the description below, (E) stands for ``expert'' and means that y
                 width is calculated by taking the distance between the turning point
                 boundaries and multiplying it by this number.
 
-          \item[\small{WKB\_TRANSITION\_FRACTION (E)}] Same as the previous option just at the
-                boundary between two WKB parts. It takes the width of the whole WKB part and
-                multiplies it by this number to get the width of the joint.
           \item[\small{ENABLE\_WKB\_JOINTS}] If set to \rustinline{true} joints will be added between
-                WKB wave function parts. If set to \rustinline{false} no joints will be added at this boundary. \rustinline{false} is recommended when plotting probabilities.
-
-          \item[\small{ENABLE\_AIRY\_JOINTS}] If set to \rustinline{true} joints will be added
-                at the boundary between Airy and WKB functions. \rustinline{false} no joints
-                will be added at these boundaries.
+                Airy and WKB wave function parts. If set to \rustinline{false} no joints will be added at this boundary.
+          \item[\small{VALIDITY\_LL\_FACTOR (E)}] This factor gets used as $a$ in~\ref{eq:valid-airy}. Higher values will create larger ranges for Airy functions.
         \end{description}
 
-  \item[\Large{Complex Results}] Since~\cite{hall2013quantum} does not work with complex
-        numbers you might get better results when setting all options to \rustinline{false}.
-        \begin{description}
-          \item[\small{COMPLEX\_AIRY}] If set to \rustinline{true} the airy function will output
-                complex numbers. This setting is recommended when using
-                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
-                outputted. Recommended when using \bashinline{plot.gnuplot}.
 
-          \item[\small{COMPLEX\_EXP\_WKB}] If set to \rustinline{true} the exponential WKB part will
-                output complex numbers. This setting is recommended when using
-                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
-                outputted. Recommended when using \bashinline{plot.gnuplot}.
-
-          \item[\small{COMPLEX\_OSZ\_WKB}] If set to \rustinline{true} the oscillating WKB part will
-                output complex numbers. This setting is recommended when using
-                \bashinline{plot_3d.gnuplot}. \rustinline{false} only real values will be
-                outputted. Recommended when using \bashinline{plot.gnuplot}.
-        \end{description}
 \end{description}
 
 \section{Wave Function}\label{sec:manual:wave-func}
