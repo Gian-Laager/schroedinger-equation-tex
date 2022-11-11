@@ -739,12 +739,12 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
 \label{eq:wkb:t}
   V(t) - E = 0 \\
 \label{eq:wkb:exp}
-  \psi^{WKB}_{exp}(x)= e^{\delta\mi} \cfrac{c_{1}}{2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
+  \psi^{WKB}_{exp}(x)= \cfrac{c_{1}}{2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
 \label{eq:wkb:osz}
-  \psi^{WKB}_{osz} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\mi + \delta \mi\right) \\
+  \psi^{WKB}_{osz} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \cos\left(\int_{x}^{t}p(y) dy - \delta \right) \\
   u_{1} = -2 m \cfrac{dV}{dx}(t) \\
 \label{eq:airy}
-  \psi^{Airy}(x) = e^{(t - x + \delta)\mi} \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
+  \psi^{Airy}(x) = \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
 \end{align}
 
 Since equation \ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
@@ -792,9 +792,9 @@ In order to do the actual calculation we need a range were the Airy function is 
 From equation~\ref{eq:valid} we can infer that the Airy function is valid where
 \begin{align}
   \label{eq:valid-airy}
-  -\cfrac{1}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
+  -\cfrac{a}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
 \end{align}
-We can assume that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on.
+We can assume that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
 
 The left boundary point must have a positive and the right a negative derivative. This means we can solve for roots and group them together by there derivatives.
 \\
