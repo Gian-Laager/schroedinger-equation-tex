@@ -1,6 +1,5 @@
 \documentclass[11pt,DIV=10,final]{scrreprt} %11pt legt die generelle Schriftgrösse fest, DIV die Seitenaufteilung (Seitenränder): lieber viele Seiten als zu kleine Seitenränder!
 %ändert man "final" zu "draft'', werden speicheraufwändige Elemente nicht eingebunden: Genau das richtige für die Plagiatsprüfung
-
 %*************** Paket-Einbindungen: ******************
 \usepackage[utf8]{inputenc} %damit man auch Umlaute eingeben kann
 \usepackage[bitstream-charter]{mathdesign} % Charter als Standardschriftart
@@ -291,12 +290,7 @@ The program will take all of its in- and outputs in Planck units.
 \chapter{Methods}
 \section{Program Architecture}
 The program has multiple interfaces or traits as they are called in Rust that give the program some abstraction.
-In~\ref{fig:uml-arch} is a UML diagram of the architecture.
-  \label{fig:uml-arch}
-  \centering
-  \includegraphics[width=\textwidth]{program_architecture.pdf}
-  \caption{UML diagram of program architecture}
-\end{figure}
+In Appendix~\ref{fig:uml-arch} is a UML diagram of the architecture.
 Since current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} we have to define our own trait for functions \rustinline{Func<A, R>} where \rustinline{A} is the type of the argument and \rustinline{R} is the return type. Later we will use this trait to implement functions for integration,evaluation and more useful utilities.
 
 \rustinline{WaveFunction} is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart}. With the \rustinline{range} function we can check when they are valid.
@@ -740,8 +734,8 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
   V(t) - E = 0 \\
 \label{eq:wkb:exp}
   \psi^{WKB}_{exp}(x)= \cfrac{c_{1}}{2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
-\label{eq:wkb:osz}
-  \psi^{WKB}_{osz} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \cos\left(\int_{x}^{t}p(y) dy - \delta \right) \\
+\label{eq:wkb:osc}
+  \psi^{WKB}_{osc} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \cos\left(\int_{x}^{t}p(y) dy - \delta \right) \\
   u_{1} = -2 m \cfrac{dV}{dx}(t) \\
 \label{eq:airy}
   \psi^{Airy}(x) = \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
@@ -760,13 +754,13 @@ program in the future.
 \end{figure}
 In figure~\ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponential decaying part $\psi^{WKB}_{exp} (x)$, equation \ref{eq:wkb:exp} is a modified version of the
 original version as described in \cite[p. 317, eq. 15.25]{hall2013quantum} where $b$ and $a$ are different solutions for $t$ of equation~\ref{eq:wkb:t}. The absolute symbol makes it possible to not
-differentiate between the case where $x < t$ and $x > t$. Further on a factor of $e^{\delta\mi}$ was added such that the imaginary part of $\psi^{WKB}_{exp}(x)$ is the same as in $\psi^{WKB}_{osz}(x)$.
+differentiate between the case where $x < t$ and $x > t$. Further on a factor of $e^{\delta\mi}$ was added such that the imaginary part of $\psi^{WKB}_{exp}(x)$ is the same as in $\psi^{WKB}_{osc}(x)$.
 
-The blue part on the right is $\psi^{WKB}_{osz}(x)$. Again equation \ref{eq:wkb:osz} was expanded to result in the more general complex solution and it also works for both $\psi_{1}$ and $\psi_{2}$ in
+The blue part on the right is $\psi^{WKB}_{osc}(x)$. Again equation \ref{eq:wkb:osc} was expanded to result in the more general complex solution and it also works for both $\psi_{1}$ and $\psi_{2}$ in
 \cite[p. 316-317, Claim 15.7]{hall2013quantum}. \cite{hall2013quantum} assumes that $\delta = \pi / 4$ which doesn't work in the simple case of $V(x) = x^{2}$, in figure \ref{fig:wave_parts} $\delta = 0$ was used. This will be further discussed in section \ref{...}.
 
 \subsection{Validity}
-When we look at the derivation of WKB we will see that equations \ref{eq:wkb:exp} and \ref{eq:wkb:osz} can only be valid if
+When we look at the derivation of WKB we will see that equations \ref{eq:wkb:exp} and \ref{eq:wkb:osc} can only be valid if
 \begin{align*}
   p(x) = \sqrt{V(x) - E} \\
   \left|\frac{dp}{dx}(x)\right| \ll p^{2}(x)
@@ -1320,8 +1314,7 @@ and
 \end{paracol}
 
 \chapter{Source Code}
-\begin{figure}[H]
-  \label{fig:uml-arch}
+\begin{figure}[H]\label{fig:uml-arch}
   \centering
   \includegraphics[width=\textwidth]{program_architecture.pdf}
   \caption{UML diagram of program architecture}
