@@ -116,7 +116,7 @@ Gian Laager\\
 \today
 \vspace{0.05\textheight}
 \begin{center}
-	\includegraphics[width=.7\textwidth]{plots/wave_func_square.pdf}
+	\includegraphics[width=\textwidth]{plots/super-square-9-12-15.pdf}
 \end{center}
 \vspace{0.05\textheight}
 Maturaarbeit\\
@@ -700,8 +700,8 @@ csv = ExportString[energys, "CSV"]
 csv = StringReplace[csv, "," -> " "]
 Export["output/energies_exact.dat", csv]
 \end{wslcode}
-These programs will output two files \bashinline{energy.txt}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
-WolframScript. As a ruff estimate we would expect an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 * 10^{-4}$, because the program checks for energies with that step size.
+These programs will output two files \bashinline{energies_approx.dat}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
+WolframScript. As a ruff estimate we would expect an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$, because the program checks for energies with that step size.
 
 \begin{figure}[H]\label{fig:energy-error}
   \centering
@@ -872,6 +872,8 @@ is actually outside the view. For this we can use Regula falsi combined with bis
 We will do this for both the left and right most turning point if there was only one boundary
 found.
 
+\section{Wave Function Parts}
+All the equations of \
 
 \section{Wave Function}
 To combine all the \rustinline{WaveFunctionPart} structs, we will define the
