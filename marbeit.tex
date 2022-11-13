@@ -815,15 +815,15 @@ We will assume that this contradiction is wrong and assume that WKB is valid if
 For this we will create two functions \rustinline{psi_osc} and \rustinline{psi_exp}.
 We will use \rustinline{psi_osc} if $x$ is inside the classically allowed region and otherwise we will use \rustinline{psi_exp}.
 \begin{rustcode}
-    fn eval(&self, x: f64) -> Complex64 {
-        let val = if self.phase.energy < (self.phase.potential)(x) {
-            self.psi_exp(x)
-        } else {
-            self.psi_osc(x)
-        };
+fn eval(&self, x: f64) -> Complex64 {
+    let val = if self.phase.energy < (self.phase.potential)(x) {
+        self.psi_exp(x)
+    } else {
+        self.psi_osc(x)
+    };
 
-        return (self.op)(val);
-    }
+    return (self.op)(val);
+}
 \end{rustcode}
 The term \rustinline{self.op} has been an attempt to use both turning points for the oscillating region. It wasn't removed because the
 current method is not perfect either and it can be used in the future to improve the accuracy.
@@ -832,17 +832,17 @@ In the exponential part we will always use the corresponding turning point and b
 it is possible that the sign of the exponential part doesn't match with the sign of the exponential part.
 To fix this, we can define the \rustinline{get_exp_sign} function.
 \begin{rustcode}
-    pub fn get_exp_sign(&self) -> f64 {
-        let limit_sign = if self.turning_point_exp == self.turning_point_osc {
-            1.0
-        } else {
-            -1.0
-        };
+pub fn get_exp_sign(&self) -> f64 {
+    let limit_sign = if self.turning_point_exp == self.turning_point_osc {
+        1.0
+    } else {
+        -1.0
+    };
 
-        (self.psi_osc(self.turning_point_exp + limit_sign * f64::EPSILON.sqrt()) / self.c)
-            .re
-            .signum()
-    }
+    (self.psi_osc(self.turning_point_exp + limit_sign * f64::EPSILON.sqrt()) / self.c)
+        .re
+        .signum()
+}
 \end{rustcode}
 It calculates the limit of the sign of the oscillating region as $x$ approaches the turning point.
 \[
@@ -989,17 +989,17 @@ At the same time it also handles the joints between the Airy and WKB functions.
 Two joints are constructed and they have the highest ``priority'' when evaluating an ApproxPart for a given $x$.
 
 \begin{rustcode}
-    fn eval(&self, x: f64) -> Complex64 {
-        if is_in_range(self.airy_join_l.range(), x) && ENABLE_AIRY_JOINTS {
-            return self.airy_join_l.eval(x);
-        } else if is_in_range(self.airy_join_r.range(), x) && ENABLE_AIRY_JOINTS {
-            return self.airy_join_r.eval(x);
-        } else if is_in_range(self.airy.ts, x) {
-            return self.airy.eval(x);
-        } else {
-            return self.wkb.eval(x);
-        }
+fn eval(&self, x: f64) -> Complex64 {
+    if is_in_range(self.airy_join_l.range(), x) && ENABLE_AIRY_JOINTS {
+        return self.airy_join_l.eval(x);
+    } else if is_in_range(self.airy_join_r.range(), x) && ENABLE_AIRY_JOINTS {
+        return self.airy_join_r.eval(x);
+    } else if is_in_range(self.airy.ts, x) {
+        return self.airy.eval(x);
+    } else {
+        return self.wkb.eval(x);
     }
+}
 \end{rustcode}
 The term ``priority'' is used to say how far up the if statement the function is. Or in other words, functions with a higher priority are preferred. Because the joints overlap with both the ranges of the
 Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
@@ -1028,8 +1028,8 @@ and construct all the \rustinline{WaveFunctionPart} structs.
 First we need to calculate the energy for the given parameters that are passed to the
 constructor. Note the this energy will also be printed to the terminal.
 \begin{rustcode}
-    let energy = energy::nth_energy(n_energy, mass, &potential, approx_inf);
-    println!("{} Energy: {:.9}", Ordinal(n_energy).to_string(), energy);
+let energy = energy::nth_energy(n_energy, mass, &potential, approx_inf);
+println!("{} Energy: {:.9}", Ordinal(n_energy).to_string(), energy);
 \end{rustcode}
 Using the energy we can calculate the view as described in section~\ref{sec:view}.
 \begin{rustcode}
@@ -1103,6 +1103,7 @@ configured. In the description below, (E) stands for ``expert'' and means that y
     \item[\Large{Concurrency Configurations}] Tune accuracy and performance
         \begin{description}
           \item[\small{INTEG\_STEPS}] The number of steps that will be used to integrate over an interval
+
           \item[\small{TRAPEZE\_PER\_THREAD (E)}] The number of trapezes that are calculated on a
                 thread in sequence. This number must be smaller then
                 \rustinline{INTEG_STEPS}.
@@ -1113,15 +1114,20 @@ configured. In the description below, (E) stands for ``expert'' and means that y
                 this interval $V(x) > E$.
         \end{description}
 
-    \item[\Large{Joint configuration}] Adjust the width of joints
+    \item[\Large{Visual Configurations}] Adjust the width of joints
         \begin{description}
+          \item[\small{VIEW\_FACTOR}] This factor is used in~\ref{sec:view} as $f_{view}$. It determines in which range the output will be calculated. This depends heavily on the potential and the energy
+                and you probably will have to change it. If the wave function is two small and most of the plot is close to $0$ then this factor has to be lowered. If the wave function is not nearly 0 at
+                the boundary of the view, this factor should be increased. Note this factor does not influence the calculation itself.
+
+          \item[\small{ENABLE\_WKB\_JOINTS}] If set to \rustinline{true} joints will be added between
+                Airy and WKB wave function parts. If set to \rustinline{false} no joints will be added at this boundary.
+
           \item[\small{AIRY\_TRANSITION\_FRACTION (E)}] When a joint between an Airy and a WKB
                 function has to be added, we have to know how wide the joint should be. The
                 width is calculated by taking the distance between the turning point
                 boundaries and multiplying it by this number.
 
-          \item[\small{ENABLE\_WKB\_JOINTS}] If set to \rustinline{true} joints will be added between
-                Airy and WKB wave function parts. If set to \rustinline{false} no joints will be added at this boundary.
           \item[\small{VALIDITY\_LL\_FACTOR (E)}] This factor gets used as $a$ in~\ref{eq:valid-airy}. Higher values will create larger ranges for Airy functions.
         \end{description}
 
