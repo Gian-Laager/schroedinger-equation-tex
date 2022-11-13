@@ -929,7 +929,48 @@ We will do this for both the left and right most turning point if there was only
 found.
 
 \section{Wave Function Parts}
-All the equations of \
+All the equations of the WKB approximation split into multiple parts. This is also reflected in the program architecture.
+The trait \rustinline{WaveFunctionPart} represents one of these sections.
+\begin{rustcode}
+pub trait WaveFunctionPart: Func<f64, Complex64> + Sync + Send {
+    fn range(&self) -> (f64, f64);
+    fn as_func(&self) -> Box<dyn Func<f64, Complex64>>;
+}
+\end{rustcode}
+These parts all need to implement the \rustinline{Func<_>} trait and are only valid in the range returned by \rustinline{WaveFunctionPart::range}.
+
+As previously mentioned the architecture has originally been designed around the assumption that both turning points will be used in the oscillating region.
+Because of this there is a specialization of this structs that can work with so called ``operations''.
+Operations were used to make the transition between the two parts of the osculating regions smoother.
+An operation is just a function $f: \mathbb{C} \to \mathbb{C}$ that will be applied over the whole function.
+The author decided not to change the architecture to the new method because the program could in theory be extended further.
+The wave function parts that support operations implement the \rustinline{WaveFunctionPartWithOp} trait.
+
+\subsection{ApproxPart}
+An \rustinline{ApproxPart} is the function around a turning point. This includes the Airy, oscillating WKB and exponential WKB part.
+At the same time it also handles the joints between the Airy and WKB functions.
+
+Two joints are constructed and they have the highest ``priority'' when evaluating an ApproxPart for a given $x$.
+\begin{rustcode}
+    fn eval(&self, x: f64) -> Complex64 {
+        if is_in_range(self.airy_join_l.range(), x) && ENABLE_AIRY_JOINTS {
+            return self.airy_join_l.eval(x);
+        } else if is_in_range(self.airy_join_r.range(), x) && ENABLE_AIRY_JOINTS {
+            return self.airy_join_r.eval(x);
+        } else if is_in_range(self.airy.ts, x) {
+            return self.airy.eval(x);
+        } else {
+            return self.wkb.eval(x);
+        }
+    }
+\end{rustcode}
+The term ``priority'' is used to say how far up the if statement the function is. Or in other words, functions with a higher priority are preferred. Because the joints overlap with both the ranges of the
+Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
+because of this the WKB part has the least priority.
+
+As we can see, the check if the joints are even enabled happens here. Because \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
+remove the branches that are always false automatically (see Appendix~\ref{test:branch-elim}). This means that in theory the program should run a little faster if \rustinline{ENABLE_AIRY_JOINTS} is
+disabled. This has to be taken into account when benchmarking.
 
 \section{Wave Function}
 To combine all the \rustinline{WaveFunctionPart} structs, we will define the
@@ -942,31 +983,23 @@ constructor. Note the this energy will also be printed to the terminal.
     let energy = energy::nth_energy(n_energy, mass, &potential, approx_inf);
     println!("{} Energy: {:.9}", Ordinal(n_energy).to_string(), energy);
 \end{rustcode}
-
-Using the energy we can calculate the view. For this we need to find the two outermost turning
-points. This can be done by applying Newtons method to
-\[
-  V(x) - E
-\]
-with initial guesses \rustinline{approx_inf.0} for \rustinline{lower_bound} and
-\rustinline{approx_inf.1} for \rustinline{upper_bound}.
-The view will then be
+Using the energy we can calculate the view as described in section~\ref{sec:view}.
 \begin{rustcode}
 (
     lower_bound * (upper_bound - lower_bound) * view_factor,
     upper_bound * (upper_bound - lower_bound) * view_factor,
 )
 \end{rustcode}
-If Newtons method fails we will define the view to be \rustinline{approx_inf}.
 
-Once we've got the view, we can calculate all the turning points and there Airy functions along with them, using \rustinline{AiryWaveFunction::new}.
-In the case that there are turning points we can then take go through each turning point and
+Once we've got the view, we can calculate all the turning points and there Airy functions along with them, using \rustinline{AiryWaveFunction::new()}.
+In the case that there are turning points we can then go through each turning point and
 also copy it's neighbors. For the outer most turning points we will take
-\rustinline{approx_inf}.
+\rustinline{approx_inf} as its neighbor.
 
+\label{sec:osc_turnging_point_problem}
 With these groups of 3 we can construct a \rustinline{WkbWaveFunction} for each of the
 turning points. However there were issues when dividing the oscillating part of the wave
-function was split into two parts with different turning points. According
+function was split into two parts with different turning points. As previously mentioned according
 to~\cite{hall2013quantum} it should be mathematically indistinguishable when using either of
 the turning points, but there arise discontinuities at the transition region. Because of that
 it has been decided that only the left turning point will be used.
@@ -1047,7 +1080,7 @@ configured. In the description below, (E) stands for ``expert'' and means that y
 
 \end{description}
 
-\section{Wave Function}\label{sec:manual:wave-func}
+\section{WaveFunction}\label{sec:manual:wave-func}
 When you only have one energy level you should use \rustinline{WaveFunction::new}.
 
 \begin{rustcode}
