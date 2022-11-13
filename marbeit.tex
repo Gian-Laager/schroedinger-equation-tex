@@ -116,7 +116,7 @@ Gian Laager\\
 \today
 \vspace{0.05\textheight}
 \begin{center}
-	\includegraphics[width=0.9\textwidth]{plots/super-square-9-12-15.pdf}
+	\includegraphics[width=0.9\textwidth]{plots/super-square-9-12-15-title.pdf}
 \end{center}
 \vspace{0.05\textheight}
 Maturaarbeit\\
@@ -268,6 +268,43 @@ call "plot_3d.gnuplot"
 to see the full complex wave function.
 
 If you'd like to learn more about Gnuplot you can read there user manual on \url{http://www.gnuplot.info/}
+
+\section{Reading Complex Plots}
+In the case of this paper we will try to plot a function
+\[
+  f: \mathbb{R} \to \mathbb{C}.
+\]
+This means that the resulting plot will be 3 dimensional. The two main visualizations would be just to plot a 3D surface or add the phase of the complex number as a color.
+The first method works better if one can interact with the structure. However this is not really possible in a PDF or on a paper. This is why both options will be implemented.
+
+For example on the next page you have the plot from the title page as a 3D plot in comparison to the color plot.
+\pagebreak[4]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.76\textwidth]{plots/super-square-9-12-15-3d.pdf}
+  \caption{3D plot of super position of $V(x) = x^2$ and energies 9, 12 and 15}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.775\textwidth]{plots/super-square-9-12-15-color.pdf}
+  \caption{Color plot of super position of $V(x) = x^2$ and energies 9, 12 and 15}
+\end{figure}
+\pagebreak[4]
+As we can see the 3D plot is basically unusable since there is no depth and lighting would also be very difficult to do on a line such that we could actually see the depth.
+In the color plot every thing seems to be clear. Except that the values of the phase can't be read exactly.
+
+When plotting the function yourself I would still recommend the 3D plot because it's clearer when you can move it around.
+
+To get used this representation, have a look at figure~\ref{fig:color-to-phase-circle}.
+\begin{figure}[H]\label{fig:color-to-phase-circle}
+  \centering
+  \includegraphics[width=0.8\textwidth]{plots/color_circle.png}
+  \caption{Illustration of the mapping of an angle to color to represent complex numbers}
+\end{figure}
+Here we can see that we can assign a color to every argument of a complex number can be assigned a distinct color.
+For example $1 + 0 \mi$ would have the color cyan and $0 + 1 \mi$ would be purple.
+This graph is a handy tool to read the color plots that will be done later since it's easier to associate the angle with the color if the color is actually at that angle
+rather then displaying it radians.
 
 \section{Planck Units}
 By using Planck units the equations get a little bit easier.
