@@ -1241,7 +1241,7 @@ The potential above would mathematically be $a + b x + c x^{2} + d x^{3}$.
 
 \begin{appendix} %Anhang falls nötig
 %
-\chapter{Detailed Calculations}
+\chapter{Detailed Calculations and Tests}
 \section{Proofs}
 \subsection{Smoothness of Transitionfunction}\label{proof:joint}
 Given that
@@ -1285,10 +1285,72 @@ and
   \deriv{(f \sqcup g)}{x}(\alpha + \delta) = \deriv{f}{x}(\alpha + \delta) + \deriv{g}{x}(\alpha + \delta) - \deriv{f}{x}(\alpha + \delta) = \deriv{g}{x}(\alpha + \delta)~\blacksquare.
 \end{align}
 
+\section{Branch Elimination}\label{test:branch-elim}
+To check if branches with a constant condition of \rustinline{false} gets removed we will use ``Compiler Explorer'' on \url{https://godbolt.org/}.
+This is an online tool to generate the assembly of source code.
+The settings used for this test are ``Rust'' for the language, ``rustc 1.65.0'' for the compiler with flags ``-O''.
+\\[1ex]
+\begin{paracol}{2}
+{\noindent \bfseries Rust Code}
+\begin{rustcode}[numbers=none]
+const COND: bool = true;
+
+pub fn test(x: f64) -> f64 {
+    if x > 5.0 && COND {
+        return x % 5.0;
+    } else {
+        return x*x;
+    }
+}
+\end{rustcode}
+\switchcolumn
+{\noindent \bfseries Assembly}
+\begin{bashcode}[numbers=none]
+.LCPI0_0:
+        .quad   0x4014000000000000
+example::test:
+        push    rax
+        ucomisd xmm0, qword ptr [rip + .LCPI0_0]
+        jbe     .LBB0_1
+        movsd   xmm1, qword ptr [rip + .LCPI0_0]
+        call    qword ptr [rip + fmod@GOTPCREL]
+        pop     rax
+        ret
+.LBB0_1:
+        mulsd   xmm0, xmm0
+        pop     rax
+        ret
+\end{bashcode}
+\end{paracol}
+As we can see in the \rustinline{true} case the \bashinline{.LBB0_1} label was inserted which means the code will branch.
+\\[1ex]
+\begin{paracol}{2}
+{\noindent \bfseries Rust Code}
+\begin{rustcode}[numbers=none]
+const COND: bool = false;
+
+pub fn test(x: f64) -> f64 {
+    if x > 5.0 && COND {
+        return x % 5.0;
+    } else {
+        return x*x;
+    }
+}
+\end{rustcode}
+\switchcolumn
+{\noindent \bfseries Assembly}
+\begin{bashcode}[numbers=none]
+example::test:
+        mulsd   xmm0, xmm0
+        ret
+\end{bashcode}
+\end{paracol}
+In the \rustinline{false} case the compiler directly calculates $x^{2}$ directly without any checks since the first condition is always \rustinline{false}.
+
 \chapter{Data Files}
 \section{Energies}
-\begin{paracol}{2}
 
+\begin{paracol}{2}
 \bashinline{energies_approx.dat}\label{dat:energy-rs}
 \begin{lstlisting}[numbers=none]
 0 0.7071985499773434
