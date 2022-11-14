@@ -19,6 +19,7 @@
 \usepackage{svg}
 \usepackage{tikz} %für tikz-Grafiken
 \usepackage{paracol}
+\usepackage{subfigure}
 
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
@@ -1295,10 +1296,121 @@ You need to set values for \rustinline{a}, \rustinline{b}, etc. and they need to
 or \rustinline{3.141} are correct. You can add even more coefficients if you'd like. The 4 in the square brackets is the degree of the polynomial plus 1.
 The potential above would mathematically be $a + b x + c x^{2} + d x^{3}$.
 
+\chapter{Results}
+\section{Wave Functions}
+\subsection{Hall Example}\label{sec:resutl:hall}
+As a first result lets replicate the example from hall with the 39th energy of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-39.pdf}
+  \caption{Wave function of 39th energy with $V(x) = x^{2}$, $m = 1$ and $f_{view}=0.1$.}
+\end{figure}
+This result is very similar to the plot~\cite[fig. 15.5]{hall2013quantum}. The only difference is the joint between the Airy function and the exponential WKB part. In our case the two functions don't
+meat as nicely.
+Overall the most important thing ought to be the number of maxima and minima which do match.
+
+\subsection{Phase Shift}
+Because the Schrödinger equation is linear we can rotate the wave function in the complex plane. For an example we will use a pase of $e^{\mi \frac{\pi}{4}}$ on the wave function of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-12-pi4.pdf}
+  \caption{Wave function of 12th energy with $V(x) = x^{2}$, $m = 1$ rotated by $\frac{\pi}{4}$.}
+\end{figure}
+
+\subsection{0th Energy}
+\begin{minipage}{\textwidth}
+In quantum mechanics the 0th energy is not always 0. As an example we will take the 0th
+energy of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-0.pdf}
+  \caption{Wave function of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+Unfortunately there's a discontinuity at $x = 0$. This shouldn't happen when only using one
+turning point and it only seems to be a problem with the 0th energy
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-0-zoom.pdf}
+  \caption{Zoom of wave function of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+As far as the program is concerned $\Psi(x) = 0$ is a valid solution but this has to be done
+in a super position of the same energy with destructive interference.
+\[
+  \Psi_{super}(x) = 1 \cdot \Psi(x) - 1 \cdot \Psi(x) = 0
+\]
+In theory this is possible but can't be physically valid because the Schrödinger equation
+does not show the full picture. In quantum field theory the wave function would always
+oscillate in some way.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/super-square-0-0-destructive.pdf}
+  \caption{Destructive interference of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+
+$\Psi(x) = 0$ would still contain energy we just can't tell because energy usually only
+emerges in the time dependent Schrödinger equation.
+\end{minipage}
+
+
+\section{Mexican Hat Potential}
+For this example we will use the ``mexican hat'' potential.
+\[
+  V(x) = {(x - 4.0)}^{2} {(x + 4.0)}^{2}
+\]
+It is particularly interesting because it has a maxima. This means that at low engineries it will form two oscillations around the two minima.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-10.pdf}
+  \caption{Wave function of a mexican hat potential, with nth energy 10 and $m = 1$. The wave function oscillates in two intervals $(-4.85, -2.89)$ and $(2.89, 4.85)$. Between these intervals
+  function decease exponentially. The transition region from exponential WKB to Airy appears to have a bigger dependency then with a square potential. Even though the two functions should meat at the same point the exponential WKB part seems to have a larger magnitude.}
+\end{figure}
+
+\begin{minipage}{\textwidth}
+If the energy is high enough, the two oscillations will eventually merge into one as shown in figure~\ref{fig:mexican-hat-high-energy}.
+\begin{figure}[H]\label{fig:mexican-hat-high-energy}
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-56.pdf}
+  \caption{
+    Wave function of mexican hat potential, with nth energy 56 and $m = 1$. This is the first energy where the oscillating parts combine. The middle of the function has a rather low frequency compared
+    to the other oscillating parts.
+  }
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+  Unfortunately the program is not able to calculate the 55th energy because Newtons method fails to find the turnging points in the middle. And with 54th energy the program doesn't generate any errors
+  but the region around $x = 0$ can't be correct (Figure~\ref{}).
+\begin{figure}[H]\label{fig:mexican-hat-high-energy}
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-53.pdf}
+  \caption{
+    Wave function of mexican hat potential, with nth energy 55 and $m = 1$. This is the first energy where the oscillating parts combine. The middle of the function has a rather low frequency compared
+    to the other oscillating parts.
+  }
+\end{figure}
+\end{minipage}
+
 
 \begin{appendix} %Anhang falls nötig
 %
+
 \chapter{Detailed Calculations and Tests}
+\section{Additional Plots}
+\subsection{Mexican Hat}
+\begin{figure}[H]
+  \centering
+    \includegraphics[width=\textwidth]{plots/mexican-hat-54.pdf}
+    \caption{caption}%
+    \label{fig:mexican-hat-54}
+\end{figure}
+
+
 \section{Proofs}
 \subsection{Smoothness of Transitionfunction}\label{proof:joint}
 Given that
@@ -1342,6 +1454,14 @@ and
   \deriv{(f \sqcup g)}{x}(\alpha + \delta) = \deriv{f}{x}(\alpha + \delta) + \deriv{g}{x}(\alpha + \delta) - \deriv{f}{x}(\alpha + \delta) = \deriv{g}{x}(\alpha + \delta)~\blacksquare.
 \end{align}
 
+\section{Validity of 0 Wave Function}\label{proof:zero-wave-function}
+\begin{align}
+  \Psi(x) = 0 \\
+  \frac{1}{2m} \frac{d^{2}}{dx^{2}}\Psi(x) + V(x) \Psi(x)  = E \Psi(x) \\
+  \frac{1}{2m} \cdot 0 + V(x) \cdot 0 = E \cdot 0 \\
+  0 = 0~\blacksquare
+\end{align}
+There for $\Psi(x) = 0$ is a solution for all energies and all potentials.
 \section{Branch Elimination}\label{test:branch-elim}
 To check if branches with a constant condition of \rustinline{false} gets removed we will use ``Compiler Explorer'' on \url{https://godbolt.org/}.
 This is an online tool to generate the assembly of source code.
