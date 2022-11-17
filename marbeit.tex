@@ -120,10 +120,10 @@ Gian Laager\\
 	\includegraphics[width=0.9\textwidth]{plots/super-square-9-12-15-title.pdf}
 \end{center}
 \vspace{0.05\textheight}
-Maturaarbeit\\
+Matura thesis\\
 Kantonsschule Glarus\\[3ex]
 Supervisor: Linus Romer\\
-Referent: Elena Borisova
+Referent: Dr. Elena Borisova
 \end{center}
 \end{titlepage}
 
@@ -330,9 +330,9 @@ The program will take all of its in- and outputs in Planck units.
 
 \chapter{Methods}
 \section{Program Architecture}
-The program has multiple interfaces or traits as they are called in Rust that give the program some abstraction.
+The program has multiple interfaces, or traits as they are called in Rust, that give the program some abstraction.
 In Appendix~\ref{fig:uml-arch} is a UML diagram of the architecture.
-Since current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} we have to define our own trait for functions \rustinline{Func<A, R>} where \rustinline{A} is the type of the argument and \rustinline{R} is the return type. Later we will use this trait to implement functions for integration,evaluation and more useful utilities.
+Since current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} a custom trait will be defined for functions \rustinline{Func<A, R>} where \rustinline{A} is the type of the argument and \rustinline{R} is the return type. Later this trait will be used to implement functions for integration, evaluation and more utilities.
 
 \rustinline{WaveFunction} is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart}. With the \rustinline{range} function we can check when they are valid.
 
@@ -355,7 +355,7 @@ Visually this looks like figure~\ref{fig:newton-ilust} where $f(x) = (x-2)(x-1)(
 	\label{fig:newton-ilust}
 \end{figure}
 The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at $(guess, f(guess))$ the next guess will be where
-the tangent intersects the x-Axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula falsi.
+the tangent intersects the x-axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula falsi.
 
 \begin{rustcode}\nopagebreak
 pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
@@ -373,32 +373,32 @@ pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
 }
 \end{rustcode}
 
-In Rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision} the function will return if
-$\|cfrac{f(x_{n})}{f'(x_{n})}|$ is less than \rustinline{precision}.
+In Rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision}. The function will return if
+$\left|\cfrac{f(x_{n})}{f'(x_{n})}\right|$ is less than \rustinline{precision}.
 
-From the structure of the algorithm it is very tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary jumps and the precision can (at least in theory) be $0$ without causing a stack overflow.
+From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in theory) be $0$ without causing a stack overflow.
 
 \section{Regula Falsi with Bisection}
-Newtons method fails if the first guess is at a maximum, since the step would go to infinity. For this case we can first use a bisection search to detect a sign change.
-We need to do a bisection search since Regula falsi requires two guesses.
+Newtons method fails if the first guess is at a maximum, since the step would go to infinity. For these cases a bisection method will be applied until the sign of the function changes.
+This needs to done because Regula Falsi requires two guesses.
 
-The algorithm itself is quite simple. To start we need
+The algorithm itself is quite simple. To start define the parameters
 \begin{align}
   f(x): \mathbb{R} \to \mathbb{R} \\
   \{a \in \mathbb{R}~|~f(a) \le 0\} \\
   \{b \in \mathbb{R}~|~f(b) \ge 0\}.
 \end{align}
-Then we can draw a line between the two points $(a, f(a))$ and $(b, f(b))$. Then $a$ becomes
-the x-value where the line intersects the x-axis becomes the new $b$, when we do the process
-again with the new $b$ we will get our new value for $a$. We can repeat this process until we
-cross a fresh hold for the accuracy and the result will be the last inter section of the line
-with the x-axis.
+Then draw a line between the two points $(a, f(a))$ and $(b, f(b))$. Then $b$ becomes
+the x-value where the line intersects the x-axis, when this process is applied
+again with the new $b$ the resulting value will become the new $a$. This process can be
+repeated until a fresh hold is crossed for the accuracy and the result will be the last intersection of the line with the x-axis.
 
 \section{Derivatives}
 Derivatives can be calculated numerically as in the C++ library Boost \citep{boost:calculating-derivative}.
-The author implemented a analytical system for derivatives in Go. From that experience the
-benefit is negligible compared to the increase in performance and in development time since
-every function is a special object.
+The author implemented a analytical system for calculating derivatives in Go. From that
+experience the benefits of an analytical approach are negligible compared to the increase in
+performance and in development time of a numerical approximation because one would have to
+implement every function as a special object that could be differentiable using the \emph{chain rule}.
 
 \begin{rustcode}
 pub fn derivative<F, R>(func: &F, x: f64) -> R
@@ -424,14 +424,17 @@ where
 \end{rustcode}
 \rustinline{f64::epsilon().sqrt()} is approximately $0.000000014901161$.
 \rustinline{f64::epsilon()} is the smallest double precision floating point number where $1 +
-\epsilon \ne 1$. this has been chosen for $dx$ because it should be fairly precise.
+\epsilon \ne 1$. This value has been chosen for $dx$ because it should be fairly precise.
 
 \section{Integration}
-The same principles apply to integrals as to derivative it would not be a great benefit to implement an analytic integration system. Integrals would also be much more difficult to implement than
-derivatives since integrals can not be broken down in to many smaller integrals that can be computed easily instead it needs to be solved as is.
+The same principles apply to integrals as to derivatives, it wouldn't be a great benefit to
+implement an analytic integration system. Integrals would also be much more difficult to
+implement than derivatives since integrals can not be broken down in to many smaller
+integrals that can be computed easily. Instead it would have to be solved as is.
 
-One approach would be to use the same method as with the derivative, take the definition with the limit and use a small value but this method can be improved in this case, since integrals calculate
-areas under curves a trapeze is more efficient and accurate then the rectangle that results from the definition.
+One approach would be to use the same method as with the derivative, take the definition with the limit and use a small value. But this method can be improved, since integrals calculate
+areas under curves a trapeze is more efficient and accurate then the rectangle that results
+from the definition.
 
 \begin{figure}[h]
   \centering
@@ -444,11 +447,11 @@ Figure~\ref{fig:integration-ilust} shows visually how the methods work, each blu
 \[
 \int _{a}^{b}f(x)\,dx\approx (b-a)f\left({\cfrac {a+b}{2}}\right).
 \]
-One trapeze would be fairly inaccurate to calculate the area under the function but as the area from $a$ to $b$ is subdivided further the result become better and better.
+One trapeze would be fairly inaccurate to calculate the area under the function, but as the area from $a$ to $b$ is subdivided further the result become better and better.
 
 The general structure of the algorithm can very easily be run in parallel since it doesn't matter in which order the segments are added together and the segments also don't dependent on one another.
 In Rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
-changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety but in this case the borrow checker will throw an error and the code wont compile.
+changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety.
 
 \begin{rustcode}
 pub trait Func<A, R>: Sync + Send {
@@ -548,19 +551,21 @@ pub fn integrate<
 }
 \end{rustcode}
 The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
-take more time to create a new thread then to actually do the calculation, this has to be further investigated and 1000 might not be optimal. The calculations performed per thread are called a batch,
-after all batches have been calculated the boundaries between batches also has to be considered therefor they are added in the end with \rustinline{rest}.
+take more time to create a new thread then to actually do the calculation, these 1000 values are called a \emph{batch}.
+This parameter was chosen for the author's computer and 1000 might not be optimal for all CPUs.
+After all batches have been calculated the boundaries between batches also have to be considered therefor they are added in the end with \rustinline{rest}.
 
 \section{Transition Regions}
 The approximation that will be used splits $\Psi(x)$ into multiple parts that do not match perfectly together.
 
-\begin{figure}[h]\label{fig:cos_taylor}
+\begin{figure}[h]
   \centering
   \includegraphics[width=.9\textwidth]{plots/cos_taylor.pdf}
-  \caption{Example for joining functions}
+  \caption{Two example functions that should be joined at $x=\frac{\pi}{2}$. The functions are two Taylor series of cosine, they have been chosen as an example because they don't overlap and get
+  close together at $x = \frac{\pi}{2}.$}\label{fig:cos_taylor}
 \end{figure}
 
-Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now we have to join the two functions at $x = \pi / 2$ such that its a mathematically smooth transition.
+Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now the two functions have to joined at $x = \pi / 2$ such that its a mathematically smooth transition.
 \begin{align}
   \label{joint:f}
   f(x) = 1 - \cfrac{x^{2}}{2} \\
@@ -577,20 +582,20 @@ As a first guess lets join $f(x)$ and $g(x)$ with a step function, this means th
     \end{array}
     \right..
 \]
-This gives us~\ref{fig:joint-step} which is obviously not smooth.
-\begin{figure}[H]\label{fig:joint-step}
+This results in figure~\ref{fig:joint-step} which is obviously not smooth.
+\begin{figure}[H]
   \centering
   \includegraphics[width=.9\textwidth]{plots/step_joint.pdf}
-  \caption{Plot of h(x) with step joint}
+  \caption{Plot of h(x) with step joint. As shown the transition is not smooth and there's a discontinuity at $x = \frac{\pi}{2}$.}\label{fig:joint-step}
 \end{figure}
 
-If we use the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum} with
+Using the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum}
 \begin{align*}
     \delta = 0.5 \\
     \alpha = \cfrac{\pi}{2} - \cfrac{\delta}{2} \\
     \chi(x) = \sin^{2}\left(x \cfrac{\pi}{2}\right)
 \end{align*}
-this results in
+a much better result can be obtained
 \[
   h(x) =  \left\{
     \begin{array}{ll}
@@ -600,15 +605,16 @@ this results in
     \end{array}
     \right.
 \]
-which is mathematically smooth as we can see in figure~\ref{fig:joint-cos-hall} (proof in Appendix~\ref{proof:joint}).
-\begin{figure}[H]\label{fig:joint-cos-hall}
+which is mathematically smooth as can be see in figure~\ref{fig:joint-cos-hall} (proof in Appendix~\ref{proof:joint}).
+\begin{figure}[H]
   \centering
   \includegraphics[width=.9\textwidth]{plots/hall_joint.pdf}
-  \caption{Plot of h(x) with Hall joint}
+  \caption{Plot of h(x) with Hall joint. The function is smooth and has a slight \emph{bump} at $x = \frac{\pi}{2}$}\label{fig:joint-cos-hall}
 \end{figure}
 
 \subsection{Implementation in Rust}
-In the program we can define a struct \rustinline{Joint} that implements \rustinline{Func<f64, Complex64>}. As in the example we need two functions $f(x)$ and $g(x)$ which we will rename to \rustinline{left} and \rustinline{right}. We will also need a variable $\alpha$ and $\delta$ which will be named \rustinline{cut} and \rustinline{delta}.
+In the program the struct \rustinline{Joint} implements the formula from \cite{hall2013quantum}.
+As in the example the two functions $f(x)$ and $g(x)$, which will be renamed to \rustinline{left} and \rustinline{right}, have to be joined at $\alpha$ over a range of $\delta$. The variables $\alpha$ and $\delta$ are from now on called \rustinline{cut} and \rustinline{delta}.
 \begin{rustcode}
 #[derive(Clone)]
 pub struct Joint {
@@ -627,7 +633,7 @@ impl Func<f64, Complex64> for Joint {
 }
 \end{rustcode}
 
-In the proof we assume that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code we will not check this requirement since it would have a major impact on performance to check the derivative on every point.
+In the proof it has been assumed that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code this assumption will not be checked, since it would have a major impact on performance to check the derivative on every point.
 
 \chapter{Calculation}
 \section{Energy Levels}
@@ -742,10 +748,10 @@ Export["output/energies_exact.dat", csv]
 These programs will output two files \bashinline{energies_approx.dat}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
 WolframScript. As a ruff estimate we would expect an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$, because the program checks for energies with that step size.
 
-\begin{figure}[H]\label{fig:energy-error}
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/energy_error.pdf}
-  \caption{Absolute error of energy levels in square potential}
+  \caption{Absolute error of energy levels in square potential}\label{fig:energy-error}
 \end{figure}
 When we plot the absolute error we get figure~\ref{fig:energy-error}. The error is a little higher than expected which is probably due to errors in the integral. Still the algorithm should be precise
 enough. If you'd like you could pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
