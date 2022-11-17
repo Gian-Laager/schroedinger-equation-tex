@@ -328,6 +328,67 @@ t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{5}}} && 1~\text{s}_{\
 \\
 The program will take all of its in- and outputs in Planck units.
 
+\section{Installation of shroedinger\_approx}
+This section is a guide on how to install \emph{shroedinger\_approx} on your computer. Please follow the guide for your operating system.
+\subsection{Linux}
+\subsubsection{Ubuntu}
+Run the following command to install the dependencies
+\begin{bashcode}
+sudo apt-get install gnuplot build-essential git libclang-dev
+sudo snap go --classic
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add stable
+\end{bashcode}
+The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
+\\[3ex]
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{shroedinger\_approx}. Then run the command
+\begin{bashcode}
+git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
+\end{bashcode}
+to download the code form GitHub.
+
+\subsubsection{Arch}
+Run the following command to install all the dependencies
+\begin{bashcode}
+sudo pacman -Sy gnuplot go git clang
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add stable
+\end{bashcode}
+The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
+\\[3ex]
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{shroedinger\_approx}. Then run the command
+\begin{bashcode}
+git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
+\end{bashcode}
+to download the code form GitHub.
+
+\subsection{macOS}
+The following instructions have only been tested under \emph{macOS Ventura 13.0.1} on an Intel CPU. This means the instructions might not work for Apple silicon.
+\\[3ex]
+First you'll need to install the package manager \emph{Homebrew}, it can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
+\begin{bashcode}
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+\end{bashcode}
+Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
+Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
+\\[3ex]
+After we've installed Homebew, we can install the dependencies of \emph{shroedinger\_approx} with the command
+\begin{bashcode}
+brew install gnuplot go gcc
+\end{bashcode}
+\vspace*{3ex}
+Next we need to install Rust with the command
+\begin{bashcode}
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add stable
+\end{bashcode}
+This will ask you to confirm the installation, type \emph{1} and enter.
+\\[3ex]
+After we've installed all re dependencies you can go to \url{https://github.com/Gian-Laager/Schroedinger-Approximation} and click the green \emph{Code} button,
+where you can download the code as a ZIP file.
 \chapter{Methods}
 \section{Program Architecture}
 The program has multiple interfaces, or traits as they are called in Rust, that give the program some abstraction.
