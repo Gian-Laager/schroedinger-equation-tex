@@ -233,7 +233,7 @@ Rust as of the time of writing this document is not yet standardized meaning the
 To learn more about Rust, it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
 
 \subsection{Setup / Installation}
-Because \emph{shroedinger\_approx} does not have a UI yet you'll need to be able to compile
+Because \emph{schroedinger\_approx} does not have a UI yet you'll need to be able to compile
 the code.
 
 For Linux follow the guide at \\
@@ -243,7 +243,7 @@ And for Windows follow the guide at \\
 \url{https://rust-lang.github.io/rustup/installation/windows.html}\\
 for the MSCV ABI.
 \\[3ex]
-You'll also need to install the Go programing language, because \emph{shroedinger\_approx} uses a Go library to calculate the Ariy functions.
+You'll also need to install the Go programing language, because \emph{schroedinger\_approx} uses a Go library to calculate the Ariy functions.
 For this follow this installation guide \url{https://go.dev/doc/install}.
 
 
@@ -281,19 +281,6 @@ The complex plane is similar to the real number line, every complex number can b
 Gnuplot is a cross platform plotting program that has all the features needed to plot the wave functions. \bashinline{schroedinger-approx} will output a file \bashinline{data.txt} and the corresponding GNU Plot scripts to plot the wave function.
 
 \subsection{Usage}
-First you need to install GNU Plot.
-For Linux the package should be in your distros repository with the name \emph{gnuplot}
-
-On Windows you can download the installer on \url{http://gnuplot.info/}. There should be a
-box with the title \emph{Version [version] (current)} at the time of writing this document
-the version is 5.4.5. Then click on the link \emph{Release [version] ([date])}. Then you
-should be redirected to SOURCEFORGE where you can download the \emph{gp545-win64-mingw.exe}
-file (the 545 might be a different number). Then go through the installer. In the \emph{Select Additional Tasks} window change \emph{Add application directory to your PATH environment variable} to true.
-
-After the installation is finished you can open a terminal (CMD on Windows) and go to the
-directory where you've downloaded the code for \bashinline{shroedinger_approx}. You then need
-to run the program according to chapter~\ref{sec:manual}
-
 To plot a wave function you can type \bashinline{gnuplot} in a terminal in the output directory. This will open a prompt. You can then run one of the following commands.
 
 \begin{description}
@@ -361,8 +348,8 @@ t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{5}}} && 1~\text{s}_{\
 \\
 The program will take all of its in- and outputs in Planck units.
 
-\section{Installation of shroedinger\_approx}
-This section is a guide on how to install \emph{shroedinger\_approx} on your computer. Please follow the section for your operating system.
+\section{Installation of schroedinger\_approx}
+This section is a guide on how to install \emph{schroedinger\_approx} on your computer. Please follow the section for your operating system.
 \subsection{Linux}
 \subsubsection{Ubuntu}
 Run the following command to install the dependencies
@@ -375,7 +362,7 @@ rustup toolchain add stable
 \end{bashcode}
 The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
 \\[3ex]
-After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{shroedinger\_approx}. Then run the command
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
 \begin{bashcode}
 git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
 \end{bashcode}
@@ -391,7 +378,7 @@ rustup toolchain add stable
 \end{bashcode}
 The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
 \\[3ex]
-After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{shroedinger\_approx}. Then run the command
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
 \begin{bashcode}
 git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
 \end{bashcode}
@@ -407,7 +394,7 @@ First you'll need to install the package manager \emph{Homebrew}, it can be used
 Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
 Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
 \\[3ex]
-After we've installed Homebew, we can install the dependencies of \emph{shroedinger\_approx} with the command
+After we've installed Homebew, we can install the dependencies of \emph{schroedinger\_approx} with the command
 \begin{bashcode}
 brew install gnuplot go gcc
 \end{bashcode}
@@ -425,7 +412,7 @@ where you can download the code as a ZIP file.
 
 
 \subsection{Windows}
-Unfortunately \emph{shroedinger\_approx} can't be installed on Windows directly, but since
+Unfortunately \emph{schroedinger\_approx} can't be installed on Windows directly, but since
 Windows already supports Linux out of the box in WSL, you can download the latest version of
 \emph{Ubuntu} from the Microsoft Store (\url{https://www.microsoft.com/store/productId/9PDXGNCFSCZV}).
 \\[3ex]
@@ -459,7 +446,7 @@ After downloading the latest version on \emph{sourceforge} run the installer. In
 \hspace*{3ex}\emph{Add application directory to your PATH environment variable} \\
 to true.
 \\[3ex]
-Now you can download the \emph{shroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
+Now you can download the \emph{schroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
 Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choise.
 Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this
 \begin{bashcode}
@@ -469,7 +456,7 @@ You then need to replace all the \bashinline{\} to \bashinline{/} and change \ba
 \begin{bashcode}
 cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
 \end{bashcode}
-You're now ready to use \emph{shroedinger\_approx}.
+You're now ready to use \emph{schroedinger\_approx}.
 
 \chapter{Methods}
 \section{Program Architecture}
