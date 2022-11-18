@@ -425,25 +425,28 @@ where you can download the code as a ZIP file.
 
 
 \subsection{Windows}
-\subsubsection{Rust}
-Download \emph{RUSTUP-INIT.EXE (64-BIT)} from \\
-\hspace*{3ex}\url{https://www.rust-lang.org/tools/install} \\
-and run the installer.
+Unfortunately \emph{shroedinger\_approx} can't be installed on Windows directly, but since
+Windows already supports Linux out of the box in WSL, you can download the latest version of
+\emph{Ubuntu} from the Microsoft Store (\url{https://www.microsoft.com/store/productId/9PDXGNCFSCZV}).
 \\[3ex]
-You'll be prompted to choose between \emph{Quick install}, \emph{Manually install} and
-\emph{Dont't install}. Type \emph{1} and enter to choose the first option. This will download
-Visual Studio a IDE from Microsoft, go through the installation with the default options.
-Once you've installed Visual Studio the installer will prompt you to confirm the installation options. Type \emph{1} and enter
-
-\subsubsection{Go}
-Because \emph{shroedinger\_approx} uses a Go library to calculate the Airy functions, you'll
-also need to install the Go compiler.
+But first the \emph{WSL optional component} has to be enabled. To do this open the \emph{CMD}
+as an administator and run the command
+\begin{bashcode}
+wsl --install
+\end{bashcode}
+and reboot once it's finished.
 \\[3ex]
-Download the installer on\\
-\hspace*{3ex}\url{https://go.dev/doc/install}\\
-and go through the installation.
-
-\subsubsection{gnuplot}
+After rebooting open \emph{Ubuntu}, this will start the installation automatically. Then
+follow the instructions of the terminal. Once your logged in run the commands
+\begin{bashcode}
+sudo apt-get update
+sudo apt-get install build-essential libclang-dev
+sudo snap install go --classic
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add stable
+\end{bashcode}
+\vspace*{3ex}
 To install \emph{gnuplot} open the link
 \url{http://gnuplot.info} (you might get a warning that the site is not secure, ignore it and
 proceed). There follow the link in the gray box with the title
@@ -455,12 +458,18 @@ After downloading the latest version on \emph{sourceforge} run the installer. In
 \emph{Select Additional Tasks} set the option \\
 \hspace*{3ex}\emph{Add application directory to your PATH environment variable} \\
 to true.
-
-\subsubsection{shroedinger\_approx}
-Go to \\
-\hspace*{3ex}\url{https://github.com/Gian-Laager/Schroedinger-Approximation}\\
-and click the green button that says \emph{Code}.
-If you aren't familiar with \emph{git} you can download the code as a ZIP file.
+\\[3ex]
+Now you can download the \emph{shroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
+Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choise.
+Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this
+\begin{bashcode}
+C:\Users\gianl\OneDrive\Desktop\Schroedinger-Approximation-master
+\end{bashcode}
+You then need to replace all the \bashinline{\} to \bashinline{/} and change \bashinline{C:} to \bashinline{/mnt/c} (if you have another letter use it's lowercase at \bashinline{/mnt/<your letter>}) and add a \bashinline{cd} at the front. For the example above it would look like this
+\begin{bashcode}
+cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
+\end{bashcode}
+You're now ready to use \emph{shroedinger\_approx}.
 
 \chapter{Methods}
 \section{Program Architecture}
