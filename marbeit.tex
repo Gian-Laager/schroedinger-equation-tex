@@ -191,27 +191,15 @@ degree.
 
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
-behave like waves, he developed a wave equation which describes how the waves move and change in a given potential $V(x)$ or Hamiltonian $\hat{H}$.
+behave like waves, he developed a wave equation which describes how the waves move and change in a given potential $V(x)$.
 \begin{center}
 \begin{math}
   \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\left[-{\cfrac {\hbar ^{2}}{2m}}{\cfrac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
 \end{math}
 \end{center}
-Or more general
-\begin{center}
-\begin{math}
-  \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\hat{H} \Psi(x,t)
-\end{math}
-\end{center}
 
 The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a
 partial differential equation.
-\begin{center}
-\begin{math}
-  E \psi (x)=\hat{H} \psi(x)
-\end{math}
-\end{center}
-or
 \begin{center}
 \begin{math}
   -{\cfrac{\hbar^{2}}{2m}}  \cfrac{d^{2} \psi}{dx^{2}} (x) + V(x) \psi(x) = E \psi(x)
@@ -231,21 +219,6 @@ Functional programming languages are especially useful for mathematical problems
 Rust as of the time of writing this document is not yet standardized meaning the code provided might no longer be correct with one of the newer Rust versions.
 
 To learn more about Rust, it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
-
-\subsection{Setup / Installation}
-Because \emph{schroedinger\_approx} does not have a UI yet you'll need to be able to compile
-the code.
-
-For Linux follow the guide at \\
-\url{https://rust-lang.github.io/rustup/installation/index.html}.
-\\[3ex]
-And for Windows follow the guide at \\
-\url{https://rust-lang.github.io/rustup/installation/windows.html}\\
-for the MSCV ABI.
-\\[3ex]
-You'll also need to install the Go programing language, because \emph{schroedinger\_approx} uses a Go library to calculate the Ariy functions.
-For this follow this installation guide \url{https://go.dev/doc/install}.
-
 
 \section{Interpretation of Quantum Mechanics}
 The author believes in the many worlds interpretation of Hugh Everett. \emph{``The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
