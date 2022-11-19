@@ -112,7 +112,7 @@
 \begin{titlepage}
 \mbox{}\vspace{0.1\textheight}
 \begin{center}
-\textbf{\Huge Approximating Solutions of the Time Independent Schrödinger Equation}\\[3ex]
+\textbf{\Huge Approximating the Time Independent Schrödinger Equation}\\[3ex]
 Gian Laager\\
 \today
 \vspace{0.05\textheight}
@@ -800,20 +800,20 @@ pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: 
     }
 }
 \end{rustcode}
-First we check over the interval \rustinline{(0.0, ENERGY_STEP)} if there are not enough zeros we check the next interval of energies and so on until we found $n$ zeros.
-It's also possible that \ref{eq:prog_cond} is negative before the 0th energy there for we also have to check for normal zeros by comparing the signs of the values.
+First the interval \rustinline{(0.0, ENERGY_STEP)} is checked, if there are not enough zeros the next interval is checked. This is repeated until $n$ zeros have been found.
+It's also possible that equation~\ref{eq:prog_cond} is negative before the 0th energy therefor it is also checked for sign changes.
 
 The struct \rustinline{SommerfeldCond} is a \rustinline{Func<f64, f64>} that evaluates~\ref{eq:prog_cond}.
 
 \subsection{Accuracy}
-For a benchmark we will use
+For a benchmark the values mentioned below, will be used.
 \begin{align*}
   m = 1 \\
   V(x) = x^{2} \\
   (-\infty, \infty) \approx (-200, 200).
 \end{align*}
-To get the actual values we will use Wolfram Language with WolframScript a programing language similar to Wolframalpha that can calculate the integral analytically.
-In Rust we can rewrite \rustinline{main} to
+To get the actual values the Wolfram Language with WolframScript will be used. WlolframScript is a programing language similar to Wolframalpha that can calculate the integral analytically and precisely.
+In Rust \rustinline{main} can be rewritten to
 \begin{rustcode}
 fn main() {
     let output_dir = Path::new("output");
@@ -833,9 +833,8 @@ fn main() {
         .unwrap();
 }
 \end{rustcode}
-This will output all energy levels from $n = 0$ to $n = 50$.
-We can implement the same thing WolframScript
-
+this will output all energy levels from $n = 0$ to $n = 50$.
+The same procedure is implemented in WolframScript.
 \begin{wslcode}
 m = 1
 V[x_] = x^2
@@ -854,30 +853,29 @@ csv = ExportString[energys, "CSV"]
 csv = StringReplace[csv, "," -> " "]
 Export["output/energies_exact.dat", csv]
 \end{wslcode}
-These programs will output two files \bashinline{energies_approx.dat}~(Appendix~\ref{dat:energy-rs}) for our implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
-WolframScript. As a ruff estimate we would expect an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$, because the program checks for energies with that step size.
+These programs will output two files \bashinline{energies_approx.dat}~(Appendix~\ref{dat:energy-rs}) for the implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
+WolframScript. As a ruff estimate an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$ is expected, because the program checks for energies with that step size.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/energy_error.pdf}
   \caption{Absolute error of energy levels in square potential}\label{fig:energy-error}
 \end{figure}
-When we plot the absolute error we get figure~\ref{fig:energy-error}. The error is a little higher than expected which is probably due to errors in the integral. Still the algorithm should be precise
+The absolute error is plotted in figure~\ref{fig:energy-error}. The error is a little higher than expected which is probably due to errors in the integral. Still the algorithm should be precise
 enough. If you'd like you could pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
-
 
 \section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
 There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
 solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
 methods when calculated on a computer} \citep[Introduction]{van2014density}.
 
-The second is Density functional field theory, it has evolved over the years and is used heavily in chemistry to calculate properties of molecules and is also applicable for the time dependent Schrödinger
-equation. It is something that might be interesting to add to the program in the future.
+The second is Density functional field theory would be interesting to add to the program in the future, but it would require major changes in the architecture.
 \\
 
 The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
 Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
-understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}.
+understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. Even though in Planck units $\hbar = 1$ the approximation is still valid because it actually
+actually assumes that other terms independent to $\hbar$ tend to 0.
 \\
 
 WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solution. The tree parts are described as
@@ -1265,7 +1263,7 @@ When you only have one energy level you should use \rustinline{WaveFunction::new
         ScalingType::/*Scaling*/,
     );
 \end{rustcode}
-The example above has to placed right after the \rustinline{fn main()} line.
+The example above has to be placed right after the \rustinline{fn main()} line.
 You have to replace all the commentaries (\rustinline{/*...*/}) with the values you want.
 For the first you can choose a potential from section~\ref{sec:potentials} for this you
 can type \rustinline{potentials::/*potential*/}.
@@ -1321,16 +1319,24 @@ Every line is a data point where the first number is the x-coordinate, the secon
 
 \subsection{WaveFunction}
 For a \rustinline{WaveFunction} as we've seen in section~\ref{sec:manual:wave-func} you have three options.
-\subsubsection{plot\_wavefunction}
+\subsubsection{plot\_wavefunction}\label{sec:plot_wavefunction}
 With \rustinline{plot::plot_wavefunction} the result will be plotted as one function in gnuplot.
 \begin{rustcode}
 plot::plot_wavefunction(&wave_function, output_dir, "data.txt");
 \end{rustcode}
 You can replace \emph{data.txt} with another file name.
 \subsubsection{plot\_wavefunction\_parts}
+Each pair of $\psi^{WKB}_{osc}$ and $\psi^{WKB}_{exp}$ will be plotted in different colors and the Airy functions will also be plotted seperately.
 
-\subsubsection{plot\_probability}
+\subsubsection{plot\_probability}\label{sec:plot_probability}
+This function will plot the probability $\|\Psi(x)\|^{2}$ of the wave function.
 
+\subsection{SuperPosition}
+\subsubsection{plot\_superposition}
+This function plots the superposition analogous to \rustinline{plot_wavefunction} for super positions.
+
+\subsubsection{plot\_probability\_superposition}
+Plots the probability $\|Psi(x)\|^{2}$ of the super position analogous to~\rustinline{plot_probability}.
 
 \section{Potentials}\label{sec:potentials}
 \begin{description}
@@ -1524,9 +1530,26 @@ Unfortunately the color plots usually don't make the symmetries that arise when 
     the complex plane because all the colors only occurs once. Further on the two maxima at $x \approx \pm 1.17$ are in opposite directions concerning the angle of the complex plane.}
 \end{figure}
 This is probably one of the simplest super position that can be made. In 3D it looks just like a single loop around the x-axis that emerges out of nowhere and disappears again by exponentially decaying.
-
 \end{minipage}
 
+\begin{minipage}{\textwidth}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plots/super-square-10_1-11_1+i.pdf}
+\caption{\label{fig:interfence-left}Wave function of square potential, super position of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
+  is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefor this is an example of quantum interference. The two wave functions
+  interact in such a way that the state on the left is far more likely.}
+\end{figure}
+The same quantum interference as shown in figure~\ref{fig:interfence-left} can be inverted such that a position on the right is more likely by changing the factor of $1+\mi$ to $-1+\mi$ as shown in
+figure~\ref{fig:interference-right}.
+\end{minipage}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plots/super-square-10_1-11_-1+i.pdf}
+\caption{\label{fig:interference-right} Wave function of square potential, super position of $1$ times 10th energy and $-1+\mi$ times 11th energy. Just like figure~\ref{fig:interfence-left}
+    interference occurs, but in this superposition the probability on the right side of the plot is higher.}
+\end{figure}
 
 
 \begin{appendix} %Anhang falls nötig
