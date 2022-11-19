@@ -462,11 +462,17 @@ the tangent intersects the x-axis (solution of $g(x) = 0$). This will converge r
 
 \begin{rustcode}\nopagebreak
 pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
-    where
-        F: Fn(f64) -> f64,
+where
+    F: Fn(f64) -> f64,
 {
     loop {
-        let step = f(guess) / derivative(f, guess);
+        let deriv = derivative(f, guess);
+
+        if deriv == 0.0 {
+            panic!("Devision by zero");
+        }
+
+        let step = f(guess) / deriv;
         if step.abs() < precision {
             return guess;
         } else {
@@ -740,13 +746,13 @@ In the proof it has been assumed that $f(x)$ and $g(x)$ are continuous of first 
 
 \chapter{Calculation}
 \section{Energy Levels}
-Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the Maslov-corrected Bhor-Sommerfeld condition which states that
+Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the condition described by \cite[eq. 15.31]{hall2013quantum}.
 \begin{align}
   n \in \mathbb{N}_{0}\\
   C = \left\{x \in \mathbb{R}~|~V(x) < E \right\}\\
-  \int_{C}\sqrt{2m(E - V(x))}dx = 2\pi(n + 1/2)
-\end{align}\emph{this condition does not (in most cases) give the exact energy levels}~\citep{hall2013quantum}.
-It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation.
+  \int_{C}\sqrt{2m(E - V(x))}dx = \pi(n + 1/2)\label{eq:energy-cond}
+\end{align}
+It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation. \cite{hall2013quantum} also states that the equations from section~\ref{meth:wkb:approximation-scheme} have to agree, up to a multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
 
 To solve this problem for an arbitrary potential in a computer the set $C$ and the fact that $n$ has to be a non negative integer is not really helpful, but the condition can be rewritten to
 \begin{align}
@@ -755,12 +761,12 @@ To solve this problem for an arbitrary potential in a computer the set $C$ and t
                   0 & else
                 \end{array}
                       \right. \\\label{eq:prog_cond}
-  \cfrac{1}{2\pi}\int_{-\infty}^{\infty}p(x) dx - \cfrac{1}{2} \mod{1} = 0
+  \cfrac{2 \int_{-\infty}^{\infty}p(x) dx - \pi}{2\pi} \mod{1} = 0
 \end{align}
 Unfortunately~\ref{eq:prog_cond} is not continuous which means that Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
 specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
 
-The implementation is quite strait forward we evaluate \ref{eq:prog_cond} for a number of energies and then check for discontinuities.
+The implementation is quite strait forward,  first equation~\ref{eq:prog_cond} is evaluated for a number of energies and then checked for discontinuities.
 \begin{rustcode}
 pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: (f64, f64)) -> f64 {
     const ENERGY_STEP: f64 = 10.0;
