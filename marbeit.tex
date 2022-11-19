@@ -246,7 +246,7 @@ $\mi$ is the imaginary unit,
 $z$ is the general form of a complex number where $\{a,b\} \in \mathbb{R}$,
 $\compconj{z}$ is the complex conjugate
 and $\|z\|^{2}$ is the norm square of $z$.
-The last equation is the Euler's formula, it rotates a number in the complex plane by $\theta$ radians. The angle theta is also called the \emph{argument} of a complex number.
+The last equation is the Euler's formula, it rotates a number in the complex plane by $\theta$ radians. The angle $\theta$ is also called the \emph{argument} of a complex number and corresponds to the \emph{color} mentioned in section~\ref{sec:complex-color-plots}.
 
 The complex plane is similar to the real number line, every complex number can be represented as a point on this plane where $\operatorname{Re}(z)$ is the x-coordinate and $\operatorname{Im}(z)$ is the y-coordinate.
 
@@ -271,37 +271,37 @@ In the case of this paper we will try to plot a function
 \[
   f: \mathbb{R} \to \mathbb{C}.
 \]
-This means that the resulting plot will be 3 dimensional. The two main visualizations would be just to plot a 3D surface or add the phase of the complex number as a color.
+This means that the resulting plot will be 3 dimensional. The two main visualizations would be just to plot a 3D surface or add the argument of the complex number as a color.
 The first method works better if one can interact with the structure. However this is not really possible in a PDF or on a paper. This is why both options will be implemented.
 
-For example on the next page you have the plot from the title page as a 3D plot in comparison to the color plot.
+For example on the next page the plot from the title page is plotted both as a 3D plot and color plot for comparison.
 \pagebreak[4]
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.76\textwidth]{plots/super-square-9-12-15-3d.pdf}
-  \caption{3D plot of super position of $V(x) = x^2$ and energies 9, 12 and 15}
+  \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-3d.pdf}
+  \caption{3D plot of super position of $V(x) = x^2$ and energies 9, 12 and 15. One can't really see anything and it's just a mess, this would be better if one could interact with the plot
+  on the computer.}\label{fig:title-wave-3d}
 \end{figure}
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.775\textwidth]{plots/super-square-9-12-15-color.pdf}
-  \caption{Color plot of super position of $V(x) = x^2$ and energies 9, 12 and 15}
+  \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-color.pdf}
+  \caption{Color plot of super position of $V(x) = x^2$ and energies 9, 12 and 15. Although it takes time to get used to, this plot is much clearer compared to figure~\ref{fig:title-wave-3d}.}
 \end{figure}
 \pagebreak[4]
-As we can see the 3D plot is basically unusable since there is no depth and lighting would also be very difficult to do on a line such that we could actually see the depth.
-In the color plot every thing seems to be clear. Except that the values of the phase can't be read exactly.
+As shown in figure~\ref{fig:title-wave-3d}, the 3D plot is basically unusable since there is no depth. This would usually be fixed with lighting but it would be very difficult to apply lighting on a line
+such that one could actually see the depth. In the color plot every thing seems to be clear. Except that the values of the phase can't be read precisely.
 
-When plotting the function yourself I would still recommend the 3D plot because it's clearer when you can move it around.
+When plotting the function yourself the author would still recommend the 3D plot because it's clearer when you can move it around.
 
-To get used this representation, have a look at figure~\ref{fig:color-to-phase-circle}.
+Figure~\ref{fig:color-to-phase-circle} should help to read the color plots.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{plots/color_circle.png}
-  \caption{Illustration of the mapping of an angle to color to represent complex numbers}\label{fig:color-to-phase-circle}
+  \caption{Illustration of the mapping of an angle to color to represent complex numbers. Every argument of a complex number is assigned to a color.}\label{fig:color-to-phase-circle}
 \end{figure}
-Here we can see that we can assign a color to every argument of a complex number can be assigned a distinct color.
 For example $1 + 0 \mi$ would have the color cyan and $0 + 1 \mi$ would be purple.
-This graph is a handy tool to read the color plots that will be done later since it's easier to associate the angle with the color if the color is actually at that angle
-rather then displaying it radians.
+This graph is a handy tool to read the color plots that will be used later since it's easier to associate the angle with the color if the color is actually at that angle
+rather then a number in radians.
 
 \section{Planck Units}
 By using Planck units the equations get a little bit easier.
@@ -311,7 +311,7 @@ Working in Planck units means that all fundamental constants are equal to 1.
 \]
 This means that the constants will usually cancel out.
 
-To convert to SI units we can just multiply powers of the constants such that there unit results in one of the base units.
+To convert to SI units one can just multiply powers of the constants such that there unit results in one of the base units.
 \begin{align*}
 l_{\text{Planck}} = l_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{3}}}  && 1~\text{m}_{\text{Planck}}  \approx 1.616255(18) \cdot 10^{-35}~\text{m}  && \text{\citep{CODATAValuePlanckLength}} \\
 m_{\text{Planck}} = m_{\text{SI}} \sqrt{\cfrac{c \hbar}{G}}      && 1~\text{kg}_{\text{Planck}} \approx  2.176434(24) \cdot 10^{-8}~\text{kg} && \text{\citep{CODATAValuePlanckMass}} \\
