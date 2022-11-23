@@ -20,6 +20,7 @@
 \usepackage{tikz} %für tikz-Grafiken
 \usepackage{paracol}
 \usepackage{subfigure}
+\usepackage{quoting}
 
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
@@ -106,6 +107,8 @@
 \newcommand{\deriv}[2]{%
   \frac{d#1}{d#2}
 }
+
+\renewcommand{\lstlistingname}{Code Snippet} % Listing->Code
 
 \begin{document}
 
@@ -431,36 +434,58 @@ cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
 \end{bashcode}
 You're now ready to use \emph{schroedinger\_approx}.
 
+\section{perf}
+\emph{perf} is a collection of performance analysis tools for Linux~\citep{perf2022manula}. It will later be used to measure the performance of \emph{schroedinger\_approx}.
+In its manual page \citep{perf2022manula} it's described as:
+\begin{quoting}
+Performance counters for Linux are a new kernel-based subsystem that provide a framework for all things performance analysis. It covers hardware level (CPU/PMU, Performance Monitoring Unit) features and software features (software counters, tracepoints) as well.
+\end{quoting}
+In particular \bashinline{perf stat} and \bashinline{perf record} will be used.
+
+\subsection*{perf stat}
+\bashinline{perf stat} gathers performance counter statistics from a command~\citep{perfstat2022manula}.
+
+\subsection*{perf record}
+
 \chapter{Methods}
+This chapter is about the implementation details and which algorithms and mathematics are used behind the scenes. Some smaller details of the code will not be discussed.
+
 \section{Program Architecture}
 The program has multiple interfaces, or traits as they are called in Rust, that give the program some abstraction.
-In Appendix~\ref{fig:uml-arch} is a UML diagram of the architecture.
-Since current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} a custom trait will be defined for functions \rustinline{Func<A, R>} where \rustinline{A} is the type of the argument and \rustinline{R} is the return type. Later this trait will be used to implement functions for integration, evaluation and more utilities.
+In Appendix~\ref{fig:uml-arch} is a diagram of the architecture.
+Since the current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} a custom trait will be defined for functions \rustinline{Func<A, R>} where \rustinline{A} is the type
+of the argument and \rustinline{R} is the return type. Later this trait will be used to implement functions for integration, evaluation and more utilities.
 
-\rustinline{WaveFunction} is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart}. With the \rustinline{range} function we can check when they are valid.
+The \rustinline{WaveFunction} struct is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a
+\rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart} which will be discussed in detail in section~\ref{sec:wave-func-parts}. With the \rustinline{range} function it can be checked when a
+part is valid that is to say when it can be evaluated without a large error.
 
 \section{Newtons Method}
 Newton's method, also called the Newton-Raphson method, is a root-finding algorithm that uses the first few terms of the Taylor series of a function $f(x)$ in the vicinity of a suspected root
 \citep{math:newton}. It makes a sequence of approximations of a root $x_{n}$ that in certain cases converges to the exact value where
 \[
-  \lim _{n \to \infty}f(x_{n}) = 0
+  \lim _{n \to \infty}f(x_{n}) = 0.
 \]
 \\
-The sequence is defined as
+The sequence needs a first guess of where the root could be which will be the variable $a$, then the sequence is defined as
 \begin{align*}
   x_{0}=a \\*
-  x_{n+1}=x_{n}-\cfrac{f(x_{n})}{f'(x_{n})}
+  x_{n+1}=x_{n}-\cfrac{f(x_{n})}{f'(x_{n})}.
 \end{align*}
 Visually this looks like figure~\ref{fig:newton-ilust} where $f(x) = (x-2)(x-1)(x+1)$ was taken as an example.
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
-	\caption{Illustration of Newtons method, $f(x) = (x-1)(x-2)(x+1)$.}
+	\caption{Illustration of Newtons method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at
+      $(guess, f(guess))$ the next guess will be where the tangent intersects the x-axis (solution of $g(x) = 0$). This will converges quicker then other methods such as Regula falsi}
 	\label{fig:newton-ilust}
 \end{figure}
-The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at $(guess, f(guess))$ the next guess will be where
-the tangent intersects the x-axis (solution of $g(x) = 0$). This will converge rather quickly compared to other methods such as Regula falsi.
+.
 
-\begin{rustcode}\nopagebreak
+\begin{rustcode}[label=code:newtons-method, caption={
+Implementation of Newtons method. The function takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision}.
+The function will return if $\left|{f(x_{n})}~/~{f'(x_{n})}\right|$ is less than \rustinline{precision}. If the derivative at any point becomes $0$ the function will panic. Because of this the function
+\rustinline{newtons_method_max_iters} provides an alternate implementation that will not panic and \emph{always} return an \rustinline{Option}.
+}]
 pub fn newtons_method<F>(f: &F, mut guess: f64, precision: f64) -> f64
 where
     F: Fn(f64) -> f64,
@@ -482,10 +507,10 @@ where
 }
 \end{rustcode}
 
-In Rust the sequence is implemented with a function that takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision}. The function will return if
-$\left|\cfrac{f(x_{n})}{f'(x_{n})}\right|$ is less than \rustinline{precision}.
+An extension to the function in snippet~\ref{newtons-method} is implemented in the struct \rustinline{NewtonsMethodFindNewZero} which can be used to find multiple roots.
 
-From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in theory) be $0$ without causing a stack overflow.
+From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in
+theory) be $0$ without causing a stack overflow.
 
 \section{Regula Falsi with Bisection}
 Newtons method fails if the first guess is at a maximum, since the step would go to infinity. For these cases a bisection method will be applied until the sign of the function changes.
@@ -504,12 +529,17 @@ repeated until a fresh hold is crossed for the accuracy and the result will be t
 
 \section{Derivatives}
 Derivatives can be calculated numerically as in the C++ library Boost \citep{boost:calculating-derivative}.
-The author implemented a analytical system for calculating derivatives in Go. From that
-experience the benefits of an analytical approach are negligible compared to the increase in
-performance and in development time of a numerical approximation because one would have to
-implement every function as a special object that could be differentiable using the \emph{chain rule}.
+The author implemented a analytical system for calculating derivatives in Go. This project used an interface an interface with two methods function and derivative. After wards functions for operations like
+multiplication, addition, etc. were added. In these operations the functions derivative was build based on the operation. This process of writing functions is tedious and the performance is worse then in
+the numerical implementation in rust (snippet~\ref{code:derivative}).
 
-\begin{rustcode}
+\begin{minipage}{\textwidth}
+\begin{rustcode}[label=code:derivative, caption={
+Rewrite of the C++ library Boost's implementation \citep{boost:calculating-derivative} of numerical differentiation for Rust.
+\rustinline{f64::epsilon().sqrt()} is approximately $1.4901161\cdot 10^{-8}$.
+\rustinline{f64::epsilon()} is the smallest double precision floating point number $\epsilon$ where $1 +
+\epsilon \ne 1$. This value has been chosen for $dx$ because it is precise enough.
+}]
 pub fn derivative<F, R>(func: &F, x: f64) -> R
 where
     F: Fn(f64) -> R + ?Sized,
@@ -531,9 +561,7 @@ where
     return ((fifteen_m1 - six_m2) + m3) / ten_dx1;
 }
 \end{rustcode}
-\rustinline{f64::epsilon().sqrt()} is approximately $0.000000014901161$.
-\rustinline{f64::epsilon()} is the smallest double precision floating point number where $1 +
-\epsilon \ne 1$. This value has been chosen for $dx$ because it should be fairly precise.
+\end{minipage}
 
 \section{Integration}
 The same principles apply to integrals as to derivatives, it wouldn't be a great benefit to
@@ -560,7 +588,7 @@ One trapeze would be fairly inaccurate to calculate the area under the function,
 
 The general structure of the algorithm can very easily be run in parallel since it doesn't matter in which order the segments are added together and the segments also don't dependent on one another.
 In Rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
-changing \rustinline{::iter()} to \rustinline{::par_iter()}. This might not work in all cases because of memory safety.
+changing \rustinline{::iter()} to \rustinline{::par_iter()}~\citep{rayonreadme}. This might not work in all cases because of memory safety.
 
 \begin{rustcode}
 pub trait Func<A, R>: Sync + Send {
