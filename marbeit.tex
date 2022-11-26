@@ -1407,7 +1407,7 @@ plot::plot_wavefunction(&wave_function, output_dir, "data.txt");
 \end{rustcode}
 You can replace \emph{data.txt} with another file name.
 \subsubsection{plot\_wavefunction\_parts}
-Each pair of $\psi^{WKB}_{osc}$ and $\psi^{WKB}_{exp}$ will be plotted in different colors and the Airy functions will also be plotted seperately.
+Each pair of $\psi^{WKB}_{osc}$ and $\psi^{WKB}_{exp}$ will be plotted in different colors and the Airy functions will also be plotted separately.
 
 \subsubsection{plot\_probability}\label{sec:plot_probability}
 This function will plot the probability $\|\Psi(x)\|^{2}$ of the wave function.
@@ -1637,7 +1637,7 @@ figure~\ref{fig:interference-right}.
 \section{Performance}
 In the appendix there's a detailed description of the test device~\ref{specs:m1}.
 \\[3ex]
-The overall felt performance by the user is from the experience of the author quite good. As
+The overall ``felt performance'' by the user is from the experience of the author quite good. As
 expected higher energies generally take longer to run. The same also applies to potentials where simple potentials such as $x^{2}$ are quite fast and complex potentials such as \emph{triple mexican hat}
 take longer. Overall the goal that the program should give a quick feed back loop for simple inputs has been achieved because the results were done in under a minute. Particularly the energies 1-6 of
 $x^{2}$ can on the test machine be calculated in under 10 s, energies 1-57 in under 30 s and 1-155 in under 1 min. The 155th energy isn't a particularly low energy yet the program still managed to
@@ -1650,8 +1650,52 @@ also was that finding turning points would be slow but the measurements indicate
 to actual wave functions, it's really slow because thousands of points have to be calculated.
 
 Performance statistics from perf suggest that the program utilizes the CPU well. The memory layout also seems to be good.
+\\[3ex]
+All the benchmark results can be found in appendix~\ref{sec:app:benchmarks}.
+
 
 \section{Accuracy}
+To determine the accuracy, the mathematically exact solutions to the Schrödinger equation has to be calculated. This can simple potentials be done with WolframScript.
+In the \newline \bashinline{exact.wsl} file a exact solutions for the potential $x^{2}$ can be calculated. Note that the energies are still calculated with the Maslov-corrected Bohr–Sommerfeld condition
+is used to calculate the energies which is an approximation \citep[p. 307]{hall2013quantum}.
+\\[3ex]
+When running the script for the 5th energy level, two linearly independent solution \bashinline{psi1} and \bashinline{psi2} are calculated.
+\begin{lstlisting}
+psi1[x] = ParabolicCylinderD[4.999999999999998, 1.6817928305074292*x]
+psi2[x] = ParabolicCylinderD[-5.999999999999998, (0. + 1.6817928305074292*I)*x]
+\end{lstlisting}
+\bashinline{psi2} will be ignored because it diverges to infinity. Afterwards because \bashinline{psi1[x]} is not normalized, it is multiplied such that the maxima of the exact solution matches the
+maxima of the solutions calculated by \emph{schroedinger\_approx}. In figure~\ref{fig:approx-vs-exact} the two solutions are plotted together.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/approx_vs_exact_wave_square_5.pdf}
+  \caption{\label{fig:approx-vs-exact} The exact and approximate solution of the 5th energy of the potential $x^{2}$. As expected the grates error can be seen where the joint between the Airy and
+    exponential part was inserted. Otherwise the approximate solution is so close to the real solution that the difference is barely noticeable.}
+\end{figure}
+The absolute error is plotted in figure~\ref{fig:absolute-error}. Even though the exact solution to the mexican hat potential was not calculated, the error at the transition regions gets worse because
+one would expected a smooth exponential decay.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/absolute_error_square_5.pdf}
+  \caption{\label{fig:absolute-error} Absolute error of the exact and approximate solution of the 5th energy of the potential $x^{2}$. The error in the semiclassical region is low around 0.01-0.015, this
+    meats the goal that the wave function should be ``visually accurate''. At the transition regions the error reaches it's maximum at around 0.034.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{plots/absolute_error_square_5_with_wave.pdf}
+  \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the red line indicates the error reaches a local maxima
+  at the maxima of the wave function itself. }
+\end{figure}
+
+The error at the local maxima, as shown in figure~\ref{fig:absolute-error-with-wave}, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This
+could be achieved by solving for a minimal area under the curve of the absolute error.
+
+For other energies then 5 the same pattern occurred, the error is greatest at the local maxima of the wave function and even bigger at the transition region.
+
+This error can be minimized by tuning the \rustinline{VALIDITY_LL_FACTOR} constant that makes the Airy functions larger. But this has to be done for each potential separately and the default value of 3.5
+should give reasonably good results for most potentials.
+
 
 \begin{appendix} %Anhang falls nötig
 %
@@ -1765,7 +1809,7 @@ Info:
   Shell: garuda-inxi running in: tty 0 (SSH) inxi: 3.0.38
 \end{verbatim}
 
-\section{Benchmarks}
+\section{Benchmarks}\label{sec:app:benchmarks}
 \subsection{Rust Benchmarks}
 \renewcommand{\lstlistingname}{Output} % Listing->Code
 These benchmarks were performed after a reboot of test machine 1 (specs~\ref{specs:m1}) in a TTY to minimize the CPU usage of other processes.
