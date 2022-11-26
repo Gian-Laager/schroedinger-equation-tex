@@ -445,7 +445,7 @@ where
 }
 \end{rustcode}
 
-An extension to the function in snippet~\ref{newtons-method} is implemented in the struct \rustinline{NewtonsMethodFindNewZero} which can be used to find multiple roots.
+An extension to the function in snippet~\ref{code:newtons-method} is implemented in the struct \rustinline{NewtonsMethodFindNewZero} which can be used to find multiple roots.
 
 From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in
 theory) be $0$ without causing a stack overflow.
