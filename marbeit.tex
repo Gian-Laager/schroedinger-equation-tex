@@ -1687,7 +1687,6 @@ one would expected a smooth exponential decay.
   \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the red line indicates the error reaches a local maxima
   at the maxima of the wave function itself. }
 \end{figure}
-
 The error at the local maxima, as shown in figure~\ref{fig:absolute-error-with-wave}, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This
 could be achieved by solving for a minimal area under the curve of the absolute error.
 
@@ -1696,6 +1695,20 @@ For other energies then 5 the same pattern occurred, the error is greatest at th
 This error can be minimized by tuning the \rustinline{VALIDITY_LL_FACTOR} constant that makes the Airy functions larger. But this has to be done for each potential separately and the default value of 3.5
 should give reasonably good results for most potentials.
 
+\chapter{Conclusion}
+In the end the program could be extended and improved almost indefinitely. Unfortunately I had to stop improving it at some point to actually write this paper about how the program works.
+Looking back at the goals, the program is quite fast for low and even ``medium'' energies while still being able to calculate solutions for complex potentials. The accuracy can be tuned a little bit
+with the constants, but they don't offer a grate flexibility.
+
+One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
+impact on the user interface which is probably the worse part of the program. It is only accessible to programmers and can't be used to it's full potential when the user doesn't know Rust, a systems
+programming language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
+someone would like to.
+
+I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities in
+side the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program too more then one dimension.
+\\[3ex]
+In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
 
 \begin{appendix} %Anhang falls nötig
 %
