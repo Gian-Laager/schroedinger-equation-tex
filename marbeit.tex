@@ -195,11 +195,9 @@ degree.
 \section{Schrödinger Equation}
 In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger equation. Based on the observations of de Broglie that particles
 behave like waves, he developed a wave equation which describes how the waves move and change in a given potential $V(x)$.
-\begin{center}
-\begin{math}
+\begin{align*}
   \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\left[-{\cfrac {\hbar ^{2}}{2m}}{\cfrac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
-\end{math}
-\end{center}
+\end{align*}
 
 The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a
 partial differential equation.
@@ -324,128 +322,68 @@ t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{5}}} && 1~\text{s}_{\
 \\
 The program will take all of its in- and outputs in Planck units.
 
-\section{Installation of schroedinger\_approx}
-This section is a guide on how to install \emph{schroedinger\_approx} on your computer. Please follow the section for your operating system.
-\subsection{Linux}
-\subsubsection{Ubuntu}
-Run the following command to install the dependencies
-\begin{bashcode}
-sudo apt-get install gnuplot build-essential git libclang-dev
-sudo snap go --classic
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.profile
-rustup toolchain add stable
-\end{bashcode}
-The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
-\\[3ex]
-After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
-\begin{bashcode}
-git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
-\end{bashcode}
-to download the code form GitHub.
 
-\subsubsection{Arch Linux}
-Run the following command to install all the dependencies
-\begin{bashcode}
-sudo pacman -Sy gnuplot go git clang
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.profile
-rustup toolchain add stable
-\end{bashcode}
-The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
-\\[3ex]
-After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
-\begin{bashcode}
-git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
-\end{bashcode}
-to download the code form GitHub.
+\section{Benchmarking}
+Benchmarking is the process where one tests the performance of software. In the case of \emph{schroeding\_approx} the goal would be to test the individual parts and
+find out where improvements are possible. And in a later step if the supposed improvements actually improved the performance. For this the two tools described below will be used.
 
-\subsection{macOS}
-The following instructions have only been tested under \emph{macOS Ventura 13.0.1} on an Intel CPU. This means the instructions might not work for Apple silicon.
-\\[3ex]
-First you'll need to install the package manager \emph{Homebrew}, it can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
-\begin{bashcode}
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-\end{bashcode}
-Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
-Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
-\\[3ex]
-After we've installed Homebew, we can install the dependencies of \emph{schroedinger\_approx} with the command
-\begin{bashcode}
-brew install gnuplot go gcc
-\end{bashcode}
-\vspace*{3ex}
-Next we need to install Rust with the command
-\begin{bashcode}
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.profile
-rustup toolchain add stable
-\end{bashcode}
-This will ask you to confirm the installation, type \emph{1} and enter.
-\\[3ex]
-After we've installed all re dependencies you can go to \url{https://github.com/Gian-Laager/Schroedinger-Approximation} and click the green \emph{Code} button,
-where you can download the code as a ZIP file.
-
-
-\subsection{Windows}
-Unfortunately \emph{schroedinger\_approx} can't be installed on Windows directly, but since
-Windows already supports Linux out of the box in WSL, you can download the latest version of
-\emph{Ubuntu} from the Microsoft Store (\url{https://www.microsoft.com/store/productId/9PDXGNCFSCZV}).
-\\[3ex]
-But first the \emph{WSL optional component} has to be enabled. To do this open the \emph{CMD}
-as an administator and run the command
-\begin{bashcode}
-wsl --install
-\end{bashcode}
-and reboot once it's finished.
-\\[3ex]
-After rebooting open \emph{Ubuntu}, this will start the installation automatically. Then
-follow the instructions of the terminal. Once your logged in run the commands
-\begin{bashcode}
-sudo apt-get update
-sudo apt-get install build-essential libclang-dev
-sudo snap install go --classic
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.profile
-rustup toolchain add stable
-\end{bashcode}
-\vspace*{3ex}
-To install \emph{gnuplot} open the link
-\url{http://gnuplot.info} (you might get a warning that the site is not secure, ignore it and
-proceed). There follow the link in the gray box with the title
-\emph{Version [\dots] (current)} that says \emph{Release [\dots] ([Date])}. The current
-version (\emph{[\dots]}) at the time of writing this document is \emph{5.4.5} but you might
-have a newer version available that should also work.
-\\[3ex]
-After downloading the latest version on \emph{sourceforge} run the installer. In the section
-\emph{Select Additional Tasks} set the option \\
-\hspace*{3ex}\emph{Add application directory to your PATH environment variable} \\
-to true.
-\\[3ex]
-Now you can download the \emph{schroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
-Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choise.
-Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this
-\begin{bashcode}
-C:\Users\gianl\OneDrive\Desktop\Schroedinger-Approximation-master
-\end{bashcode}
-You then need to replace all the \bashinline{\} to \bashinline{/} and change \bashinline{C:} to \bashinline{/mnt/c} (if you have another letter use it's lowercase at \bashinline{/mnt/<your letter>}) and add a \bashinline{cd} at the front. For the example above it would look like this
-\begin{bashcode}
-cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
-\end{bashcode}
-You're now ready to use \emph{schroedinger\_approx}.
-
-\section{perf}
+\subsection{perf}
 \emph{perf} is a collection of performance analysis tools for Linux~\citep{perf2022manula}. It will later be used to measure the performance of \emph{schroedinger\_approx}.
 In its manual page \citep{perf2022manula} it's described as:
 \begin{quoting}
 Performance counters for Linux are a new kernel-based subsystem that provide a framework for all things performance analysis. It covers hardware level (CPU/PMU, Performance Monitoring Unit) features and software features (software counters, tracepoints) as well.
 \end{quoting}
 In particular \bashinline{perf stat} and \bashinline{perf record} will be used.
+\\[3ex]
+The outputs produced by \bashinline{perf stat} are fairly technical can measure performance on the CPU level.
+Most of the metrics produced \emph{will not} be used. Below there's an example output of a benchmark of \emph{schroedinger\_approx}.
 
-\subsection*{perf stat}
-\bashinline{perf stat} gathers performance counter statistics from a command~\citep{perfstat2022manula}.
+\begin{minipage}{\textwidth}
+    \begin{lstlisting}
+            727,840.51 msec task-clock                       #   15.452 CPUs utilized
+            404,803      context-switches                 #  556.170 /sec
+                5,210      cpu-migrations                   #    7.158 /sec
+                30,529      page-faults                      #   41.945 /sec
+    2,482,025,824,794      cycles                           #    3.410 GHz
+        1,855,377,839      stalled-cycles-frontend          #    0.07% frontend cycles idle
+        3,495,430,962      stalled-cycles-backend           #    0.14% backend cycles idle
+    4,704,001,143,909      instructions                     #    1.90  insn per cycle
+                                                    #    0.00  stalled cycles per insn
+    566,687,255,541      branches                         #  778.587 M/sec
+        252,663,255      branch-misses                    #    0.04% of all branches
 
-\subsection*{perf record}
+        47.103191946 seconds time elapsed
+
+        722.481191000 seconds user
+        5.147335000 seconds sys
+    \end{lstlisting}
+    \begin{description}
+      \item[CPUs utilized] This states how many ``percent'' of the \emph{CPU} were actually used, important to note is that ``CPU'' in this case means hardware thread. In the case of the test machine, it
+            has 8 cores with 2 threads each, therefor in theory this number could be as high as 16.0. The goal would be to use as much of the CPU as possible but one has to be cautious because other
+            processes besides \emph{schroedinger\_approx} are also running and use some part of the CPU.
+
+      \item[context-switches] This factor is handled by the Linux kernel. The kernel \emph{switches} between processes that can run on a thread of the CPU. In this case most of the context switches were
+            happening inside \emph{schroedinger\_approx} itself because behind the scene it uses a thread pool. In general it is an indicator of how efficiently the kernel can handle the multi threading in
+            a program.
+      \item[page-faults] This is an ``error'' that happens inside the CPU when a process is trying to access memory that is not yet loaded into the cache of the CPU. When the number of page faults per
+            second is high, the process's memory layout is not good and should be optimized. These kind of optimizations are very hard to do.
+
+      \item[branch-misses] Modern CPUs don't actually execute the assembly directly but they perform \emph{speculative execution}. This means the CPU ``guesses'' ahead if for example an if-statement will
+            be true and then already do the calculations before the instruction pointer actually reached the branch. Even though the CPU is pretty good at ``guessing'' if it's wrong it has to throw away
+            all those calculation, this is called a \emph{branch miss}. The code can be made faster if the percentage of branch misses is low (< 0.05\%), this can be done by writing ``predictable'' code
+            which requires intensive testing.
+      \item[time elapsed] This is the time the program was running. This is similar to the \bashinline{time} command.
+
+    \end{description}
+\end{minipage}
+
+
+
+\subsection{Rust Benchmarks}
+The nightly version of Rust contains benchmarks that can be run with the command \bashinline{cargo bench}. The benchmarks are the functions marked with the \rustinline{#[bench]} macro. All those functions take a \rustinline{test::Bencher} as an argument.
+This struct will measure the time it takes the code to complete. It will also run the fragments multiple times. Finlay it will print the time measurements for each benchmark to the terminal.
+
+While \emph{perf} captures the big picture, it's possible to \emph{zoom} in to the individual components of the system with Rust benchmarks.
 
 \chapter{Methods}
 This chapter is about the implementation details and which algorithms and mathematics are used behind the scenes. Some smaller details of the code will not be discussed.
@@ -773,7 +711,7 @@ impl Func<f64, Complex64> for Joint {
 In the proof it has been assumed that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code this assumption will not be checked, since it would have a major impact on performance to check the derivative on every point.
 
 \chapter{Calculation}
-\section{Energy Levels}
+\section{Energy Levels}\label{sec:energy-calculation}
 Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the condition described by \cite[eq. 15.31]{hall2013quantum}.
 \begin{align}
   n \in \mathbb{N}_{0}\\
@@ -1109,7 +1047,7 @@ is actually outside the view. For this we can use Regula falsi combined with bis
 We will do this for both the left and right most turning point if there was only one boundary
 found.
 
-\section{Wave Function Parts}
+\section{Wave Function Parts}\label{sec:wave-func-parts}
 All the equations of the WKB approximation split into multiple parts. This is also reflected in the program architecture.
 The trait \rustinline{WaveFunctionPart} represents one of these sections.
 \begin{rustcode}
@@ -1240,6 +1178,121 @@ Its implementation of \rustinline{Func<f64, Complex64>} will then sum over all t
 the individual \rustinline{WaveFunction} structs.
 
 \chapter{Program Manual}\label{sec:manual}
+\section{Installation of schroedinger\_approx}
+This section is a guide on how to install \emph{schroedinger\_approx} on your computer. Please follow the section for your operating system.
+\subsection{Linux}
+\subsubsection{Ubuntu}
+Run the following command to install the dependencies
+\begin{bashcode}
+sudo apt-get install gnuplot build-essential git libclang-dev
+sudo snap go --classic
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add nightly
+\end{bashcode}
+The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
+\\[3ex]
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
+\begin{bashcode}
+git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
+\end{bashcode}
+to download the code form GitHub.
+
+\subsubsection{Arch Linux}
+Run the following command to install all the dependencies
+\begin{bashcode}
+sudo pacman -Sy gnuplot go git clang
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add nightly
+\end{bashcode}
+The curl command that installs Rust will prompt you to choose between installation options, you can choose number \emph{1}.
+\\[3ex]
+After you've run the script above to install all the dependencies, you can go to the directory where you'd like to install \emph{schroedinger\_approx}. Then run the command
+\begin{bashcode}
+git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
+\end{bashcode}
+to download the code form GitHub.
+
+\subsection{macOS}
+The following instructions have only been tested under \emph{macOS Ventura 13.0.1} on an Intel CPU. This means the instructions might not work for Apple silicon.
+\\[3ex]
+First you'll need to install the package manager \emph{Homebrew}, it can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
+\begin{bashcode}
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+\end{bashcode}
+Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
+Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
+\\[3ex]
+After we've installed Homebew, we can install the dependencies of \emph{schroedinger\_approx} with the command
+\begin{bashcode}
+brew install gnuplot go gcc
+\end{bashcode}
+\vspace*{3ex}
+Next we need to install Rust with the command
+\begin{bashcode}
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add nightly
+\end{bashcode}
+This will ask you to confirm the installation, type \emph{1} and enter.
+\\[3ex]
+After we've installed all re dependencies you can go to \url{https://github.com/Gian-Laager/Schroedinger-Approximation} and click the green \emph{Code} button,
+where you can download the code as a ZIP file.
+
+
+\subsection{Windows}
+Unfortunately \emph{schroedinger\_approx} can't be installed on Windows directly, but since
+Windows already supports Linux out of the box in WSL, you can download the latest version of
+\emph{Ubuntu} from the Microsoft Store (\url{https://www.microsoft.com/store/productId/9PDXGNCFSCZV}).
+\\[3ex]
+But first the \emph{WSL optional component} has to be enabled. To do this open the \emph{CMD}
+as an administator and run the command
+\begin{bashcode}
+wsl --install
+\end{bashcode}
+and reboot once it's finished.
+\\[3ex]
+After rebooting open \emph{Ubuntu}, this will start the installation automatically. Then
+follow the instructions of the terminal. Once your logged in run the commands
+\begin{bashcode}
+sudo apt-get update
+sudo apt-get install build-essential libclang-dev
+sudo snap install go --classic
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.profile
+rustup toolchain add nightly
+\end{bashcode}
+\vspace*{3ex}
+To install \emph{gnuplot} open the link
+\url{http://gnuplot.info} (you might get a warning that the site is not secure, ignore it and
+proceed). There follow the link in the gray box with the title
+\emph{Version [\dots] (current)} that says \emph{Release [\dots] ([Date])}. The current
+version (\emph{[\dots]}) at the time of writing this document is \emph{5.4.5} but you might
+have a newer version available that should also work.
+\\[3ex]
+After downloading the latest version on \emph{sourceforge} run the installer. In the section
+\emph{Select Additional Tasks} set the option \\
+\hspace*{3ex}\emph{Add application directory to your PATH environment variable} \\
+to true.
+\\[3ex]
+Now you can download the \emph{schroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
+Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choise.
+Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this
+\begin{bashcode}
+C:\Users\gianl\OneDrive\Desktop\Schroedinger-Approximation-master
+\end{bashcode}
+You then need to replace all the \bashinline{\} to \bashinline{/} and change \bashinline{C:} to \bashinline{/mnt/c} (if you have another letter use it's lowercase at \bashinline{/mnt/<your letter>}) and add a \bashinline{cd} at the front. For the example above it would look like this
+\begin{bashcode}
+cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
+\end{bashcode}
+
+To run the program, run the command
+\begin{bashcode}
+cargo run --release
+\end{bashcode}
+
+\section{Usage}
 In the \bashinline{src} directory you will find the \bashinline{main.rs} file.
 After the imports (lines with \rustinline{use}) you can find all the constants that can be
 configured. In the description below, (E) stands for ``expert'' and means that you should use the default unless you really know what you're doing.
@@ -1579,11 +1632,263 @@ figure~\ref{fig:interference-right}.
     interference occurs, but in this superposition the probability on the right side of the plot is higher.}
 \end{figure}
 
+\subsection{Relationship between Energy and Mass}
+
+\section{Performance}
+In the appendix there's a detailed description of the test device~\ref{specs:m1}.
+\\[3ex]
+The overall felt performance by the user is from the experience of the author quite good. As
+expected higher energies generally take longer to run. The same also applies to potentials where simple potentials such as $x^{2}$ are quite fast and complex potentials such as \emph{triple mexican hat}
+take longer. Overall the goal that the program should give a quick feed back loop for simple inputs has been achieved because the results were done in under a minute. Particularly the energies 1-6 of
+$x^{2}$ can on the test machine be calculated in under 10 s, energies 1-57 in under 30 s and 1-155 in under 1 min. The 155th energy isn't a particularly low energy yet the program still managed to
+complete in under a minute.
+\\[3ex]
+Further on despite the ``felt'' performance of the user the benchmarks also show good results. As expected the most time is spent on integration. In particular finding energies. Even though energies in
+an interval of $10$ units are found in almost the same time frame (output~\ref{out:m2:energy-bench}). This is expected due to the algorithm described in section~\ref{sec:energy-calculation}. These could
+be fixed by using a grater search area by increasing the variable \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:47}. The overall evaluation process is fast with 100 samples in 10 ms. One concern
+also was that finding turning points would be slow but the measurements indicate that these calculations take less then a millisecond. Even though the bench mark for renormalization is fast, when applied
+to actual wave functions, it's really slow because thousands of points have to be calculated.
+
+Performance statistics from perf suggest that the program utilizes the CPU well. The memory layout also seems to be good.
+
+\section{Accuracy}
 
 \begin{appendix} %Anhang falls nötig
 %
 
 \chapter{Detailed Calculations and Tests}
+\section{Test Machine Specs}
+This output was generated by \bashinline{garuda-inxi}. ``[\dots]'' Means the data was removed because it is not necessary.
+
+\subsection{Machine 1}\label{specs:m1}
+Machine 1 is the laptop of the author.
+\begin{verbatim}
+System:
+  Kernel: 6.0.9-zen1-1-zen arch: x86_64 bits: 64 compiler: gcc v: 12.2.0
+    parameters: BOOT_IMAGE=/@/boot/vmlinuz-linux-zen
+    root=UUID=308b5626-2597-4f46-9f16-a4d882bf2bf0 rw rootflags=subvol=@
+    quiet splash rd.udev.log_priority=3 vt.global_cursor_default=0
+    systemd.unified_cgroup_hierarchy=1 loglevel=3 ibt=off
+  Console: pty pts/0 DM: SDDM Distro: Garuda Linux base: Arch Linux
+Machine:
+  Type: Laptop System: ASUSTeK product: ROG Zephyrus G14 GA401QM_GA401QM
+    v: 1.0 serial: <filter>
+  Mobo: ASUSTeK model: GA401QM v: 1.0 serial: <filter> UEFI: American
+    Megatrends LLC. v: GA401QM.412 date: 08/30/2022
+
+[...]
+
+CPU:
+  Info: model: AMD Ryzen 9 5900HS with Radeon Graphics socket: FP6 bits: 64
+    type: MT MCP arch: Zen 3 gen: 4 level: v3 note: check built: 2021-22
+    process: TSMC n7 (7nm) family: 0x19 (25) model-id: 0x50 (80) stepping: 0
+    microcode: 0xA50000C
+  Topology: cpus: 1x cores: 8 tpc: 2 threads: 16 smt: enabled cache:
+    L1: 512 KiB desc: d-8x32 KiB; i-8x32 KiB L2: 4 MiB desc: 8x512 KiB
+    L3: 16 MiB desc: 1x16 MiB
+  Speed (MHz): avg: 3300 min/max: 1200/4679 boost: enabled
+    base/boost: 3300/4650 scaling: driver: acpi-cpufreq governor: performance
+    volts: 1.2 V ext-clock: 100 MHz cores: 1: 3300 2: 3300 3: 3300 4: 3300
+    5: 3300 6: 3300 7: 3300 8: 3300 9: 3300 10: 3300 11: 3300 12: 3300
+    13: 3300 14: 3300 15: 3300 16: 3300 bogomips: 105400
+  Flags: avx avx2 ht lm nx pae sse sse2 sse3 sse4_1 sse4_2 sse4a ssse3 svm
+  Vulnerabilities:
+  Type: itlb_multihit status: Not affected
+  Type: l1tf status: Not affected
+  Type: mds status: Not affected
+  Type: meltdown status: Not affected
+  Type: mmio_stale_data status: Not affected
+  Type: retbleed status: Not affected
+  Type: spec_store_bypass mitigation: Speculative Store Bypass disabled via
+    prctl
+  Type: spectre_v1 mitigation: usercopy/swapgs barriers and __user pointer
+    sanitization
+  Type: spectre_v2 mitigation: Retpolines, IBPB: conditional, IBRS_FW,
+    STIBP: always-on, RSB filling, PBRSB-eIBRS: Not affected
+  Type: srbds status: Not affected
+  Type: tsx_async_abort status: Not affected
+
+[...]
+
+Garuda (2.6.9-1):
+  System install date:     2022-01-06
+  Last full system update: 2022-11-19
+  Is partially upgraded:   No
+  Relevant software:       NetworkManager
+  Windows dual boot:       Yes
+  Snapshots:               Snapper
+  Failed units:            shadow.service snapper-cleanup.service
+\end{verbatim}
+
+\subsection{Machine 2}\label{specs:m2}
+Machine 2 is a VM running Ubuntu 20.04.1 LTS on the server of Fridolins Robotik (FRC team 6417).
+\begin{verbatim}
+System:
+  Kernel: 5.4.0-132-generic x86_64 bits: 64 compiler: gcc v: 9.4.0
+  parameters: BOOT_IMAGE=/vmlinuz-5.4.0-132-generic
+  root=/dev/mapper/ubuntu--vg-ubuntu--lv ro maybe-ubiquity
+  Console: tty 0 dm: N/A Distro: Ubuntu 20.04.1 LTS (Focal Fossa)
+Machine:
+  Type: Kvm System: QEMU product: Standard PC (i440FX + PIIX, 1996)
+  v: pc-i440fx-6.1 serial: <filter> Chassis: type: 1 v: pc-i440fx-6.1
+  serial: <filter>
+  Mobo: N/A model: N/A serial: N/A BIOS: SeaBIOS
+  v: rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org date: 04/01/2014
+CPU:
+  Topology: 24-Core model: Common KVM bits: 64 type: MCP arch: K8
+  family: F (15) model-id: 6 stepping: 1 microcode: 1000065
+  L2 cache: 12.0 MiB
+  flags: lm nx pae sse sse2 sse3 bogomips: 138938
+  Speed: 2895 MHz min/max: N/A Core speeds (MHz): 1: 2895 2: 2895 3: 2895
+  4: 2895 5: 2895 6: 2895 7: 2895 8: 2895 9: 2895 10: 2895 11: 2895 12: 2895
+  13: 2895 14: 2895 15: 2895 16: 2895 17: 2895 18: 2895 19: 2895 20: 2895
+  21: 2895 22: 2895 23: 2895 24: 2895
+  Vulnerabilities: Type: itlb_multihit status: Not affected
+  Type: l1tf status: Not affected
+  Type: mds status: Not affected
+  Type: meltdown status: Not affected
+  Type: mmio_stale_data status: Not affected
+  Type: retbleed status: Not affected
+  Type: spec_store_bypass status: Not affected
+  Type: spectre_v1
+  mitigation: usercopy/swapgs barriers and __user pointer sanitization
+  Type: spectre_v2 mitigation: Retpolines, STIBP: disabled, RSB filling,
+  PBRSB-eIBRS: Not affected
+  Type: srbds status: Not affected
+  Type: tsx_async_abort status: Not affected
+
+[...]
+
+Info:
+  Processes: 288 Uptime: 1m Memory: 3.83 GiB used: 345.0 MiB (8.8%)
+  Init: systemd v: 245 runlevel: 5 Compilers: gcc: 9.4.0 alt: 9
+  Shell: garuda-inxi running in: tty 0 (SSH) inxi: 3.0.38
+\end{verbatim}
+
+\section{Benchmarks}
+\subsection{Rust Benchmarks}
+\renewcommand{\lstlistingname}{Output} % Listing->Code
+These benchmarks were performed after a reboot of test machine 1 (specs~\ref{specs:m1}) in a TTY to minimize the CPU usage of other processes.
+\begin{lstlisting}[caption={
+Test run on machine 1, the energy tests were ignored because they take about 2 hours to run.
+}]
+test benchmarks::test::energy_bench_nenergy_1             ... ignored
+test benchmarks::test::energy_bench_nenergy_2             ... ignored
+test benchmarks::test::energy_bench_nenergy_3             ... ignored
+test benchmarks::test::energy_bench_nenergy_4             ... ignored
+test benchmarks::test::energy_bench_nenergy_5             ... ignored
+test benchmarks::test::energy_bench_nenergy_6             ... ignored
+test benchmarks::test::energy_bench_nenergy_7             ... ignored
+test benchmarks::test::energy_bench_nenergy_8             ... ignored
+test benchmarks::test::energy_bench_nenergy_9             ... ignored
+test benchmarks::test::evaluate_bench_nenergy_1           ... bench:  11,106,464 ns/iter (+/- 1,746,488)
+test benchmarks::test::evaluate_bench_nenergy_2           ... bench:  10,952,637 ns/iter (+/- 3,015,099)
+test benchmarks::test::evaluate_bench_nenergy_3           ... bench:  10,779,924 ns/iter (+/- 1,115,300)
+test benchmarks::test::evaluate_bench_nenergy_4           ... bench:  10,674,015 ns/iter (+/- 1,218,173)
+test benchmarks::test::evaluate_bench_nenergy_5           ... bench:  10,597,315 ns/iter (+/- 1,565,714)
+test benchmarks::test::evaluate_bench_nenergy_6           ... bench:  10,394,542 ns/iter (+/- 1,370,995)
+test benchmarks::test::evaluate_bench_nenergy_7           ... bench:  10,459,327 ns/iter (+/- 3,031,317)
+test benchmarks::test::evaluate_bench_nenergy_8           ... bench:  10,426,418 ns/iter (+/- 1,183,630)
+test benchmarks::test::evaluate_bench_nenergy_9           ... bench:  10,168,316 ns/iter (+/- 1,286,419)
+test turning_points::test::turning_point_square_nenergy_1 ... bench:     352,416 ns/iter (+/- 14,520)
+test turning_points::test::turning_point_square_nenergy_2 ... bench:     345,360 ns/iter (+/- 18,186)
+test turning_points::test::turning_point_square_nenergy_3 ... bench:     334,762 ns/iter (+/- 10,151)
+test turning_points::test::turning_point_square_nenergy_4 ... bench:     320,085 ns/iter (+/- 17,957)
+test turning_points::test::turning_point_square_nenergy_5 ... bench:     337,889 ns/iter (+/- 16,637)
+test turning_points::test::turning_point_square_nenergy_6 ... bench:     319,445 ns/iter (+/- 140,482)
+test turning_points::test::turning_point_square_nenergy_7 ... bench:     318,446 ns/iter (+/- 19,353)
+test turning_points::test::turning_point_square_nenergy_8 ... bench:     321,418 ns/iter (+/- 135,708)
+test turning_points::test::turning_point_square_nenergy_9 ... bench:     325,621 ns/iter (+/- 18,741)
+test wave_function_builder::test::renormalize_square      ... bench:     147,407 ns/iter (+/- 11,088)
+\end{lstlisting}
+\vspace*{3ex}
+\begin{lstlisting}[caption={
+Test on machine 2 (specs~\ref{specs:m2}).
+}]
+test benchmarks::test::energy_bench_nenergy_1             ... ignored
+test benchmarks::test::energy_bench_nenergy_2             ... ignored
+test benchmarks::test::energy_bench_nenergy_3             ... ignored
+test benchmarks::test::energy_bench_nenergy_4             ... ignored
+test benchmarks::test::energy_bench_nenergy_5             ... ignored
+test benchmarks::test::energy_bench_nenergy_6             ... ignored
+test benchmarks::test::energy_bench_nenergy_7             ... ignored
+test benchmarks::test::energy_bench_nenergy_8             ... ignored
+test benchmarks::test::energy_bench_nenergy_9             ... ignored
+test benchmarks::test::evaluate_bench_nenergy_1           ... bench:  25,078,868 ns/iter (+/- 7,078,947)
+test benchmarks::test::evaluate_bench_nenergy_2           ... bench:  24,153,512 ns/iter (+/- 5,987,513)
+test benchmarks::test::evaluate_bench_nenergy_3           ... bench:  24,043,451 ns/iter (+/- 6,440,041)
+test benchmarks::test::evaluate_bench_nenergy_4           ... bench:  23,665,692 ns/iter (+/- 6,265,762)
+test benchmarks::test::evaluate_bench_nenergy_5           ... bench:  22,671,743 ns/iter (+/- 5,090,286)
+test benchmarks::test::evaluate_bench_nenergy_6           ... bench:  23,273,191 ns/iter (+/- 6,871,818)
+test benchmarks::test::evaluate_bench_nenergy_7           ... bench:  23,143,284 ns/iter (+/- 6,225,635)
+test benchmarks::test::evaluate_bench_nenergy_8           ... bench:  23,470,605 ns/iter (+/- 6,941,491)
+test benchmarks::test::evaluate_bench_nenergy_9           ... bench:  22,564,435 ns/iter (+/- 5,548,813)
+test turning_points::test::turning_point_square_nenergy_1 ... bench:   1,871,010 ns/iter (+/- 826,263)
+test turning_points::test::turning_point_square_nenergy_2 ... bench:   1,928,734 ns/iter (+/- 893,799)
+test turning_points::test::turning_point_square_nenergy_3 ... bench:   1,750,410 ns/iter (+/- 972,254)
+test turning_points::test::turning_point_square_nenergy_4 ... bench:   1,826,680 ns/iter (+/- 986,256)
+test turning_points::test::turning_point_square_nenergy_5 ... bench:   1,943,480 ns/iter (+/- 1,000,387)
+test turning_points::test::turning_point_square_nenergy_6 ... bench:   1,887,249 ns/iter (+/- 806,322)
+test turning_points::test::turning_point_square_nenergy_7 ... bench:   1,781,980 ns/iter (+/- 846,578)
+test turning_points::test::turning_point_square_nenergy_8 ... bench:   1,957,382 ns/iter (+/- 908,014)
+test turning_points::test::turning_point_square_nenergy_9 ... bench:   1,919,896 ns/iter (+/- 962,210)
+test wave_function_builder::test::renormalize_square      ... bench:     813,134 ns/iter (+/- 675,427)
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption={
+Previously ignored energy tests on machine 2
+}, label=out:m2:energy-bench]
+running 9 tests
+test benchmarks::test::energy_bench_nenergy_1             ... bench: 2,066,938,596 ns/iter (+/- 122,637,612)
+test benchmarks::test::energy_bench_nenergy_2             ... bench: 2,087,782,039 ns/iter (+/- 135,082,403)
+test benchmarks::test::energy_bench_nenergy_3             ... bench: 2,093,995,693 ns/iter (+/- 156,802,393)
+test benchmarks::test::energy_bench_nenergy_4             ... bench: 2,069,512,511 ns/iter (+/- 102,294,553)
+test benchmarks::test::energy_bench_nenergy_5             ... bench: 2,079,575,086 ns/iter (+/- 129,997,432)
+test benchmarks::test::energy_bench_nenergy_6             ... bench: 2,091,588,104 ns/iter (+/- 134,889,997)
+test benchmarks::test::energy_bench_nenergy_7             ... bench: 4,149,571,071 ns/iter (+/- 225,497,112)
+test benchmarks::test::energy_bench_nenergy_8             ... bench: 4,175,954,724 ns/iter (+/- 201,706,134)
+test benchmarks::test::energy_bench_nenergy_9             ... bench: 4,175,015,897 ns/iter (+/- 163,725,865)
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 9 measured; 35 filtered out; finished in 7521.30s
+\end{lstlisting}
+\renewcommand{\lstlistingname}{Code Snippet} % Listing->Code
+
+\subsection{Perf}
+\bashinline{perf stat -d -d -d -repeat 100} on super position of energies 1 through 9 of $x^{2}$.
+\begin{lstlisting}
+# started on Sat Nov 19 22:21:53 2022
+
+
+ Performance counter stats for './target/release/schroedinger_approx' (100 runs):
+
+      2,446,386.86 msec task-clock                       #   15.938 CPUs utilized            ( +-  0.07% )
+           769,294      context-switches                 #  314.455 /sec                     ( +-  0.73% )
+            18,443      cpu-migrations                   #    7.539 /sec                     ( +-  0.92% )
+            44,453      page-faults                      #   18.171 /sec                     ( +-  1.21% )
+ 7,820,854,372,190      cycles                           #    3.197 GHz                      ( +-  0.05% )  (40.00%)
+     8,485,422,199      stalled-cycles-frontend          #    0.11% frontend cycles idle     ( +- 28.66% )  (40.00%)
+     9,501,600,446      stalled-cycles-backend           #    0.12% backend cycles idle      ( +-  1.14% )  (40.00%)
+14,477,558,852,335      instructions                     #    1.85  insn per cycle
+                                                  #    0.00  stalled cycles per insn  ( +-  0.01% )  (40.00%)
+ 1,384,019,071,011      branches                         #  565.729 M/sec                    ( +-  0.02% )  (40.00%)
+       818,139,391      branch-misses                    #    0.06% of all branches          ( +-  0.45% )  (40.00%)
+ 5,582,382,628,800      L1-dcache-loads                  #    2.282 G/sec                    ( +-  0.02% )  (40.00%)
+   115,562,637,690      L1-dcache-load-misses            #    2.07% of all L1-dcache accesses  ( +-  0.17% )  (40.00%)
+   <not supported>      LLC-loads
+   <not supported>      LLC-load-misses
+    12,523,189,958      L1-icache-loads                  #    5.119 M/sec                    ( +-  0.48% )  (40.00%)
+        80,902,476      L1-icache-load-misses            #    0.64% of all L1-icache accesses  ( +-  0.61% )  (40.00%)
+     2,380,836,711      dTLB-loads                       #  973.186 K/sec                    ( +-  1.10% )  (40.00%)
+        53,829,893      dTLB-load-misses                 #    2.37% of all dTLB cache accesses  ( +-  1.68% )  (40.00%)
+        34,803,159      iTLB-loads                       #   14.226 K/sec                    ( +-  2.36% )  (40.00%)
+        17,518,263      iTLB-load-misses                 #   39.70% of all iTLB cache accesses  ( +-  1.86% )  (40.00%)
+   106,080,681,746      L1-dcache-prefetches             #   43.361 M/sec                    ( +-  0.00% )  (40.00%)
+   <not supported>      L1-dcache-prefetch-misses
+
+           153.498 +- 0.128 seconds time elapsed  ( +-  0.08% )
+\end{lstlisting}
+
 \section{Additional Plots}
 \subsection{Mexican Hat}
 \begin{figure}[H]
