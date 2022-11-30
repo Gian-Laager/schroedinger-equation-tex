@@ -518,17 +518,27 @@ from the definition.
 	\label{fig:integration-ilust}
 \end{figure}
 
-Figure~\ref{fig:integration-ilust} shows visually how the methods work, each blue trapeze from start ($a$) to end ($b$) has an area of
+Figure~\ref{fig:integration-ilust} shows visually how the methods work, each blue trapeze has an area of
 \[
 \int _{a}^{b}f(x)\,dx\approx (b-a)f\left({\cfrac {a+b}{2}}\right).
 \]
-One trapeze would be fairly inaccurate to calculate the area under the function, but as the area from $a$ to $b$ is subdivided further the result become better and better.
+where $a$ and $b$ are the bounds of integration. One trapeze would be fairly inaccurate to calculate the area under the function, but as the area from $a$ to $b$ is subdivided further the approximation
+generally gets better.
 
 The general structure of the algorithm can very easily be run in parallel since it doesn't matter in which order the segments are added together and the segments also don't dependent on one another.
-In Rust this is implemented using rayon. Rayon is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel \emph{just} by
-changing \rustinline{::iter()} to \rustinline{::par_iter()}~\citep{rayonreadme}. This might not work in all cases because of memory safety.
+In Rust this is implemented using \emph{rayon}. \emph{rayon} is an implementation for parallel iterators meaning that normal data structures that implement \rustinline{std::iter} can be run in parallel
+\emph{just} by changing \rustinline{::iter()} to \rustinline{::par_iter()}~\citep{rayonreadme}. While programing the author noticed that this does not work in all cases and the compiler would throw an
+error because certain objects can't be shared across threads. In particular the objects have to implement the \rustinline{Send} and \rustinline{Sync} traits \citep{rustlang2022nomicon}.
 
-\begin{rustcode}
+The implementation of the integral approximation consists of two functions as shown in code snippet~\ref{code:evaluate_function_between} and \ref{code:integrate}.
+
+\begin{rustcode}[caption = {
+    \rustinline{Point} stores both the input, x and the output, y of a function
+    and Such that functions with states, like wave functions that store parameters, can be integrated
+    there is a trait \rustinline{Func<A, R>}. The \rustinline{evaluate_function_between} then evaluates the function \rustinline{f} in the interval $(a,b)$ in parallel.
+    The type bonds of the function assure that as many data types of \rustinline{X} and \rustinline{Y} can be calculated.
+    This function is used to implement the actual integration and to evaluate the points of the wave function.
+  }, label = code:evaluate_function_between]
 pub trait Func<A, R>: Sync + Send {
     fn eval(&self, x: A) -> R;
 }
@@ -537,13 +547,9 @@ pub struct Point {
     pub x: f64,
     pub y: Complex64,
 }
-\end{rustcode}
-Such that functions with states, like wave functions that store parameters, can be integrated
-there is a trait \rustinline{Func<A, R>}.
 
-\rustinline{Point} stores both the input, x and the output, y of a function.
+// ...
 
-\begin{rustcode}
 pub fn evaluate_function_between<X, Y>(f: &dyn Func<X, Y>, a: X, b: X, n: usize) -> Vec<Point<X, Y>>
 where
     X: Copy
@@ -576,13 +582,13 @@ where
         .collect()
 }
 \end{rustcode}
-\rustinline{Func<X, Y>} can be passed to \rustinline{evaluate_function_between}
-it calculates \rustinline{n} points between an interval from \rustinline{a} to \rustinline{b}
-and returns a vector of \rustinline{Point}. \rustinline{X} and \rustinline{Y} are general
-data types such that it supports as many types of numbers as possible.
 
-\pagebreak
-\begin{rustcode}
+\begin{rustcode}[caption = {
+The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
+take more time to create a new thread then to actually do the calculation, these 1000 values are called a \emph{batch}.
+This parameter was chosen for the author's computer and 1000 might not be optimal for all CPUs.
+After all batches have been calculated the boundaries between batches also have to be considered therefor they are added in the end with \rustinline{rest}.
+    }, label=code:integrate]
 pub fn integrate<
     X: Sync + std::ops::Add<Output = X> + std::ops::Sub<Output = X> + Copy,
     Y: Default
@@ -625,10 +631,7 @@ pub fn integrate<
     return parallel + rest;
 }
 \end{rustcode}
-The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
-take more time to create a new thread then to actually do the calculation, these 1000 values are called a \emph{batch}.
-This parameter was chosen for the author's computer and 1000 might not be optimal for all CPUs.
-After all batches have been calculated the boundaries between batches also have to be considered therefor they are added in the end with \rustinline{rest}.
+
 
 \section{Transition Regions}
 The approximation that will be used splits $\Psi(x)$ into multiple parts that do not match perfectly together.
@@ -2302,10 +2305,6 @@ The source code is also available on the authors GitHub \\
 \lstinputlisting[language=Rust]{code/src/wkb_wave_func.rs}
 
 \end{appendix}
-\chapter*{Bildquellen}
-%
-Wo nicht anders angegeben, sind die Bilder aus dieser Arbeit selbst erstellt worden.
-%
 \bibliographystyle{plainnatromer}
 \bibliography{marbeit}
 
