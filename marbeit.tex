@@ -1178,6 +1178,223 @@ be used to construct the previously discussed \rustinline{WaveFunction}.
 Its implementation of \rustinline{Func<f64, Complex64>} will then sum over all the results of
 the individual \rustinline{WaveFunction} structs.
 
+
+\chapter{Results}
+\section{Wave Functions}
+\subsection{Hall Example}\label{sec:resutl:hall}
+As a first result lets replicate the example from hall with the 39th energy of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-39.pdf}
+  \caption{Wave function of 39th energy with $V(x) = x^{2}$, $m = 1$ and $f_{view}=0.1$.}
+\end{figure}
+This result is very similar to the plot~\cite[fig. 15.5]{hall2013quantum}. The only difference is the joint between the Airy function and the exponential WKB part. In our case the two functions don't
+meat as nicely.
+Overall the most important thing ought to be the number of maxima and minima which do match.
+
+\subsection{Phase Shift}
+Because the Schrödinger equation is linear we can rotate the wave function in the complex plane. For an example we will use a pase of $e^{\mi \frac{\pi}{4}}$ on the wave function of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-12-pi4.pdf}
+  \caption{Wave function of 12th energy with $V(x) = x^{2}$, $m = 1$ rotated by $\frac{\pi}{4}$.}
+\end{figure}
+
+\subsection{0th Energy}
+\begin{minipage}{\textwidth}
+In quantum mechanics the 0th energy is not always 0. As an example we will take the 0th
+energy of a square potential.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-0.pdf}
+  \caption{Wave function of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+Unfortunately there's a discontinuity at $x = 0$. This shouldn't happen when only using one
+turning point and it only seems to be a problem with the 0th energy
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/square-0-zoom.pdf}
+  \caption{Zoom of wave function of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+As far as the program is concerned $\Psi(x) = 0$ is a valid solution but this has to be done
+in a super position of the same energy with destructive interference.
+\[
+  \Psi_{super}(x) = 1 \cdot \Psi(x) - 1 \cdot \Psi(x) = 0
+\]
+In theory this is possible but can't be physically valid because the Schrödinger equation
+does not show the full picture. In quantum field theory the wave function would always
+oscillate in some way.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/super-square-0-0-destructive.pdf}
+  \caption{Destructive interference of 0th energy with $V(x) = x^{2}$.}
+\end{figure}
+
+$\Psi(x) = 0$ would still contain energy we just can't tell because energy usually only
+emerges in the time dependent Schrödinger equation.
+\end{minipage}
+
+
+\section{Mexican Hat Potential}
+For this example we will use the ``mexican hat'' potential.
+\[
+  V(x) = {(x - 4.0)}^{2} {(x + 4.0)}^{2}
+\]
+It is particularly interesting because it has a maxima. This means that at low engineries it will form two oscillations around the two minima.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-10.pdf}
+  \caption{Wave function of a mexican hat potential, with nth energy 10 and $m = 1$. The wave function oscillates in two intervals $(-4.85, -2.89)$ and $(2.89, 4.85)$. Between these intervals
+  function decease exponentially. The transition region from exponential WKB to Airy appears to have a bigger dependency then with a square potential. Even though the two functions should meat at the same point the exponential WKB part seems to have a larger magnitude.}
+\end{figure}
+
+\begin{minipage}{\textwidth}
+If the energy is high enough, the two oscillations will eventually merge into one as shown in figure~\ref{fig:mexican-hat-56th-energy}.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-56.pdf}
+  \caption{
+    Wave function of mexican hat potential, with nth energy 56 and $m = 1$. This is the first energy where the oscillating parts combine. The middle of the function has a rather low frequency compared
+    to the other oscillating parts.
+  }\label{fig:mexican-hat-56th-energy}
+\end{figure}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+  Unfortunately the program is not able to calculate the 55th energy because Newtons method fails to find the turning points in the middle. And with 54th energy the program doesn't generate any errors
+  but the region around $x = 0$ can't be correct (Figure~\ref{fig:mexican-hat-54th-energy}), this occurs because the program fails to detect all the turning points.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/mexican-hat-53.pdf}
+  \caption{
+    Wave function of mexican hat potential, with 53rd energy and $m = 1$. Because the oscillating parts are right at the boundary to merge, the wave function has a discontinuity that has been generated by the program at $x = 0$.
+  }\label{fig:mexican-hat-53rd-energy}
+\end{figure}
+But the 53rd energy can be calculated. However there's a discontinuity at $x = 0$ as shown in figure~\ref{fig:mexican-hat-53rd-energy}. This happens because there would be an extra term in the
+approximation that handles these cases. When this extension has been implemented, there were problems that most of the wave function would diverge to infinity.
+\end{minipage}
+
+\subsection{Super Position}
+While some wave functions with super position of energy seem to be chaotic, others are in some way beautiful because of there symmetries.
+Unfortunately the color plots usually don't make the symmetries that arise when plotted in 3D obvious.
+
+\begin{minipage}{\textwidth}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plots/super-square-1_1-2_i.pdf}
+\caption{\label{fig:label} Wave function of square potential, super position of $1$ times 1st energy and $\mi$ times 2nd energy. The function has three local maxim, it takes a full ``turn'' around
+    the complex plane because all the colors only occurs once. Further on the two maxima at $x \approx \pm 1.17$ are in opposite directions concerning the angle of the complex plane.}
+\end{figure}
+This is probably one of the simplest super position that can be made. In 3D it looks just like a single loop around the x-axis that emerges out of nowhere and disappears again by exponentially decaying.
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plots/super-square-10_1-11_1+i.pdf}
+\caption{\label{fig:interfence-left}Wave function of square potential, super position of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
+  is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefor this is an example of quantum interference. The two wave functions
+  interact in such a way that the state on the left is far more likely.}
+\end{figure}
+The same quantum interference as shown in figure~\ref{fig:interfence-left} can be inverted such that a position on the right is more likely by changing the factor of $1+\mi$ to $-1+\mi$ as shown in
+figure~\ref{fig:interference-right}.
+\end{minipage}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plots/super-square-10_1-11_-1+i.pdf}
+\caption{\label{fig:interference-right} Wave function of square potential, super position of $1$ times 10th energy and $-1+\mi$ times 11th energy. Just like figure~\ref{fig:interfence-left}
+    interference occurs, but in this superposition the probability on the right side of the plot is higher.}
+\end{figure}
+
+\subsection{Relationship between Energy and Mass}
+
+\section{Performance}
+In the appendix there's a detailed description of the test device~\ref{specs:m1}.
+\\[3ex]
+The overall ``felt performance'' by the user is from the experience of the author quite good. As
+expected higher energies generally take longer to run. The same also applies to potentials where simple potentials such as $x^{2}$ are quite fast and complex potentials such as \emph{triple mexican hat}
+take longer. Overall the goal that the program should give a quick feed back loop for simple inputs has been achieved because the results were done in under a minute. Particularly the energies 1-6 of
+$x^{2}$ can on the test machine be calculated in under 10 s, energies 1-57 in under 30 s and 1-155 in under 1 min. The 155th energy isn't a particularly low energy yet the program still managed to
+complete in under a minute.
+\\[3ex]
+Further on despite the ``felt'' performance of the user the benchmarks also show good results. As expected the most time is spent on integration. In particular finding energies. Even though energies in
+an interval of $10$ units are found in almost the same time frame (output~\ref{out:m2:energy-bench}). This is expected due to the algorithm described in section~\ref{sec:energy-calculation}. These could
+be fixed by using a grater search area by increasing the variable \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:47}. The overall evaluation process is fast with 100 samples in 10 ms. One concern
+also was that finding turning points would be slow but the measurements indicate that these calculations take less then a millisecond. Even though the bench mark for renormalization is fast, when applied
+to actual wave functions, it's really slow because thousands of points have to be calculated.
+
+Performance statistics from perf suggest that the program utilizes the CPU well. The memory layout also seems to be good.
+\\[3ex]
+All the benchmark results can be found in appendix~\ref{sec:app:benchmarks}.
+
+
+\section{Accuracy}
+To determine the accuracy, the mathematically exact solutions to the Schrödinger equation has to be calculated. This can simple potentials be done with WolframScript.
+In the \newline \bashinline{exact.wsl} file a exact solutions for the potential $x^{2}$ can be calculated. Note that the energies are still calculated with the Maslov-corrected Bohr–Sommerfeld condition
+is used to calculate the energies which is an approximation \citep[p. 307]{hall2013quantum}.
+\\[3ex]
+When running the script for the 5th energy level, two linearly independent solution \bashinline{psi1} and \bashinline{psi2} are calculated.
+\begin{lstlisting}
+psi1[x] = ParabolicCylinderD[4.999999999999998, 1.6817928305074292*x]
+psi2[x] = ParabolicCylinderD[-5.999999999999998, (0. + 1.6817928305074292*I)*x]
+\end{lstlisting}
+\bashinline{psi2} will be ignored because it diverges to infinity. Afterwards because \bashinline{psi1[x]} is not normalized, it is multiplied such that the maxima of the exact solution matches the
+maxima of the solutions calculated by \emph{schroedinger\_approx}. In figure~\ref{fig:approx-vs-exact} the two solutions are plotted together.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/approx_vs_exact_wave_square_5.pdf}
+  \caption{\label{fig:approx-vs-exact} The exact and approximate solution of the 5th energy of the potential $x^{2}$. As expected the grates error can be seen where the joint between the Airy and
+    exponential part was inserted. Otherwise the approximate solution is so close to the real solution that the difference is barely noticeable.}
+\end{figure}
+The absolute error is plotted in figure~\ref{fig:absolute-error}. Even though the exact solution to the mexican hat potential was not calculated, the error at the transition regions gets worse because
+one would expected a smooth exponential decay.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{plots/absolute_error_square_5.pdf}
+  \caption{\label{fig:absolute-error} Absolute error of the exact and approximate solution of the 5th energy of the potential $x^{2}$. The error in the semiclassical region is low around 0.01-0.015, this
+    meats the goal that the wave function should be ``visually accurate''. At the transition regions the error reaches it's maximum at around 0.034.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{plots/absolute_error_square_5_with_wave.pdf}
+  \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the red line indicates the error reaches a local maxima
+  at the maxima of the wave function itself. }
+\end{figure}
+The error at the local maxima, as shown in figure~\ref{fig:absolute-error-with-wave}, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This
+could be achieved by solving for a minimal area under the curve of the absolute error.
+
+For other energies then 5 the same pattern occurred, the error is greatest at the local maxima of the wave function and even bigger at the transition region.
+
+This error can be minimized by tuning the \rustinline{VALIDITY_LL_FACTOR} constant that makes the Airy functions larger. But this has to be done for each potential separately and the default value of 3.5
+should give reasonably good results for most potentials.
+
+\chapter{Conclusion}
+In the end the program could be extended and improved almost indefinitely. Unfortunately I had to stop improving it at some point to actually write this paper about how the program works.
+Looking back at the goals, the program is quite fast for low and even ``medium'' energies while still being able to calculate solutions for complex potentials. The accuracy can be tuned a little bit
+with the constants, but they don't offer a grate flexibility.
+
+One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
+impact on the user interface which is probably the worse part of the program. It is only accessible to programmers and can't be used to it's full potential when the user doesn't know Rust, a systems
+programming language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
+someone would like to.
+
+I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities in
+side the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program too more then one dimension.
+\\[3ex]
+In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
+
+\begin{appendix} %Anhang falls nötig
+%
+
 \chapter{Program Manual}\label{sec:manual}
 \section{Installation of schroedinger\_approx}
 This section is a guide on how to install \emph{schroedinger\_approx} on your computer. Please follow the section for your operating system.
@@ -1220,8 +1437,9 @@ The following instructions have only been tested under \emph{macOS Ventura 13.0.
 \\[3ex]
 First you'll need to install the package manager \emph{Homebrew}, it can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
 \begin{bashcode}
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 \end{bashcode}
+
 Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
 Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
 \\[3ex]
@@ -1497,223 +1715,6 @@ fn polynom(x: f64) -> f64 {
 You need to set values for \rustinline{a}, \rustinline{b}, etc. and they need to be floating point numbers or you'll get error E0308. For example \rustinline{1} would cause an error but \rustinline{1.0}
 or \rustinline{3.141} are correct. You can add even more coefficients if you'd like. The 4 in the square brackets is the degree of the polynomial plus 1.
 The potential above would mathematically be $a + b x + c x^{2} + d x^{3}$.
-
-\chapter{Results}
-\section{Wave Functions}
-\subsection{Hall Example}\label{sec:resutl:hall}
-As a first result lets replicate the example from hall with the 39th energy of a square potential.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/square-39.pdf}
-  \caption{Wave function of 39th energy with $V(x) = x^{2}$, $m = 1$ and $f_{view}=0.1$.}
-\end{figure}
-This result is very similar to the plot~\cite[fig. 15.5]{hall2013quantum}. The only difference is the joint between the Airy function and the exponential WKB part. In our case the two functions don't
-meat as nicely.
-Overall the most important thing ought to be the number of maxima and minima which do match.
-
-\subsection{Phase Shift}
-Because the Schrödinger equation is linear we can rotate the wave function in the complex plane. For an example we will use a pase of $e^{\mi \frac{\pi}{4}}$ on the wave function of a square potential.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/square-12-pi4.pdf}
-  \caption{Wave function of 12th energy with $V(x) = x^{2}$, $m = 1$ rotated by $\frac{\pi}{4}$.}
-\end{figure}
-
-\subsection{0th Energy}
-\begin{minipage}{\textwidth}
-In quantum mechanics the 0th energy is not always 0. As an example we will take the 0th
-energy of a square potential.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/square-0.pdf}
-  \caption{Wave function of 0th energy with $V(x) = x^{2}$.}
-\end{figure}
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-Unfortunately there's a discontinuity at $x = 0$. This shouldn't happen when only using one
-turning point and it only seems to be a problem with the 0th energy
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/square-0-zoom.pdf}
-  \caption{Zoom of wave function of 0th energy with $V(x) = x^{2}$.}
-\end{figure}
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-As far as the program is concerned $\Psi(x) = 0$ is a valid solution but this has to be done
-in a super position of the same energy with destructive interference.
-\[
-  \Psi_{super}(x) = 1 \cdot \Psi(x) - 1 \cdot \Psi(x) = 0
-\]
-In theory this is possible but can't be physically valid because the Schrödinger equation
-does not show the full picture. In quantum field theory the wave function would always
-oscillate in some way.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/super-square-0-0-destructive.pdf}
-  \caption{Destructive interference of 0th energy with $V(x) = x^{2}$.}
-\end{figure}
-
-$\Psi(x) = 0$ would still contain energy we just can't tell because energy usually only
-emerges in the time dependent Schrödinger equation.
-\end{minipage}
-
-
-\section{Mexican Hat Potential}
-For this example we will use the ``mexican hat'' potential.
-\[
-  V(x) = {(x - 4.0)}^{2} {(x + 4.0)}^{2}
-\]
-It is particularly interesting because it has a maxima. This means that at low engineries it will form two oscillations around the two minima.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/mexican-hat-10.pdf}
-  \caption{Wave function of a mexican hat potential, with nth energy 10 and $m = 1$. The wave function oscillates in two intervals $(-4.85, -2.89)$ and $(2.89, 4.85)$. Between these intervals
-  function decease exponentially. The transition region from exponential WKB to Airy appears to have a bigger dependency then with a square potential. Even though the two functions should meat at the same point the exponential WKB part seems to have a larger magnitude.}
-\end{figure}
-
-\begin{minipage}{\textwidth}
-If the energy is high enough, the two oscillations will eventually merge into one as shown in figure~\ref{fig:mexican-hat-56th-energy}.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/mexican-hat-56.pdf}
-  \caption{
-    Wave function of mexican hat potential, with nth energy 56 and $m = 1$. This is the first energy where the oscillating parts combine. The middle of the function has a rather low frequency compared
-    to the other oscillating parts.
-  }\label{fig:mexican-hat-56th-energy}
-\end{figure}
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-  Unfortunately the program is not able to calculate the 55th energy because Newtons method fails to find the turning points in the middle. And with 54th energy the program doesn't generate any errors
-  but the region around $x = 0$ can't be correct (Figure~\ref{fig:mexican-hat-54th-energy}), this occurs because the program fails to detect all the turning points.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/mexican-hat-53.pdf}
-  \caption{
-    Wave function of mexican hat potential, with 53rd energy and $m = 1$. Because the oscillating parts are right at the boundary to merge, the wave function has a discontinuity that has been generated by the program at $x = 0$.
-  }\label{fig:mexican-hat-53rd-energy}
-\end{figure}
-But the 53rd energy can be calculated. However there's a discontinuity at $x = 0$ as shown in figure~\ref{fig:mexican-hat-53rd-energy}. This happens because there would be an extra term in the
-approximation that handles these cases. When this extension has been implemented, there were problems that most of the wave function would diverge to infinity.
-\end{minipage}
-
-\subsection{Super Position}
-While some wave functions with super position of energy seem to be chaotic, others are in some way beautiful because of there symmetries.
-Unfortunately the color plots usually don't make the symmetries that arise when plotted in 3D obvious.
-
-\begin{minipage}{\textwidth}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{plots/super-square-1_1-2_i.pdf}
-\caption{\label{fig:label} Wave function of square potential, super position of $1$ times 1st energy and $\mi$ times 2nd energy. The function has three local maxim, it takes a full ``turn'' around
-    the complex plane because all the colors only occurs once. Further on the two maxima at $x \approx \pm 1.17$ are in opposite directions concerning the angle of the complex plane.}
-\end{figure}
-This is probably one of the simplest super position that can be made. In 3D it looks just like a single loop around the x-axis that emerges out of nowhere and disappears again by exponentially decaying.
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{plots/super-square-10_1-11_1+i.pdf}
-\caption{\label{fig:interfence-left}Wave function of square potential, super position of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
-  is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefor this is an example of quantum interference. The two wave functions
-  interact in such a way that the state on the left is far more likely.}
-\end{figure}
-The same quantum interference as shown in figure~\ref{fig:interfence-left} can be inverted such that a position on the right is more likely by changing the factor of $1+\mi$ to $-1+\mi$ as shown in
-figure~\ref{fig:interference-right}.
-\end{minipage}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{plots/super-square-10_1-11_-1+i.pdf}
-\caption{\label{fig:interference-right} Wave function of square potential, super position of $1$ times 10th energy and $-1+\mi$ times 11th energy. Just like figure~\ref{fig:interfence-left}
-    interference occurs, but in this superposition the probability on the right side of the plot is higher.}
-\end{figure}
-
-\subsection{Relationship between Energy and Mass}
-
-\section{Performance}
-In the appendix there's a detailed description of the test device~\ref{specs:m1}.
-\\[3ex]
-The overall ``felt performance'' by the user is from the experience of the author quite good. As
-expected higher energies generally take longer to run. The same also applies to potentials where simple potentials such as $x^{2}$ are quite fast and complex potentials such as \emph{triple mexican hat}
-take longer. Overall the goal that the program should give a quick feed back loop for simple inputs has been achieved because the results were done in under a minute. Particularly the energies 1-6 of
-$x^{2}$ can on the test machine be calculated in under 10 s, energies 1-57 in under 30 s and 1-155 in under 1 min. The 155th energy isn't a particularly low energy yet the program still managed to
-complete in under a minute.
-\\[3ex]
-Further on despite the ``felt'' performance of the user the benchmarks also show good results. As expected the most time is spent on integration. In particular finding energies. Even though energies in
-an interval of $10$ units are found in almost the same time frame (output~\ref{out:m2:energy-bench}). This is expected due to the algorithm described in section~\ref{sec:energy-calculation}. These could
-be fixed by using a grater search area by increasing the variable \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:47}. The overall evaluation process is fast with 100 samples in 10 ms. One concern
-also was that finding turning points would be slow but the measurements indicate that these calculations take less then a millisecond. Even though the bench mark for renormalization is fast, when applied
-to actual wave functions, it's really slow because thousands of points have to be calculated.
-
-Performance statistics from perf suggest that the program utilizes the CPU well. The memory layout also seems to be good.
-\\[3ex]
-All the benchmark results can be found in appendix~\ref{sec:app:benchmarks}.
-
-
-\section{Accuracy}
-To determine the accuracy, the mathematically exact solutions to the Schrödinger equation has to be calculated. This can simple potentials be done with WolframScript.
-In the \newline \bashinline{exact.wsl} file a exact solutions for the potential $x^{2}$ can be calculated. Note that the energies are still calculated with the Maslov-corrected Bohr–Sommerfeld condition
-is used to calculate the energies which is an approximation \citep[p. 307]{hall2013quantum}.
-\\[3ex]
-When running the script for the 5th energy level, two linearly independent solution \bashinline{psi1} and \bashinline{psi2} are calculated.
-\begin{lstlisting}
-psi1[x] = ParabolicCylinderD[4.999999999999998, 1.6817928305074292*x]
-psi2[x] = ParabolicCylinderD[-5.999999999999998, (0. + 1.6817928305074292*I)*x]
-\end{lstlisting}
-\bashinline{psi2} will be ignored because it diverges to infinity. Afterwards because \bashinline{psi1[x]} is not normalized, it is multiplied such that the maxima of the exact solution matches the
-maxima of the solutions calculated by \emph{schroedinger\_approx}. In figure~\ref{fig:approx-vs-exact} the two solutions are plotted together.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/approx_vs_exact_wave_square_5.pdf}
-  \caption{\label{fig:approx-vs-exact} The exact and approximate solution of the 5th energy of the potential $x^{2}$. As expected the grates error can be seen where the joint between the Airy and
-    exponential part was inserted. Otherwise the approximate solution is so close to the real solution that the difference is barely noticeable.}
-\end{figure}
-The absolute error is plotted in figure~\ref{fig:absolute-error}. Even though the exact solution to the mexican hat potential was not calculated, the error at the transition regions gets worse because
-one would expected a smooth exponential decay.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{plots/absolute_error_square_5.pdf}
-  \caption{\label{fig:absolute-error} Absolute error of the exact and approximate solution of the 5th energy of the potential $x^{2}$. The error in the semiclassical region is low around 0.01-0.015, this
-    meats the goal that the wave function should be ``visually accurate''. At the transition regions the error reaches it's maximum at around 0.034.}
-\end{figure}
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=\textwidth]{plots/absolute_error_square_5_with_wave.pdf}
-  \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the red line indicates the error reaches a local maxima
-  at the maxima of the wave function itself. }
-\end{figure}
-The error at the local maxima, as shown in figure~\ref{fig:absolute-error-with-wave}, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This
-could be achieved by solving for a minimal area under the curve of the absolute error.
-
-For other energies then 5 the same pattern occurred, the error is greatest at the local maxima of the wave function and even bigger at the transition region.
-
-This error can be minimized by tuning the \rustinline{VALIDITY_LL_FACTOR} constant that makes the Airy functions larger. But this has to be done for each potential separately and the default value of 3.5
-should give reasonably good results for most potentials.
-
-\chapter{Conclusion}
-In the end the program could be extended and improved almost indefinitely. Unfortunately I had to stop improving it at some point to actually write this paper about how the program works.
-Looking back at the goals, the program is quite fast for low and even ``medium'' energies while still being able to calculate solutions for complex potentials. The accuracy can be tuned a little bit
-with the constants, but they don't offer a grate flexibility.
-
-One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
-impact on the user interface which is probably the worse part of the program. It is only accessible to programmers and can't be used to it's full potential when the user doesn't know Rust, a systems
-programming language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
-someone would like to.
-
-I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities in
-side the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program too more then one dimension.
-\\[3ex]
-In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
-
-\begin{appendix} %Anhang falls nötig
-%
-
 \chapter{Detailed Calculations and Tests}
 \section{Test Machine Specs}
 This output was generated by \bashinline{garuda-inxi}. ``[\dots]'' Means the data was removed because it is not necessary.
