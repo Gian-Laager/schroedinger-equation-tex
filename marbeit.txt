@@ -1,0 +1,935 @@
+1 Introduction
+Richard Feynmann one of the core people behind our modern theory of quantum mechanics
+repeatedly said: “I think I can safely say that nobody understands quantum mechanics.”.
+Nothing behaves like in our every day lives. Everything is just a probability and nothing
+is certain. Even Schrödinger the inventor of the equation that governs all of those weird
+phenomena rejected the idea that there are just probabilities.
+In this paper we will try to understand this world a little bit better by looking at wave
+functions in a simplified universe. This universe only has 1 dimension and there will not be
+any sense of time. This means that the wave function can actually be plotted and one can
+look at it. Usually in our universe the wave function has more then 3 dimensions, meaning
+we can’t really imagine nor visualize it intuitively.
+
+1.1 Goals
+The goal of this Matura thesis is to write a program, schroeding-approx that calculates
+solutions to the time independent Schrödinger equation in 1 dimension for a large variety
+of potentials. For the calculation it is assumed that the wave function, Ψ(x) will converge
+to 0 as x goes to ±∞. The program should be reasonably fast, meaning that for simple
+potentials and low energies it should be done in under 1 minute. The architecture should
+be able to support improvements.
+Making the program user friendly is not a main focus. Meaning that a clear and simple
+API that can be extended in the future is enough. Even though the user will have to edit the
+code to, for example change between energies.
+The program should also follow the UNIX philosophy, “do one thing and one thing well”.
+As a consequence the program will only do the calculations and not the plotting. But it
+provides a simple and clear interface for a plotting program such as GNU Plot.
+The main focus will be to balance performance and accuracy. Accuracy manly meaning
+that the visualizations should be visually accurate and give some insight into quantum mechanics. The user should also be able to tune the balance between performance and accuracy
+to some degree.
+
+2 Preliminary
+2.1 Schrödinger Equation
+In 1926 Erwin Schrödinger changed our understanding of quantum physics with the Schrödinger
+equation. Based on the observations of de Broglie that particles behave like waves, he developed a wave equation which describes how the waves move and change in a given potential
+V (x).
+The time independent version that is going to be used later, ignores the change over time
+and is much simpler to solve since it is only an ordinary differential equation instead of a
+partial differential equation.
+Even with the time independent equation it is very difficult to get analytical solutions,
+because of this there are mainly three approaches to approximate solutions of ψ(x), perturbation theory, density functional field theory and WKB approximation. Perturbation theory’s
+goal is to give an analytical approximation which means it is extremely difficult to implement
+for a computer. WKB on the other hand is much better since it is to some degree a step by
+step manual.
+
+2.2 Rust
+Rust is one of the newer programming languages and attempts to replace C/C++ which are
+notoriously difficult to work with. It supports both functional and object-oriented paradigms.
+It is much safer in terms of memory and promises the same performance as C. One of the goals
+of Rust is fearless concurrency which means everybody should be able to write concurrent
+code without deadlocks and data races. This means calculations can utilize the full potential
+of the CPU without countless hours of debugging.
+Functional programming languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
+Rust as of the time of writing this document is not yet standardized meaning the code
+provided might no longer be correct with one of the newer Rust versions.
+To learn more about Rust, it has excellent documentation on https://doc.rust-lang.
+org/book/.
+
+2.3 Interpretation of Quantum Mechanics
+The author believes in the many worlds interpretation of Hugh Everett. “The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is
+held to be the fundamental entity, obeying at all times a deterministic wave equation.” (DeWitt
+
+und Graham, 2015, p. 115). This means that the observer is also quantum mechanical and
+gets entangled with one particular state of the system that is being measured (DeWitt und
+Graham, 2015, p. 116). This is some what different to the popular explanation of many
+worlds but has the same results and is, at least to the author more reasonable.
+An important point for the author also was that the theory accepts quantum mechanics as
+it is and doesn’t make unreasonable assumption such as that the observer plays an important
+role.
+On top of that this interpretation also discards the need for an “observation” in the program
+which would also be mathematically impossible (DeWitt und Graham, 2015, p. 111).
+
+2.4 Complex Numbers
+In quantum mechanics it’s customary to work with complex numbers. Complex numbers
+are an extension to the real numbers, since Rust will do most of the calculations, you don’t
+have to master complex numbers. i is the imaginary unit, z is the general form of a complex
+number where {a, b} ∈ R, z is the complex conjugate and ∥z∥2 is the norm square of z. The
+last equation is the Euler’s formula, it rotates a number in the complex plane by θ radians.
+The angle θ is also called the argument of a complex number and corresponds to the color
+mentioned in section 2.6.
+The complex plane is similar to the real number line, every complex number can be represented as a point on this plane where Re(z) is the x-coordinate and Im(z) is the y-coordinate.
+
+2.5 GNU Plot
+Gnuplot is a cross platform plotting program that has all the features needed to plot the
+wave functions. schroedinger-approx will output a file data.txt and the corresponding
+GNU Plot scripts to plot the wave function.
+
+2.5.1 Usage
+To plot a wave function you can type gnuplot in a terminal in the output directory. This will
+open a prompt. You can then run one of the following commands.
+
+call “plot.gnuplot” This will plot the real part of the wave function.
+call “plot_im.gnuplot” This will plot the imaginary part of the wave function.
+call “plot_3d.gnuplot” This will plot the wave function as a 3d graph.
+call “plot_color.gnuplot” This will plot the wave function as a color plot according to
+section 2.6.
+If you’d like to learn more about Gnuplot you can read there user manual on http://www.
+gnuplot.info/
+
+2.6 Reading Complex Plots
+In the case of this paper we will try to plot a function This means that the resulting plot will
+be 3 dimensional. The two main visualizations would be just to plot a 3D surface or add
+the argument of the complex number as a color. The first method works better if one can
+interact with the structure. However this is not really possible in a PDF or on a paper. This
+is why both options will be implemented.
+For example on the next page the plot from the title page is plotted both as a 3D plot and
+color plot for comparison.
+
+Figure 2.1: 3D plot of super position of V (x) = x 2 and energies 9, 12 and 15. One can’t
+really see anything and it’s just a mess, this would be better if one could interact
+with the plot on the computer.
+
+Figure 2.2: Color plot of super position of V (x) = x 2 and energies 9, 12 and 15. Although
+it takes time to get used to, this plot is much clearer compared to figure 2.1.
+
+As shown in figure 2.1, the 3D plot is basically unusable since there is no depth. This
+would usually be fixed with lighting but it would be very difficult to apply lighting on a line
+such that one could actually see the depth. In the color plot every thing seems to be clear.
+Except that the values of the phase can’t be read precisely.
+When plotting the function yourself the author would still recommend the 3D plot because
+it’s clearer when you can move it around.
+Figure 2.3 should help to read the color plots.
+Figure 2.3: Illustration of the mapping of an angle to color to represent complex numbers.
+Every argument of a complex number is assigned to a color.
+For example 1 + 0i would have the color cyan and 0 + 1i would be purple. This graph is
+a handy tool to read the color plots that will be used later since it’s easier to associate the
+angle with the color if the color is actually at that angle rather then a number in radians.
+
+2.7 Planck Units
+By using Planck units the equations get a little bit easier. Working in Planck units means that
+all fundamental constants are equal to 1. This means that the constants will usually cancel
+out.
+To convert to SI units one can just multiply powers of the constants such that there unit
+results in one of the base units.
+(Gaarder Haug, 2016, Table 1)
+The program will take all of its in- and outputs in Planck units.
+
+2.8 Benchmarking
+Benchmarking is the process where one tests the performance of software. In the case of
+schroeding_approx the goal would be to test the individual parts and find out where improvements are possible. And in a later step if the supposed improvements actually improved the
+performance. For this the two tools described below will be used.
+
+2.8.1 perf
+perf is a collection of performance analysis tools for Linux (Linux Kernel Organization, 2022).
+It will later be used to measure the performance of schroedinger_approx. In its manual page
+(Linux Kernel Organization, 2022) it’s described as:
+Performance counters for Linux are a new kernel-based subsystem that provide a framework for all things performance analysis. It covers hardware level
+(CPU/PMU, Performance Monitoring Unit) features and software features (software counters, tracepoints) as well.
+
+In particular perf stat and perf record will be used.
+The outputs produced by perf stat are fairly technical can measure performance on the
+CPU level. Most of the metrics produced will not be used. Below there’s an example output
+of a benchmark of schroedinger_approx.
+
+CPUs utilized This states how many “percent” of the CPU were actually used, important to
+note is that “CPU” in this case means hardware thread. In the case of the test machine,
+it has 8 cores with 2 threads each, therefor in theory this number could be as high
+as 16.0. The goal would be to use as much of the CPU as possible but one has to be
+cautious because other processes besides schroedinger_approx are also running and use
+some part of the CPU.
+
+context-switches This factor is handled by the Linux kernel. The kernel switches between
+processes that can run on a thread of the CPU. In this case most of the context switches
+were happening inside schroedinger_approx itself because behind the scene it uses a
+thread pool. In general it is an indicator of how efficiently the kernel can handle the
+multi threading in a program.
+
+page-faults This is an “error” that happens inside the CPU when a process is trying to
+access memory that is not yet loaded into the cache of the CPU. When the number of
+page faults per second is high, the process’s memory layout is not good and should be
+optimized. These kind of optimizations are very hard to do.
+
+branch-misses Modern CPUs don’t actually execute the assembly directly but they perform speculative execution. This means the CPU “guesses” ahead if for example an
+if-statement will be true and then already do the calculations before the instruction
+pointer actually reached the branch. Even though the CPU is pretty good at “guessing”
+if it’s wrong it has to throw away all those calculation, this is called a branch miss. The
+code can be made faster if the percentage of branch misses is low (< 0.05%), this can
+be done by writing “predictable” code which requires intensive testing.
+
+time elapsed This is the time the program was running. This is similar to the time command.
+
+2.8.2 Rust Benchmarks
+The nightly version of Rust contains benchmarks that can be run with the command cargo
+bench. The benchmarks are the functions marked with the #[bench] macro. All those
+functions take a test::Bencher as an argument. This struct will measure the time it takes
+the code to complete. It will also run the fragments multiple times. Finlay it will print the
+time measurements for each benchmark to the terminal.
+While perf captures the big picture, it’s possible to zoom in to the individual components
+of the system with Rust benchmarks.
+
+3 Methods
+This chapter is about the implementation details and which algorithms and mathematics are
+used behind the scenes. Some smaller details of the code will not be discussed.
+
+3.1 Program Architecture
+The program has multiple interfaces, or traits as they are called in Rust, that give the program
+some abstraction. In Appendix ?? is a diagram of the architecture. Since the current version
+of Rust does not support manual implementations of std::ops::Fn a custom trait will be
+defined for functions Func<A, R> where A is the type of the argument and R is the return
+type. Later this trait will be used to implement functions for integration, evaluation and
+more utilities.
+The WaveFunction struct is at the heart of the program, it contains all the functionality to
+build wave functions. It is composed of WaveFunctionPart which represent either a Joint,
+PureWkb or an ApproxPart which will be discussed in detail in section 4.4. With the range
+function it can be checked when a part is valid that is to say when it can be evaluated without
+a large error.
+
+3.2 Newtons Method
+Newton’s method, also called the Newton-Raphson method, is a root-finding algorithm that
+uses the first few terms of the Taylor series of a function f (x) in the vicinity of a suspected
+root (Weisstein, 2022). It makes a sequence of approximations of a root x n that in certain
+cases converges to the exact value where
+The sequence needs a first guess of where the root could be which will be the variable a, then
+the sequence is defined as Visually this looks like figure 3.1 where f (x) = (x −2)(x −1)(x +1)
+was taken as an example.
+Figure 3.1: Illustration of Newtons method, f (x) = (x − 1)(x − 2)(x + 1).The blue line indicates the initial guess which in this case is 2.5 the black line (g(x)) is a tangent to
+f (x) at (guess, f (guess)) the next guess will be where the tangent intersects the
+x-axis (solution of g(x) = 0). This will converges quicker then other methods
+such as Regula falsi
+.
+
+Code Snippet 3.1: Implementation of Newtons method. The function takes a closure f, the
+initial guess guess and a stop condition precision. The function will
+return if f (x n ) / f ′ (x n ) is less than precision. If the derivative at any
+point becomes 0 the function will panic. Because of this the function
+newtons_method_max_iters provides an alternate implementation that
+will not panic and always return an Option.
+An extension to the function in snippet 3.1 is implemented in the struct NewtonsMethodFindNewZero
+which can be used to find multiple roots.
+From the structure of the algorithm it is tempting to implement it recursively, but by using
+a loop it is much faster since there are no unnecessary function calls and the precision can
+(at least in theory) be 0 without causing a stack overflow.
+
+3.3 Regula Falsi with Bisection
+Newtons method fails if the first guess is at a maximum, since the step would go to infinity.
+For these cases a bisection method will be applied until the sign of the function changes.
+This needs to done because Regula Falsi requires two guesses.
+The algorithm itself is quite simple. To start define the parameters Then draw a line
+between the two points (a, f (a)) and (b, f (b)). Then b becomes the x-value where the line
+intersects the x-axis, when this process is applied again with the new b the resulting value
+will become the new a. This process can be repeated until a fresh hold is crossed for the
+accuracy and the result will be the last intersection of the line with the x-axis.
+
+3.4 Derivatives
+Derivatives can be calculated numerically as in the C++ library Boost (John Maddock). The
+author implemented a analytical system for calculating derivatives in Go. This project used
+an interface an interface with two methods function and derivative. After wards functions for
+operations like multiplication, addition, etc. were added. In these operations the functions
+derivative was build based on the operation. This process of writing functions is tedious and
+the performance is worse then in the numerical implementation in rust (snippet 3.2).
+Code Snippet 3.2: Rewrite of the C++ library Boost’s implementation (John Maddock) of
+numerical differentiation for Rust. f64::epsilon().sqrt() is approximately 1.4901161 · 10−8 . f64::epsilon() is the smallest double precision floating point number ε where 1 + ε ̸= 1. This value has been chosen
+for d x because it is precise enough.
+
+3.5 Integration
+The same principles apply to integrals as to derivatives, it wouldn’t be a great benefit to
+implement an analytic integration system. Integrals would also be much more difficult to
+
+implement than derivatives since integrals can not be broken down in to many smaller integrals that can be computed easily. Instead it would have to be solved as is.
+One approach would be to use the same method as with the derivative, take the definition
+with the limit and use a small value. But this method can be improved, since integrals
+calculate areas under curves a trapeze is more efficient and accurate then the rectangle that
+results from the definition.
+Figure 3.2: Illustration of integration with trapeze from Wkipedia (2022).
+Figure 3.2 shows visually how the methods work, each blue trapeze from start (a) to end
+(b) has an area of One trapeze would be fairly inaccurate to calculate the area under the
+function, but as the area from a to b is subdivided further the result become better and
+better.
+The general structure of the algorithm can very easily be run in parallel since it doesn’t
+matter in which order the segments are added together and the segments also don’t dependent on one another. In Rust this is implemented using rayon. Rayon is an implementation
+for parallel iterators meaning that normal data structures that implement std::iter can be
+run in parallel just by changing ::iter() to ::par_iter() (rayon rs, 2022). This might not
+work in all cases because of memory safety.
+Such that functions with states, like wave functions that store parameters, can be integrated
+there is a trait Func<A, R>.
+Point stores both the input, x and the output, y of a function.
+Func<X, Y> can be passed to evaluate_function_between it calculates n points between an
+
+interval from a to b and returns a vector of Point. X and Y are general data types such that
+it supports as many types of numbers as possible.
+
+The actual integration happens in integrate, it calculates the areas of the trapezes between
+the points passed to it. For optimization 1000 trapezes are calculated per thread because it
+would take more time to create a new thread then to actually do the calculation, these 1000
+values are called a batch. This parameter was chosen for the author’s computer and 1000
+might not be optimal for all CPUs. After all batches have been calculated the boundaries
+between batches also have to be considered therefor they are added in the end with rest.
+
+3.6 Transition Regions
+The approximation that will be used splits Ψ(x) into multiple parts that do not match perfectly together.
+Figure 3.3: Two example functions that should be joined at x = π2 . The functions are two
+Taylor series of cosine, they have been chosen as an example because they don’t
+overlap and get close together at x = π2 .
+Lets consider an example, in figure 3.3 we can see two Taylor series of cosine. Now the
+two functions have to joined at x = π/2 such that its a mathematically smooth transition.
+As a first guess lets join f (x) and g(x) with a step function, this means that the joint
+function h(x) will be This results in figure 3.4 which is obviously not smooth.
+Figure 3.4: Plot of h(x) with step joint. As shown the transition is not smooth and there’s a
+discontinuity at x = π2 .
+Using the formula from (Hall, 2013, p. 325, section 15.6.4) a much better result can be
+obtained which is mathematically smooth as can be see in figure 3.5 (proof in Appendix ??).
+Figure 3.5: Plot of h(x) with Hall joint. The function is smooth and has a slight bump at
+x = π2
+
+3.6.1 Implementation in Rust
+In the program the struct Joint implements the formula from Hall (2013). As in the example
+the two functions f (x) and g(x), which will be renamed to left and right, have to be joined
+at α over a range of δ. The variables α and δ are from now on called cut and delta.
+In the proof it has been assumed that f (x) and g(x) are continuous of first order in the
+interval (α, α + δ). In the code this assumption will not be checked, since it would have a
+major impact on performance to check the derivative on every point.
+
+4 Calculation
+4.1 Energy Levels
+Solving the Schrödinger equation is an eigenvalue problem. This means that only certain
+energies will result in physically correct results. For an energy to be valid it has to satisfy the
+condition described by (Hall, 2013, eq. 15.31). It can be interpreted such that the oscillating
+part of the wave function has to complete all half oscillation. Hall (2013) also states that
+the equations from section 4.2 have to agree, up to a multiplication by a constant which will
+be the case iff equation ?? is satisfied.
+To solve this problem for an arbitrary potential in a computer, the set C and the fact that
+n has to be a non negative integer is not really helpful, but the condition can be rewritten
+to Unfortunately ?? is not continuous which means that Newtons method can’t be applied.
+Further on the bounds of integration have to be finite, this means the user of the program will
+have to specify a value for the constant APPROX_INF where any value for x out side of that
+range should satisfy V (x) > E. But it shouldn’t be to big since the integrate function can
+only evaluate a relatively small number (default 64000) of trapezes before the performance
+will suffer enormously. The default value for APPROX_INF is (-200.0, 200.0).
+Code Snippet 4.1: The implementation checks for discontinuities in the first the interval
+(0.0, ENERGY_STEP) is checked, if there are not enough zeros the next
+interval is checked. This is repeated until n zeros have been found. It’s
+also possible that equation ?? is negative before the 0th energy therefor
+it is also checked for sign changes.
+The struct SommerfeldCond is a Func<f64, f64> that evaluates ??.
+
+4.1.1 Accuracy
+For a benchmark the values mentioned below, will be used. To get the actual values the Wolfram Language with WolframScript will be used. WlolframScript is a programing language
+similar to Wolframalpha that can calculate the integral analytically and precisely. In Rust
+main can be rewritten to
+Code Snippet 4.2: Main function that calculates energies 0-50 of square potential and writes
+the results to energy.txt.
+The same procedure is implemented in WolframScript.
+These programs will output two files energies_approx.dat (Appendix ??) for the implementation in Rust and energies_exact.dat (Appendix ??) for WolframScript. As a ruff estimate
+
+an error of ±
+
+10
+
+64000
+with that step size.
+
+≈ ±1.56 · 10−4 is expected, because the program checks for energies
+
+Figure 4.1: Absolute error of energy levels in square potential. The error is a little higher
+than expected which is probably due to errors in the integral. Still the algorithm
+should be precise enough.
+The absolute error is plotted in figure 4.1. If you’d like you could pick a lower value
+for ENERGY_STEP in src/energy.rs:49, but this will impact the performance for calculating
+energies with higher numbers for n.
+
+4.2 Approximation Scheme
+There are mainly three approximation methods used to solve for the actual wave function
+itself. There is perturbation theory which breaks the problem down in to ever smaller subproblems that then can be solved exactly. This can be achieved by adding something to the
+Hamiltonian operator Ĥ which can then be solved exactly. But perturbation theory is inefficient compared to other approximation methods when calculated on a computer (Van Mourik
+et al., 2014, Introduction).
+The second is Density functional field theory would be interesting to add to the program
+in the future, but it would require major changes in the architecture.
+The program uses the third method WKB approximation, it is applicable to a wide verity
+of linear differential equations and works very well in the case of the Schrödinger equation.
+Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian Ĥ in one dimension. The approximation
+is best understood as applying to a fixed range of energies as ℏ tends to zero (Hall, 2013,
+p. 305). Even though in Planck units ℏ = 1 the approximation is still valid because it actually
+actually assumes that other terms independent to ℏ tend to 0.
+WKB splits Ψ(x) into tree parts that can be connected to form the full solution. The tree
+parts are described as
+Since equation ?? might have more than one solution for turning points t, we have to
+consider each one of them individually and in the end join them into one function.
+The factor of 1/2 in equation ?? is analogous to (Littlejohn, 2020, eq. 92). This means
+that it’s only valid if the turning points aren’t “too close together” (Littlejohn, 2020). This
+will be a problem later when we look at some solutions. Littlejohn (2020) also mansions
+that there are extensions to WKB that can handle these cases. It would be interesting to add
+those to the program in the future.
+Unfortunately there seems to be some kind of error in equation ?? when two different
+turning points are used the result at least according to Hall (2013) should be the same. But
+there functions did not join nicely in the middle of the two turning points. To maintain
+
+smoothness only one turning point was there for used. This issue will be discussed later in
+section 4.5.
+Figure 4.2: Left half of wave function with NEner g y = 9 ⇒ E ≈ 13.4, m = 2, V (x) = x 2
+In figure 4.2 the three parts are visualized. The purple section on the left is the exponential
+KB
+decaying part ψW
+e x p (x), equation ?? is a calculated according to (Hall, 2013, p. 317, Claim
+15.7) where b and a are different solutions for t of equation ??. The absolute symbol makes
+it possible to not differentiate between the case where x < t and x > t.
+
+4.2.1 Validity
+When we look at the derivation of WKB we will see that equations ?? and ?? can only be
+valid if as Zwiebach (2018) showed in his lecture. But this would mean that WKB is only
+valid iff V (x) > E because p2 (x) would be negative otherwise. If this is the case this would
+imply that ?? can’t be valid.
+We will assume that this contradiction is wrong and assume that WKB is valid if
+
+4.2.2 Implementation
+WKB
+WkbWaveFunction implements equations ?? and ??. For this we will create two functions
+psi_osc and psi_exp. We will use psi_osc if x is inside the classically allowed region and
+
+otherwise we will use psi_exp.
+The term self.op has been an attempt to use both turning points for the oscillating region.
+It wasn’t removed because the current method is not perfect either and it can be used in the
+future to improve the accuracy.
+In the exponential part we will always use the corresponding turning point and because
+we’re working with two separate turning points in the same function it is possible that the
+sign of the exponential part doesn’t match with the sign of the exponential part. To fix this,
+we can define the get_exp_sign function.
+It calculates the limit of the sign of the oscillating region as x approaches the turning point.
+Airy
+The constructorAiryWaveFunction::new calculates all the turning points in the view and
+then creates an AiryWaveFunction for each of them. These functions are then returned as a
+pair of the instance and the corresponding turning point.
+Just like in the case of the WKB functions, the Airy implementation also implements the
+self.op which can be used to implement the osculating region with two turning points
+
+4.3 Turning Points
+A point x where V (x) = E is called a turning point. We assume that the WKB function is
+a good approximation in the region where In order to do the actual calculation we need a
+range were the Airy function is valid. From equation ?? we can infer that the Airy function
+is valid where We can assume that the Airy function is only valid in a closed interval, this
+means that there must be at least two roots of equation ??. These roots will be called turning
+point boundaries from now on. The factor of a is used to emulate the behavior of ≪.
+The left boundary point must have a positive and the right a negative derivative. This
+means we can solve for roots and group them together by there derivatives.
+In order to find all roots we will use a modification of Newtons method. When we find a
+solution, x 0 we can divide the original function by (x − x 0 ) this means that Newtons method
+wont be able to find x 0 again.
+To later plot the wave function we will define the so called “view”. This is the interval
+which the user will see in the end. It is defined to be where t l is the left and t r the right
+most turning point. f view is a user defined constant. These two points will be calculated by
+applying Newtons method to V (x) − E with initial guesses at APPROX_INF.
+Further on since we check for roots inside the interval of the view, we don’t have a good
+first guess where the turning point might be. Because of this we will make 1000 guesses
+evenly distributed over the interval and invent a system that can rate how good of a guess
+this point could be. Newtons method works well if the value of f (x) is small and f ′ (x) is
+neither to small nor to big. We will assume that f ′ (x) = 1 is optimal. As a rating we will
+use where lower is better. This function is just an educated guess, but it has to have some
+properties, as the derivative of f tends to 0, σ(x) should diverge to infinity. If f (x) = 0 we
+found an actual root in the first guess meaning that σ(x) should be 0. Formula ?? doesn’t
+satisfy this property since it’s undefined if f ′ (x) = 0 and f (x) = 0, but we can extend it’s
+definition such that
+Figure 4.3: Logarithmic heat diagram of σ(x), darker/bluer is better
+As we can see in figure 4.3 where darker/bluer values are better than yellow/red areas
+that σ(x) indeed has all of the desired properties.
+After we rated all of the 1000 guesses we can pick the best one as a first guess and use the
+modified Newtons method with it. We do this process 256 times by default. In theory we
+could therefor use the WKB approximation for potentials with up to 256 turning points.
+Here make_guess uses σ(x) and returns the best guess. NewtonsMethodFindNewZero is the
+modified version of Newtons method where all the roots are stored and its implementation
+of Func<f64, f64> is just defined as Where the set Z is the set of all the zeros that have been
+found previously. After the 256 iterations we filter out all the zeros that aren’t in the view.
+Equation ?? is implemented in NewtonsMethodFindNewZero. Unfortunately this procedure
+can’t be implement asynchronously since you have to know all previous zeros before you can
+find a new one.
+
+Once we found the zeros we need to group them as previously mentioned the derivative
+of the validity function (??) must be positive if the boundary point is on the left and negative
+when its on the right side of the turning point. It could be the case that if the turning point
+is in the view that one of the boundary points is actually outside the view. For this we can
+use Regula falsi combined with bisection. We will do this for both the left and right most
+turning point if there was only one boundary found.
+
+4.4 Wave Function Parts
+All the equations of the WKB approximation split into multiple parts. This is also reflected
+in the program architecture. The trait WaveFunctionPart represents one of these sections.
+These parts all need to implement the Func<_> trait and are only valid in the range returned
+by WaveFunctionPart::range.
+As previously mentioned the architecture has originally been designed around the assumption that both turning points will be used in the oscillating region. Because of this there is
+a specialization of this structs that can work with so called “operations”. Operations were
+used to make the transition between the two parts of the osculating regions smoother. An
+operation is just a function f : C → C that will be applied over the whole function. The author decided not to change the architecture to the new method because the program could
+in theory be extended further. The wave function parts that support operations implement
+the WaveFunctionPartWithOp trait.
+
+4.4.1 ApproxPart
+An ApproxPart is the function around a turning point. This includes the Airy, oscillating
+WKB and exponential WKB part. At the same time it also handles the joints between the
+Airy and WKB functions.
+Two joints are constructed and they have the highest “priority” when evaluating an ApproxPart for a given x.
+The term “priority” is used to say how far up the if statement the function is. Or in other
+words, functions with a higher priority are preferred. Because the joints overlap with both
+the ranges of the Airy and WKB function is important that they are given a higher priority.
+Further on the range of the Airy part is also included in the WKB range because of this the
+WKB part has the least priority.
+As we can see, the check if the joints are even enabled happens here. Because ENABLE_AIRY_JOINTS
+is a constant. The compiler will remove the branches that are always false automatically
+(see Appendix ??). This means that in theory the program should run a little faster if
+ENABLE_AIRY_JOINTS is disabled. This has to be taken into account when benchmarking.
+
+4.4.2 PureWkb
+In the case that there are no turning points or none were found. The program will still try
+to calculate a wave function. This is done by taking APPROX_INF as the turning points. This
+can be done because no Airy functions will be used. In this case the turning points just act
+as a bound of integration.
+From experience the results are inaccurate but still usable. At least in the case where the
+turning points were missed by Newtons method the WKB parts were fairly accurate, but
+unsurprisingly diverged at the turning points because there were no Airy functions.
+The struct PureWkb works the same as ApproxPart but only implements the WKB functions
+It does not contain any Airy functions or joints.
+
+4.5 Wave Function
+To combine all the WaveFunctionPart structs, we will define the WaveFunction struct. Under the hood it will also calculate all the variables and construct all the WaveFunctionPart
+structs.
+First we need to calculate the energy for the given parameters that are passed to the
+constructor. Note the this energy will also be printed to the terminal.
+Using the energy we can calculate the view as described in section 4.3.
+Once we’ve got the view, we can calculate all the turning points and there Airy functions
+along with them, using AiryWaveFunction::new(). In the case that there are turning points
+we can then go through each turning point and also copy it’s neighbors. For the outer most
+turning points we will take approx_inf as its neighbor.
+With these groups of 3 we can construct a WkbWaveFunction for each of the turning points.
+However there were issues when dividing the oscillating part of the wave function was split
+into two parts with different turning points. As previously mentioned according to Hall
+(2013) it should be mathematically indistinguishable when using either of the turning points,
+but there arise discontinuities at the transition region. Because of that it has been decided
+that only the left turning point will be used.
+Unfortunately in this method even though the function is continuous it will not be symmetric about the mid point of the oscillating region. This has the effect that the probabilities
+will be lower on the right none the less they should have the same probability. Because of
+the architecture of the program the oscillating part will still be split into two distinct regions.
+While iterating over the turning points we can also calculate the ranges in which the
+functions are valid.
+Once we have all the WkbWaveFunction instances we need to group them with the AiryWaveFunction
+instances. Using those pairs we can finally construct all the ApproxPart instances.
+
+Finally we need to apply the scaling which may be one of the following options (where
+a ∈ C):
+
+None The solution wont be multiplied by anything.
+Mul(a) The solution will be multiplied by a.
+Renormalize(a) Ψ(x) will be renormalized such that
+useful to add a phase to the wave function.
+
+R∞
+−∞
+
+|aΨ(x)|2 d x = 1. This can be
+
+In the case that no turning points are found WKB will be inaccurate. But for completeness we
+will assume that approx_inf is a turning point. Then we can insert two WkbWaveFunction
+instances without the Airy functions. This behavior is implemented in PureWkb. Afterwards
+we apply the same scaling procedure (4.5) as if there were turning points.
+In this case you’ll also get a warning in the terminal that no turning points were found.
+Because the results can be inaccurate.
+
+4.5.1 Super Position
+Because the super position principal is also applicable to energies it is possible that Ψ(x) is
+a sum of wave functions with different energies.
+On the implementation side this means that we can create a struct SuperPosition that is
+constructed with a list of energy levels and ScalingType that can be used to construct the
+previously discussed WaveFunction. Its implementation of Func<f64, Complex64> will then
+sum over all the results of the individual WaveFunction structs.
+
+5 Program Manual
+5.1 Usage
+In the src directory you will find the main.rs file. After the imports (lines with use) you can
+find all the constants that can be configured. In the description below, (E) stands for “expert”
+and means that you should use the default unless you really know what you’re doing.
+
+Concurrency Configurations
+
+Tune accuracy and performance
+
+INTEG_STEPS The number of steps that will be used to integrate over an interval
+TRAPEZE_PER_THREAD (E) The number of trapezes that are calculated on a
+thread in sequence. This number must be smaller then INTEG_STEPS.
+NUMBER_OF_POINTS The number of points that will be written to the output
+file.
+APPROX_INF This are the values for “±∞”. Where the first number is −∞ and
+the second number is ∞. Most importantly outside of this interval V (x) > E.
+
+Visual Configurations
+
+Adjust the width of joints
+
+VIEW_FACTOR This factor is used in 4.3 as f view . It determines in which range
+the output will be calculated. This depends heavily on the potential and the
+energy and you probably will have to change it. If the wave function is two
+small and most of the plot is close to 0 then this factor has to be lowered. If the
+wave function is not nearly 0 at the boundary of the view, this factor should be
+increased. Note this factor does not influence the calculation itself.
+ENABLE_WKB_JOINTS If set to true joints will be added between Airy and WKB
+wave function parts. If set to false no joints will be added at this boundary.
+AIRY_TRANSITION_FRACTION (E) When a joint between an Airy and a WKB
+function has to be added, we have to know how wide the joint should be. The
+width is calculated by taking the distance between the turning point boundaries
+and multiplying it by this number.
+VALIDITY_LL_FACTOR (E) This factor gets used as a in ??. Higher values will
+create larger ranges for Airy functions.
+
+5.2 WaveFunction
+When you only have one energy level you should use WaveFunction::new.
+
+The example above has to be placed right after the fn main() line. You have to replace
+all the commentaries (/*...*/) with the values you want. For the first you can choose a
+potential from section 5.5 for this you can type potentials::/*potential*/.
+For the Mass you can just use a normal float.
+“nth energy ” must be a positive integer (including 0) and is the nth energy level of the
+potential.
+And as for the scaling type, choose one of the options described at the end of section ??.
+
+5.3 SuperPosition
+To construct a super position you can add this to your main function
+Just like in section 5.2 you have to replace all the commentaries (/*...*/) with the values
+you want.
+“potential” you have to choose a potential from section 5.5.
+“mass” your mass as a float.
+“nth energy ” must be a positive integer (including 0) and is the nth energy level of the
+potential.
+“phase” a complex number that the wave function with the corresponding energy will be
+multiplied by. To make a complex number you can use complex(/*Re*/, /*Im*/).
+“// ...” you can add as many energies as your computer can handle.
+And as for the scaling type, choose one of the options described at the end of section ??.
+
+5.4 Plotting
+For all the plotting methods mentioned below you’ll need an output directory in which the
+files will be placed.
+1
+
+let output_dir = Path::new("output");
+
+The default is output, you can choose any directory name that you’d like. The folder will be
+located where you ran the program. The data calculated by the program will be stored as
+space separated values like in the example below (the first line will not be in the output file).
+x
+
+Re
+
+Im
+
+1.0 2.718 3.141
+2.0 1.414 1.465
+
+Every line is a data point where the first number is the x-coordinate, the second the real part
+of Ψ(x) and the third the imaginary part of Ψ(x)
+
+5.4.1 WaveFunction
+For a WaveFunction as we’ve seen in section 5.2 you have three options.
+
+plot_wavefunction
+With plot::plot_wavefunction the result will be plotted as one function in gnuplot.
+1
+
+plot::plot_wavefunction(&wave_function, output_dir, "data.txt");
+
+You can replace data.txt with another file name.
+plot_wavefunction_parts
+KB
+KB
+Each pair of ψW
+and ψW
+osc
+e x p will be plotted in different colors and the Airy functions will
+also be plotted separately.
+
+plot_probability
+This function will plot the probability ∥Ψ(x)∥2 of the wave function.
+
+5.4.2 SuperPosition
+plot_superposition
+This function plots the superposition analogous to plot_wavefunction for super positions.
+plot_probability_superposition
+Plots the probability ∥Psi(x)∥2 of the super position analogous to plot_probability.
+
+5.5 Potentials
+square Normal square potential as used in Hall (2013).
+x2
+
+mexican_hat 4th degree polynomial that looks like a mexican hat, with 2 minima.
+(x − 4)2 (x + 4)2
+
+double_mexican_hat 6th degree polynomial that has 3 minima.
+(x − 4)2 x 2 (x + 4)2
+
+triple_mexican_hat 8th degree polynomial that has 4 minima.
+(x − 6)2 (x − 3)2 (x + 3)2 (x + 6)2
+
+smooth_step Step function that goes to
+
+ENERGY_INF outside the interval (−5, 5). Joints
+
+were added at ±5 to make the function differentiable.
+
+5.5.1 Custom Potentials
+To create a custom potential you’ll have to define a function like shown below.
+my_potential is the name that you can choose and have to use later when you’re passing
+
+it to WaveFunction::new. /*some calculation*/ can be any Rust code that results in a f64.
+
+Examples
+2
+
+Negative bell curve (−e−x + 1)
+General polynomial (might not work for all configurations)
+You need to set values for a, b, etc. and they need to be floating point numbers or you’ll
+get error E0308. For example 1 would cause an error but 1.0 or 3.141 are correct. You can
+add even more coefficients if you’d like. The 4 in the square brackets is the degree of the
+polynomial plus 1. The potential above would mathematically be a + b x + c x 2 + d x 3 .
+
+6 Results
+6.1 Wave Functions
+6.1.1 Hall Example
+As a first result lets replicate the example from hall with the 39th energy of a square potential.
+Figure 6.1: Wave function of 39th energy with V (x) = x 2 , m = 1 and f view = 0.1.
+This result is very similar to the plot (Hall, 2013, fig. 15.5). The only difference is the
+joint between the Airy function and the exponential WKB part. In our case the two functions
+don’t meat as nicely. Overall the most important thing ought to be the number of maxima
+and minima which do match.
+
+6.1.2 Phase Shift
+Because the Schrödinger equation is linear we can rotate the wave function in the complex
+π
+plane. For an example we will use a pase of ei 4 on the wave function of a square potential.
+Figure 6.2: Wave function of 12th energy with V (x) = x 2 , m = 1 rotated by
+
+π
+4.
+
+6.1.3 0th Energy
+In quantum mechanics the 0th energy is not always 0. As an example we will take the 0th
+energy of a square potential.
+Figure 6.3: Wave function of 0th energy with V (x) = x 2 .
+Unfortunately there’s a discontinuity at x = 0. This shouldn’t happen when only using one
+turning point and it only seems to be a problem with the 0th energy
+Figure 6.4: Zoom of wave function of 0th energy with V (x) = x 2 .
+
+As far as the program is concerned Ψ(x) = 0 is a valid solution but this has to be done in a
+super position of the same energy with destructive interference. In theory this is possible but
+can’t be physically valid because the Schrödinger equation does not show the full picture. In
+quantum field theory the wave function would always oscillate in some way.
+Figure 6.5: Destructive interference of 0th energy with V (x) = x 2 .
+Ψ(x) = 0 would still contain energy we just can’t tell because energy usually only emerges
+in the time dependent Schrödinger equation.
+
+6.2 Mexican Hat Potential
+For this example we will use the “mexican hat” potential. It is particularly interesting because
+it has a maxima. This means that at low engineries it will form two oscillations around the
+two minima.
+Figure 6.6: Wave function of a mexican hat potential, with nth energy 10 and m = 1. The
+wave function oscillates in two intervals (−4.85, −2.89) and (2.89, 4.85). Between these intervals function decease exponentially. The transition region from
+exponential WKB to Airy appears to have a bigger dependency then with a square
+potential. Even though the two functions should meat at the same point the exponential WKB part seems to have a larger magnitude.
+If the energy is high enough, the two oscillations will eventually merge into one as shown in
+figure 6.7.
+Figure 6.7: Wave function of mexican hat potential, with nth energy 56 and m = 1. This is
+the first energy where the oscillating parts combine. The middle of the function
+has a rather low frequency compared to the other oscillating parts.
+Unfortunately the program is not able to calculate the 55th energy because Newtons method
+fails to find the turning points in the middle. And with 54th energy the program doesn’t
+generate any errors but the region around x = 0 can’t be correct (Figure ??), this occurs
+because the program fails to detect all the turning points.
+Figure 6.8: Wave function of mexican hat potential, with 53rd energy and m = 1. Because
+the oscillating parts are right at the boundary to merge, the wave function has a
+discontinuity that has been generated by the program at x = 0.
+But the 53rd energy can be calculated. However there’s a discontinuity at x = 0 as shown
+in figure 6.8. This happens because there would be an extra term in the approximation that
+handles these cases. When this extension has been implemented, there were problems that
+most of the wave function would diverge to infinity.
+
+6.2.1 Super Position
+While some wave functions with super position of energy seem to be chaotic, others are in
+some way beautiful because of there symmetries. Unfortunately the color plots usually don’t
+make the symmetries that arise when plotted in 3D obvious.
+Figure 6.9: Wave function of square potential, super position of 1 times 1st energy and
+i times 2nd energy. The function has three local maxim, it takes a full “turn”
+around the complex plane because all the colors only occurs once. Further on
+the two maxima at x ≈ ±1.17 are in opposite directions concerning the angle of
+the complex plane.
+This is probably one of the simplest super position that can be made. In 3D it looks just
+like a single loop around the x-axis that emerges out of nowhere and disappears again by
+exponentially decaying.
+Figure 6.10: Wave function of square potential, super position of 1 times 10th energy and
+1 + i times 11th energy. The function has a higher probability towards the left
+which is interesting because both the wave functions for the 10th and 11th
+energy are symmetrical with resect to the y-axis. Therefor this is an example of
+quantum interference. The two wave functions interact in such a way that the
+state on the left is far more likely.
+The same quantum interference as shown in figure 6.10 can be inverted such that a position
+on the right is more likely by changing the factor of 1 + i to −1 + i as shown in figure 6.11.
+Figure 6.11: Wave function of square potential, super position of 1 times 10th energy and
+−1 + i times 11th energy. Just like figure 6.10 interference occurs, but in this
+superposition the probability on the right side of the plot is higher.
+
+6.2.2 Relationship between Energy and Mass
+
+6.3 Performance
+In the appendix there’s a detailed description of the test device ??.
+The overall “felt performance” by the user is from the experience of the author quite good.
+As expected higher energies generally take longer to run. The same also applies to potentials where simple potentials such as x 2 are quite fast and complex potentials such as triple
+mexican hat take longer. Overall the goal that the program should give a quick feed back
+loop for simple inputs has been achieved because the results were done in under a minute.
+
+Particularly the energies 1-6 of x 2 can on the test machine be calculated in under 10 s, energies 1-57 in under 30 s and 1-155 in under 1 min. The 155th energy isn’t a particularly
+low energy yet the program still managed to complete in under a minute.
+Further on despite the “felt” performance of the user the benchmarks also show good results. As expected the most time is spent on integration. In particular finding energies. Even
+though energies in an interval of 10 units are found in almost the same time frame (output ??). This is expected due to the algorithm described in section 4.1. These could be fixed
+by using a grater search area by increasing the variable ENERGY_STEP in src/energy.rs:47.
+The overall evaluation process is fast with 100 samples in 10 ms. One concern also was that
+finding turning points would be slow but the measurements indicate that these calculations
+take less then a millisecond. Even though the bench mark for renormalization is fast, when
+applied to actual wave functions, it’s really slow because thousands of points have to be
+calculated.
+Performance statistics from perf suggest that the program utilizes the CPU well. The memory layout also seems to be good.
+All the benchmark results can be found in appendix ??.
+
+6.4 Accuracy
+To determine the accuracy, the mathematically exact solutions to the Schrödinger equation
+has to be calculated. This can simple potentials be done with WolframScript. In the
+exact.wsl file a exact solutions for the potential x 2 can be calculated. Note that the energies
+are still calculated with the Maslov-corrected Bohr–Sommerfeld condition is used to calculate
+the energies which is an approximation (Hall, 2013, p. 307).
+When running the script for the 5th energy level, two linearly independent solution psi1
+and psi2 are calculated.
+1
+2
+
+psi1[x] = ParabolicCylinderD[4.999999999999998, 1.6817928305074292*x]
+psi2[x] = ParabolicCylinderD[-5.999999999999998, (0. + 1.6817928305074292*I)*x]
+
+psi2 will be ignored because it diverges to infinity. Afterwards because psi1[x] is not normalized, it is multiplied such that the maxima of the exact solution matches the maxima of
+the solutions calculated by schroedinger_approx. In figure 6.12 the two solutions are plotted
+together.
+
+Figure 6.12: The exact and approximate solution of the 5th energy of the potential x 2 . As
+expected the grates error can be seen where the joint between the Airy and
+exponential part was inserted. Otherwise the approximate solution is so close
+to the real solution that the difference is barely noticeable.
+The absolute error is plotted in figure 6.13. Even though the exact solution to the mexican
+
+hat potential was not calculated, the error at the transition regions gets worse because one
+would expected a smooth exponential decay.
+Figure 6.13: Absolute error of the exact and approximate solution of the 5th energy of the
+potential x 2 . The error in the semiclassical region is low around 0.01-0.015,
+this meats the goal that the wave function should be “visually accurate”. At the
+transition regions the error reaches it’s maximum at around 0.034.
+
+Figure 6.14: The absolute from figure 6.13 is plotted with the approximate wave function.
+As the red line indicates the error reaches a local maxima at the maxima of the
+wave function itself.
+The error at the local maxima, as shown in figure 6.14, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This could be
+achieved by solving for a minimal area under the curve of the absolute error.
+For other energies then 5 the same pattern occurred, the error is greatest at the local
+maxima of the wave function and even bigger at the transition region.
+This error can be minimized by tuning the VALIDITY_LL_FACTOR constant that makes the
+Airy functions larger. But this has to be done for each potential separately and the default
+value of 3.5 should give reasonably good results for most potentials.
+
+7 Conclusion
+In the end the program could be extended and improved almost indefinitely. Unfortunately
+I had to stop improving it at some point to actually write this paper about how the program
+works. Looking back at the goals, the program is quite fast for low and even “medium”
+energies while still being able to calculate solutions for complex potentials. The accuracy
+can be tuned a little bit with the constants, but they don’t offer a grate flexibility.
+One of the core design decisions was to follow the UNIX philosophy to some degree and
+personally I think this has been achieved with the flexible architecture. But as usual the
+UNIX philosophy has an impact on the user interface which is probably the worse part of
+the program. It is only accessible to programmers and can’t be used to it’s full potential
+when the user doesn’t know Rust, a systems programming language that is not very similar
+to popular programing languages like Python. If I have time I will definitely improve the
+user experience without taking away the freedom to edit the code if someone would like to.
+I might also add a time dependent wave function that uses something simple like Euler’s
+method on the initial WKB solution. In general there are still many things for which there
+are already utilities in side the current version of the program. For example, there’s an implementation for multidimensional variant of Newton’s method that could be used to extend
+the program too more then one dimension.
+In the end I gained a deeper understanding of this weird world we’re living in and the beauty
+of the things that can arise from complex mathematics.
+
+Bibliography
+CODATA.
+
+CODATA Value: Planck Length, 2022a.
+cgi-bin/cuu/Value?plkl.
+
+URL https://physics.nist.gov/
+
+CODATA. CODATA Value: Planck Mass, 2022b. URL https://physics.nist.gov/cgi-bin/
+cuu/Value?plkm.
+CODATA. CODATA Value: Planck Time, 2022c. URL https://physics.nist.gov/cgi-bin/
+cuu/Value?plkt.
+Bryce Seligman DeWitt und Neill Graham. The many-worlds interpretation of quantum mechanics, volume 63. Princeton University Press, 2015.
+Espen Gaarder Haug. The gravitational constant and the Planck units. A simplification of
+the quantum realm. Physics Essays, 29(4):558–561, 2016.
+Brain C. Hall. Quantum Theory for Mathematicians. Springer New York, NY, 1 edition, 2013.
+ISBN 978-1461471158.
+Christopher Kormanyos John Maddock.
+
+Calculating a Derivative - 1.58.0.
+
+URL
+
+https://www.boost.org/doc/libs/1_58_0/libs/multiprecision/doc/html/boost_
+multiprecision/tut/floats/fp_eg/nd.html.
+
+Linux Kernel Organization.
+
+Perf Manual Page, April 2022. URL url{https://man.
+archlinux.org/man/perf.1}. [Copy, Online; accessed 20-November-2022].
+
+Robert G. Littlejohn. Physics 221A, 2020. URL url{https://www.pas.rochester.edu/
+~passage/resources/prelim/Quantum/UCB%20Notes/7%20wkb.pdf}.
+rayon rs. Rayon, November 2022. URL https://github.com/rayon-rs/rayon. [Online;
+accessed 23-November-2022].
+Erwin Schrödinger. Die gegenwärtige Situation in der Quantenmechanik.
+senschaften, 23, 1935.
+
+Naturwis-
+
+Tanja Van Mourik, Michael Bühl, und Marie-Pierre Gaigeot. Density functional theory across
+chemistry, physics and biology, 2014.
+Eric W. Weisstein.
+
+Newton’s Method, 2022.
+
+URL https://mathworld.wolfram.com/
+
+NewtonsMethod.html. [Online; accessed 10-August-2022].
+
+Wkipedia.
+
+Numerical integration, 2022.
+
+URL https://en.wikipedia.org/wiki/
+
+Numerical_integration. [Online; accessed 10-August-2022].
+
+Barton Zwiebach. MIT 8.06 Quantum Physics III, 2018. URL url{https://ocw.mit.edu/
+courses/8-06-quantum-physics-iii-spring-2018/resources/l7-3/}.
+
+
