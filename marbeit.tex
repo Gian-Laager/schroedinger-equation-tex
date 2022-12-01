@@ -16,7 +16,6 @@
 \usepackage{listings} % für Quelltext mit Syntax-Highlighting
 \usepackage{listings-rust}
 \usepackage{hyperref}
-\usepackage{svg}
 \usepackage{tikz} %für tikz-Grafiken
 \usepackage{paracol}
 \usepackage{subfigure}
@@ -775,13 +774,13 @@ pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: 
 The struct \rustinline{SommerfeldCond} is a \rustinline{Func<f64, f64>} that evaluates~\ref{eq:prog_cond}.
 
 \subsection{Accuracy}
-For a benchmark the values mentioned below, will be used.
+For a benchmark the values below, will be used.
 \begin{align*}
   m = 1 \\
   V(x) = x^{2} \\
   (-\infty, \infty) \approx (-200, 200).
 \end{align*}
-To get the actual values the Wolfram Language with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, a  that can calculate the integral analytically and precisely.
+To get the actual values the Wolfram Language with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, it can calculate the integral analytically and precisely.
 In Rust \rustinline{main} can be rewritten to
 \begin{rustcode}[caption={
 Main function that calculates energies 0-50 of square potential and writes the results to \bashinline{energy.txt}.
@@ -832,28 +831,28 @@ WolframScript. As a ruff estimate an error of $\pm \cfrac{10}{64000} \approx \pm
   \caption{Absolute error of energy levels in square potential. The error is a little higher than expected which is probably due to errors in the integral. Still the algorithm should be precise
     enough.}\label{fig:energy-error}
 \end{figure}
-The absolute error is plotted in figure~\ref{fig:energy-error}.  If you'd like you could pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
+The absolute error is plotted in figure~\ref{fig:energy-error}.  It would be possible to  pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
 
 \section{Turning Points}
-A point $x$ where $V(x) = E$ is called a turning point. We assume that the WKB function is a good approximation in the region where
+A point $x$ where $V(x) = E$ is called a turning point. It is assumed that the WKB function is a good approximation in the region where
 \begin{align}
   \label{eq:valid}
   -\cfrac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
 \end{align}
 In order to do the actual calculation we need a range were the Airy function is valid.
-From equation~\ref{eq:valid} we can infer that the Airy function is valid where
+From equation~\ref{eq:valid} it can inferred that the Airy function is valid where
 \begin{align}
   \label{eq:valid-airy}
   -\cfrac{a}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
 \end{align}
-We can assume that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
+Further on it can assumed that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
 
-The left boundary point must have a positive and the right a negative derivative. This means we can solve for roots and group them together by there derivatives.
+The left boundary point must have a positive and the right a negative derivative. This means  after calculating the roots, they can be group together by there derivatives.
 \\
-In order to find all roots we will use a modification of Newtons method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newtons method wont be able to find $x_{0}$ again.
+In order to find all roots a modified version of Newtons method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newtons method wont be able to find $x_{0}$ again.
 \\
 \label{sec:view}
-To later plot the wave function we will define the so called ``view''. This is the interval which the user will see in the end.
+To later plot the wave function we will define the so called ``view''. This is the interval which the user has to see in the end.
 It is defined to be
 \begin{align*}
   t_{l} < t_{r} \\
@@ -864,22 +863,22 @@ These two points will be calculated by applying Newtons method to $V(x) - E$ wit
 
 Further on since we check for roots inside the interval of the view, we don't
 have a good first guess where the turning point might be. Because of this we will make $1000$
-guesses evenly distributed over the interval and invent a system that can rate how good of a
-guess this point could be.
-Newtons method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big. We will assume that $f'(x) = 1$ is optimal.
-As a rating we will use
+guesses evenly distributed over the interval and invent an algorithm that can rate how good of a guess a point could be.
+Newtons method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big.
+As a rating function
 \[
   \label{eq:rating-newton}
   \sigma(x) = \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)}
 \]
-where lower is better. This function is just an educated guess, but it has to have some properties, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
-\[lim_{\deriv{f}{x} \to 0} \sigma(x) = \infty\]
-If $f(x) = 0$ we found an actual root in the first guess meaning that $\sigma(x)$ should be 0.
-Formula~\ref{eq:rating-newton} doesn't satisfy this property since it's undefined if $f'(x) = 0$ and $f(x) = 0$, but we can extend it's definition such that
+is used, where lower is better. This function is just an educated guess, but it has to have some properties, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
+\[\lim_{\deriv{f}{x} \to 0} \sigma(x) = \infty\]
+If $f(x) = 0$ found an actual root has been found in the first guess meaning that $\sigma(x)$
+should be 0. Formula~\ref{eq:rating-newton} doesn't satisfy this property since it's
+undefined if $f'(x) = 0$ and $f(x) = 0$, but the definition can be extended
 \[
   \sigma(x) = \left\{
     \begin{array}{ll}
-    \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)} & f(x) \ne 0~\text{and}~\deriv{f}{x} \ne 0 \\
+    \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)} & \text{if} ~f(x) \ne 0~\text{and}~\deriv{f}{x} \ne 0 \\
     0 & \text{else}
     \end{array}\right.
 \]
@@ -930,30 +929,30 @@ implementation of \rustinline{Func<f64, f64>} is just defined as
   \cfrac{f(x)}{\prod\limits_{r \in Z} (x - r)}
 \end{align}
 Where the set $Z$ is the set of all the zeros that have been found previously.
-After the 256 iterations we filter out all the zeros that aren't in the view.
+After the 256 iterations, all the zeros that aren't in the view are filtered out.
 Equation~\ref{eq:newton-modified} is implemented in \rustinline{NewtonsMethodFindNewZero}.
 Unfortunately this procedure can't be implement asynchronously since you have to know all
 previous zeros before you can find a new one.
 
-Once we found the zeros we need to group them as previously mentioned the derivative of the
-validity function (\ref{eq:valid-airy}) must be positive if the boundary point is on the left
-and negative when its on the right side of the turning point.
+Once the zeros have been found they are grouped such that the previously mentioned
+derivative of the validity function (\ref{eq:valid-airy}) must be positive if the boundary
+point is on the left and negative when its on the right side of the turning point.
 It could be the case that if the turning point is in the view that one of the boundary points
-is actually outside the view. For this we can use Regula falsi combined with bisection.
-We will do this for both the left and right most turning point if there was only one boundary
-found.
+is actually outside the view. For this the Regula falsi method is used with the initial
+guess of the turning point. We will do this for both the left and right most turning point
+if there was only one boundary found.
 
 \section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
 There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
 solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
 methods when calculated on a computer} \citep[Introduction]{van2014density}.
 
-The second is Density functional field theory would be interesting to add to the program in the future, but it would require major changes in the architecture.
+The second is Density functional field theory, it would be interesting to add to the program in the future, but it would require major changes in the architecture.
 \\
 
 The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
 Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
-understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. Even though in Planck units $\hbar = 1$ the approximation is still valid because it actually
+understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. Even though in Planck units $\hbar = 1$ the approximation is still valid because it
 actually assumes that other terms independent to $\hbar$ tend to 0.
 \\
 
@@ -972,14 +971,14 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
   \psi^{Airy}(x) = \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
 \end{align}
 
-Since equation~\ref{eq:wkb:t} might have more than one solution for turning points $t$, we have to consider each one of them individually and in the end join them into one function.
+Since equation~\ref{eq:wkb:t} might have more than one solution for turning points $t$,  each one of them has to be considered individually and in the end all of them have to be joined together.
 
 The factor of $1/2$ in equation~\ref{eq:wkb:exp} is analogous to \citep[eq. 92]{robert2020wkb}. This means that it's only valid if the turning points aren't ``too close together''~\citep{robert2020wkb}.
 This will be a problem later when we look at some solutions. \cite{robert2020wkb} also mansions that there are extensions to WKB that can handle these cases. It would be interesting to add those to the
 program in the future.
 
 Unfortunately there seems to be some kind of error in equation~\ref{eq:wkb:osc} when two different turning points are used the result at least according to~\cite{hall2013quantum} should be the same.
-But there functions did not join nicely in the middle of the two turning points. To maintain smoothness only one turning point was there for used. This issue will be discussed later in
+But there functions did not join nicely in the middle of the two turning points. To maintain smoothness only one turning point was there for used. This issue will be discussed in
 section~\ref{sec:osc_turnging_point_problem}.
 
 \begin{figure}[H]
@@ -1008,8 +1007,8 @@ We will assume that this contradiction is wrong and assume that WKB is valid if
 \subsection{Implementation}
 \subsubsection{WKB}
 \rustinline{WkbWaveFunction} implements equations~\ref{eq:wkb:exp} and~\ref{eq:wkb:osc}.
-For this we will create two functions \rustinline{psi_osc} and \rustinline{psi_exp}.
-We will use \rustinline{psi_osc} if $x$ is inside the classically allowed region and otherwise we will use \rustinline{psi_exp}.
+The actual equations are implemented in \rustinline{psi_osc} and \rustinline{psi_exp}.
+\rustinline{psi_osc} is used if $x$ is inside the classically allowed region otherwise \rustinline{psi_exp} is used.
 \begin{rustcode}
 fn eval(&self, x: f64) -> Complex64 {
     let val = if self.phase.energy < (self.phase.potential)(x) {
@@ -1024,6 +1023,7 @@ fn eval(&self, x: f64) -> Complex64 {
 The term \rustinline{self.op} has been an attempt to use both turning points for the oscillating region. It wasn't removed because the
 current method is not perfect either and it can be used in the future to improve the accuracy.
 \\
+\bfseries{REWRITE}
 In the exponential part we will always use the corresponding turning point and because we're working with two separate turning points in the same function
 it is possible that the sign of the exponential part doesn't match with the sign of the exponential part.
 To fix this, we can define the \rustinline{get_exp_sign} function.
