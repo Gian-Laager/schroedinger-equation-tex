@@ -723,7 +723,7 @@ Solving the Schrödinger equation is an eigenvalue problem. This means that only
 \end{align}
 It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation. \cite{hall2013quantum} also states that the equations from section~\ref{meth:wkb:approximation-scheme} have to agree, up to a multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
 
-To solve this problem for an arbitrary potential in a computer, the set $C$ and the fact that $n$ has to be a non negative integer is not really helpful, but the condition can be rewritten to
+To solve this problem for an arbitrary potential in a computer, the condition can be rewritten to equation~\ref{eq:prog_cond} such that the implementation is easier on a computer.
 \begin{align}
   p(x) = \left\{\begin{array}{ll}
                   \sqrt{2m(E - V(x))} & V(x) < E \\
@@ -781,7 +781,7 @@ For a benchmark the values mentioned below, will be used.
   V(x) = x^{2} \\
   (-\infty, \infty) \approx (-200, 200).
 \end{align*}
-To get the actual values the Wolfram Language with WolframScript will be used. WlolframScript is a programing language similar to Wolframalpha that can calculate the integral analytically and precisely.
+To get the actual values the Wolfram Language with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, a  that can calculate the integral analytically and precisely.
 In Rust \rustinline{main} can be rewritten to
 \begin{rustcode}[caption={
 Main function that calculates energies 0-50 of square potential and writes the results to \bashinline{energy.txt}.
