@@ -1023,9 +1023,7 @@ fn eval(&self, x: f64) -> Complex64 {
 The term \rustinline{self.op} has been an attempt to use both turning points for the oscillating region. It wasn't removed because the
 current method is not perfect either and it can be used in the future to improve the accuracy.
 \\
-\bfseries{REWRITE}
-In the exponential part we will always use the corresponding turning point and because we're working with two separate turning points in the same function
-it is possible that the sign of the exponential part doesn't match with the sign of the exponential part.
+For the exponential part the original turning point will still be used. But this means that the exponential will always be positive even if the oscillating part is negative.
 To fix this, we can define the \rustinline{get_exp_sign} function.
 \begin{rustcode}
 pub fn get_exp_sign(&self) -> f64 {
