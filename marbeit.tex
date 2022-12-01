@@ -1195,33 +1195,41 @@ meat as nicely.
 Overall the most important thing ought to be the number of maxima and minima which do match.
 
 \subsection{Phase Shift}
-Because the Schrödinger equation is linear we can rotate the wave function in the complex plane. For an example we will use a pase of $e^{\mi \frac{\pi}{4}}$ on the wave function of a square potential.
+Because the Schrödinger equation is linear the wave function can be rotated in the complex plane. For an example we will use a pase of $e^{\mi \frac{\pi}{4}}$ on the wave function of a square potential (figure~\ref{fig:square-12-pi4}).
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/square-12-pi4.pdf}
-  \caption{Wave function of 12th energy with $V(x) = x^{2}$, $m = 1$ rotated by $\frac{\pi}{4}$.}
+  \caption{\label{fig:square-12-pi4} Wave function of 12th energy with $V(x) = x^{2}$, $m = 1$ rotated by $\frac{\pi}{4}$.}
 \end{figure}
 
 \subsection{0th Energy}
 \begin{minipage}{\textwidth}
 In quantum mechanics the 0th energy is not always 0. As an example we will take the 0th
-energy of a square potential.
+energy of a square potential as shown in figure~\ref{fig:square-0}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/square-0.pdf}
-  \caption{Wave function of 0th energy with $V(x) = x^{2}$.}
+  \caption{\label{fig:square-0} Wave function of 0th energy with $V(x) = x^{2}$. The function has one maxima and consists almost entirely of Airy functions (blue and yellow). In the middle the function does not seem smooth, see figure~\ref{fig:zoom-square-0} for a closer view.}
 \end{figure}
 \end{minipage}
 
 \begin{minipage}{\textwidth}
 Unfortunately there's a discontinuity at $x = 0$. This shouldn't happen when only using one
-turning point and it only seems to be a problem with the 0th energy
+turning point and it only seems to be a problem with the 0th energy. This phenomenon has
+also been observed for other potentials with the 0th energy.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/square-0-zoom.pdf}
-  \caption{Zoom of wave function of 0th energy with $V(x) = x^{2}$.}
+  \caption{\label{fig:zoom-square-0} Zoom of wave function of 0th energy with $V(x) = x^{2}$. The two parts meet in the middle and form a unexpected spike. If joints were disabled, the function would be smooth at $x = 0$ but there's also the usual gap between the Airy and WKB functions.}
 \end{figure}
 \end{minipage}
+\vspace*{3ex}
+
+This occurs because the joints of the right and left half overlap to form the ``spike'' in
+the middle. Unfortunately this can't be fixed, because one could try to either increase
+\rustinline{VALIDITY_LL_FACTOR} to make the two Airy functions overlap which wont be a
+perfect fit either. Or it would be possible to decrease \rustinline{AIRY_TRANSITION_FRACTION} which would make the joints smaller, but this would
+just make a smooth spike that does not match to the rest of the function.
 
 \begin{minipage}{\textwidth}
 As far as the program is concerned $\Psi(x) = 0$ is a valid solution but this has to be done
@@ -1316,8 +1324,6 @@ figure~\ref{fig:interference-right}.
     interference occurs, but in this superposition the probability on the right side of the plot is higher.}
 \end{figure}
 
-\subsection{Relationship between Energy and Mass}
-
 \section{Performance}
 In the appendix there's a detailed description of the test device~\ref{specs:m1}.
 \\[3ex]
@@ -1368,7 +1374,7 @@ one would expected a smooth exponential decay.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{plots/absolute_error_square_5_with_wave.pdf}
-  \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the red line indicates the error reaches a local maxima
+  \caption{\label{fig:absolute-error-with-wave} The absolute from figure~\ref{fig:absolute-error} is plotted with the approximate wave function. As the violet line indicates the error reaches a local maxima
   at the maxima of the wave function itself. }
 \end{figure}
 The error at the local maxima, as shown in figure~\ref{fig:absolute-error-with-wave}, of the wave function could potentially be lower because the scaling factor of the exact solution is not optimal. This
