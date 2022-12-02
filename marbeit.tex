@@ -280,13 +280,13 @@ For example on the next page the plot from the title page is plotted both as a 3
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-3d.pdf}
-  \caption{3D plot of super position of $V(x) = x^2$ and energies 9, 12 and 15. One can't really see anything and it's just a mess, this would be better if one could interact with the plot
+  \caption{3D plot of superposition of $V(x) = x^2$ and energies 9, 12 and 15. One can't really see anything and it's just a mess, this would be better if one could interact with the plot
   on the computer.}\label{fig:title-wave-3d}
 \end{figure}
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-color.pdf}
-  \caption{Color plot of super position of $V(x) = x^2$ and energies 9, 12 and 15. Although it takes time to get used to, this plot is much clearer compared to figure~\ref{fig:title-wave-3d}.}
+  \caption{Color plot of superposition of $V(x) = x^2$ and energies 9, 12 and 15. Although it takes time to get used to, this plot is much clearer compared to figure~\ref{fig:title-wave-3d}.}
 \end{figure}
 \pagebreak[4]
 As shown in figure~\ref{fig:title-wave-3d}, the 3D plot is basically unusable since there is no depth. This would usually be fixed with lighting but it would be very difficult to apply lighting on a line
@@ -398,7 +398,7 @@ The \rustinline{WaveFunction} struct is at the heart of the program, it contains
 \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart} which will be discussed in detail in section~\ref{sec:wave-func-parts}. With the \rustinline{range} function it can be checked when a
 part is valid that is to say when it can be evaluated without a large error.
 
-\section{Newtons Method}
+\section{Newton's Method}
 Newton's method, also called the Newton-Raphson method, is a root-finding algorithm that uses the first few terms of the Taylor series of a function $f(x)$ in the vicinity of a suspected root
 \citep{math:newton}. It makes a sequence of approximations of a root $x_{n}$ that in certain cases converges to the exact value where
 \[
@@ -413,14 +413,14 @@ The sequence needs a first guess of where the root could be which will be the va
 Visually this looks like figure~\ref{fig:newton-ilust} where $f(x) = (x-2)(x-1)(x+1)$ was taken as an example.
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
-	\caption{Illustration of Newtons method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at
+	\caption{Illustration of Newton's method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at
       $(guess, f(guess))$ the next guess will be where the tangent intersects the x-axis (solution of $g(x) = 0$). This will converges quicker then other methods such as Regula falsi}
 	\label{fig:newton-ilust}
 \end{figure}
 .
 
 \begin{rustcode}[label=code:newtons-method, caption={
-Implementation of Newtons method. The function takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision}.
+Implementation of Newton's method. The function takes a closure \rustinline{f}, the initial guess \rustinline{guess} and a stop condition \rustinline{precision}.
 The function will return if $\left|{f(x_{n})}~/~{f'(x_{n})}\right|$ is less than \rustinline{precision}. If the derivative at any point becomes $0$ the function will panic. Because of this the function
 \rustinline{newtons_method_max_iters} provides an alternate implementation that will not panic and \emph{always} return an \rustinline{Option}.
 }]
@@ -445,13 +445,13 @@ where
 }
 \end{rustcode}
 
-An extension to the function in snippet~\ref{code:newtons-method} is implemented in the struct \rustinline{NewtonsMethodFindNewZero} which can be used to find multiple roots.
+An extension to the function in snippet~\ref{code:newtons-method} is implemented in the struct \rustinline{Newton'sMethodFindNewZero} which can be used to find multiple roots.
 
 From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in
 theory) be $0$ without causing a stack overflow.
 
 \section{Regula Falsi with Bisection}
-Newtons method fails if the first guess is at a maximum, since the step would go to infinity. For these cases a bisection method will be applied until the sign of the function changes.
+Newton's method fails if the first guess is at a maximum, since the step would go to infinity. For these cases a bisection method will be applied until the sign of the function changes.
 This needs to done because Regula Falsi requires two guesses.
 
 The algorithm itself is quite simple. To start define the parameters
@@ -736,7 +736,7 @@ To solve this problem for an arbitrary potential in a computer, the condition ca
   \cfrac{2 \int_{-\infty}^{\infty}p(x) dx - \pi}{2\pi} \mod{1} = 0
 \end{align}
 where $p(x)$ is the momentum, $m$ the mass, $V(x)$ the potential and $E$ the energy of the particle.
-Because~\ref{eq:prog_cond} is not continuous, Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
+Because~\ref{eq:prog_cond} is not continuous, Newton's method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
 specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
 
 \begin{rustcode}[caption={
@@ -854,7 +854,7 @@ Further on it can assumed that the Airy function is only valid in a closed inter
 
 The left boundary point must have a positive and the right a negative derivative. This means  after calculating the roots, they can be group together by there derivatives.
 \\
-In order to find all roots a modified version of Newtons method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newtons method wont be able to find $x_{0}$ again.
+In order to find all roots a modified version of Newton's method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newton's method wont be able to find $x_{0}$ again.
 \\
 \label{sec:view}
 To later plot the wave function we will define the so called ``view''. This is the interval which the user has to see in the end.
@@ -864,12 +864,12 @@ It is defined to be
   \left(t_{l} - f_{view} (t_{r} - t_{l}), t_{r} - f_{view} (t_{r} - t_{l})\right)
 \end{align*}
 where $t_{l}$ is the left and $t_{r}$ the right most turning point. $f_{view}$ is a user defined constant.
-These two points will be calculated by applying Newtons method to $V(x) - E$ with initial guesses at \rustinline{APPROX_INF}.
+These two points will be calculated by applying Newton's method to $V(x) - E$ with initial guesses at \rustinline{APPROX_INF}.
 
 Further on since we check for roots inside the interval of the view, we don't
 have a good first guess where the turning point might be. Because of this we will make $1000$
 guesses evenly distributed over the interval and invent an algorithm that can rate how good of a guess a point could be.
-Newtons method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big.
+Newton's method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big.
 As a rating function
 \[
   \label{eq:rating-newton}
@@ -895,7 +895,7 @@ undefined if $f'(x) = 0$ and $f(x) = 0$, but the definition can be extended
 \end{figure}
 As we can see in figure~\ref{fig:simga-heat} where darker/bluer values are better than yellow/red areas that $\sigma(x)$ indeed has all of the desired properties.
 \\
-After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newtons method with it. We do this process 256 times by default. In theory we could therefore use the WKB approximation for potentials with up to 256 turning points.
+After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newton's method with it. We do this process 256 times by default. In theory we could therefore use the WKB approximation for potentials with up to 256 turning points.
 
 \begin{rustcode}
 fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
@@ -904,7 +904,7 @@ fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
         1.0 / (2.0 * phase_clone.mass).sqrt() * derivative(&|t| (phase_clone.potential)(t), x).abs()
             - ((phase_clone.potential)(x) - phase_clone.energy).pow(2)
     });
-    let mut zeros = NewtonsMethodFindNewZero::new(validity_func, ACCURACY, 1e4 as usize);
+    let mut zeros = Newton'sMethodFindNewZero::new(validity_func, ACCURACY, 1e4 as usize);
 
     (0..MAX_TURNING_POINTS).into_iter().for_each(|_| {
         let modified_func = |x| zeros.modified_func(x);
@@ -927,7 +927,7 @@ fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
     return unique_zeros;
 }
 \end{rustcode}
-Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{NewtonsMethodFindNewZero} is the modified version of Newtons method where all the roots are stored and its
+Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{Newton'sMethodFindNewZero} is the modified version of Newton's method where all the roots are stored and its
 implementation of \rustinline{Func<f64, f64>} is just defined as
 \begin{align}
   \label{eq:newton-modified}
@@ -935,7 +935,7 @@ implementation of \rustinline{Func<f64, f64>} is just defined as
 \end{align}
 Where the set $Z$ is the set of all the zeros that have been found previously.
 After the 256 iterations, all the zeros that aren't in the view are filtered out.
-Equation~\ref{eq:newton-modified} is implemented in \rustinline{NewtonsMethodFindNewZero}.
+Equation~\ref{eq:newton-modified} is implemented in \rustinline{Newton'sMethodFindNewZero}.
 Unfortunately this procedure can't be implement asynchronously since you have to know all
 previous zeros before you can find a new one.
 
@@ -1115,7 +1115,7 @@ In the case that there are no turning points or none were found. The program wil
 \rustinline{APPROX_INF} as the turning points. This can be done because no Airy functions will be used. In this case the turning points just act as a bound of
 integration.
 
-From experience the results are inaccurate but still usable. At least in the case where the turning points were missed by Newtons method the WKB parts were fairly accurate, but unsurprisingly diverged at
+From experience the results are inaccurate but still usable. At least in the case where the turning points were missed by Newton's method the WKB parts were fairly accurate, but unsurprisingly diverged at
 the turning points because there were no Airy functions.
 
 The struct \rustinline{PureWkb} works the same as \rustinline{ApproxPart} but only implements the WKB functions
@@ -1185,8 +1185,8 @@ Afterwards we apply the same scaling procedure (\ref{sec:scaling-type}) as if th
 In this case you'll also get a warning in the terminal that no turning points were found.
 Because the results can be inaccurate.
 
-\subsection{Super Position}
-Because the super position principal is also applicable to energies it is possible that
+\subsection{Superposition}
+Because the superposition principal is also applicable to energies it is possible that
 $\Psi(x)$ is a sum of wave functions with different energies.
 
 On the implementation side this means that we can create a struct \rustinline{SuperPosition}
@@ -1248,7 +1248,7 @@ just make a smooth spike that does not match to the rest of the function.
 
 \begin{minipage}{\textwidth}
 As far as the program is concerned $\Psi(x) = 0$ is a valid solution but this has to be done
-in a super position of the same energy with destructive interference.
+in a superposition of the same energy with destructive interference.
 \[
   \Psi_{super}(x) = 1 \cdot \Psi(x) - 1 \cdot \Psi(x) = 0
 \]
@@ -1292,7 +1292,7 @@ If the energy is high enough, the two oscillations will eventually merge into on
 \end{minipage}
 
 \begin{minipage}{\textwidth}
-  Unfortunately the program is not able to calculate the 55th energy because Newtons method fails to find the turning points in the middle. And with 54th energy the program doesn't generate any errors
+  Unfortunately the program is not able to calculate the 55th energy because Newton's method fails to find the turning points in the middle. And with 54th energy the program doesn't generate any errors
   but the region around $x = 0$ can't be correct (Figure~\ref{fig:mexican-hat-54th-energy}), this occurs because the program fails to detect all the turning points.
 
 \begin{figure}[H]
@@ -1306,25 +1306,25 @@ But the 53rd energy can be calculated. However there's a discontinuity at $x = 0
 approximation that handles these cases. When this extension has been implemented, there were problems that most of the wave function would diverge to infinity.
 \end{minipage}
 
-\subsection{Super Position}
-While some wave functions with super position of energy seem to be chaotic, others are in some way beautiful because of there symmetries.
+\subsection{Superposition}
+While some wave functions with superposition of energy seem to be chaotic, others are in some way beautiful because of there symmetries.
 Unfortunately the color plots usually don't make the symmetries that arise when plotted in 3D obvious.
 
 \begin{minipage}{\textwidth}
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plots/super-square-1_1-2_i.pdf}
-\caption{\label{fig:label} Wave function of square potential, super position of $1$ times 1st energy and $\mi$ times 2nd energy. The function has three local maxim, it takes a full ``turn'' around
+\caption{\label{fig:label} Wave function of square potential, superposition of $1$ times 1st energy and $\mi$ times 2nd energy. The function has three local maxim, it takes a full ``turn'' around
     the complex plane because all the colors only occurs once. Further on the two maxima at $x \approx \pm 1.17$ are in opposite directions concerning the angle of the complex plane.}
 \end{figure}
-This is probably one of the simplest super position that can be made. In 3D it looks just like a single loop around the x-axis that emerges out of nowhere and disappears again by exponentially decaying.
+This is probably one of the simplest superposition that can be made. In 3D it looks just like a single loop around the x-axis that emerges out of nowhere and disappears again by exponentially decaying.
 \end{minipage}
 
 \begin{minipage}{\textwidth}
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plots/super-square-10_1-11_1+i.pdf}
-\caption{\label{fig:interfence-left}Wave function of square potential, super position of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
+\caption{\label{fig:interfence-left}Wave function of square potential, superposition of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
   is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefore this is an example of quantum interference. The two wave functions
   interact in such a way that the state on the left is far more likely.}
 \end{figure}
@@ -1335,7 +1335,7 @@ figure~\ref{fig:interference-right}.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{plots/super-square-10_1-11_-1+i.pdf}
-\caption{\label{fig:interference-right} Wave function of square potential, super position of $1$ times 10th energy and $-1+\mi$ times 11th energy. Just like figure~\ref{fig:interfence-left}
+\caption{\label{fig:interference-right} Wave function of square potential, superposition of $1$ times 10th energy and $-1+\mi$ times 11th energy. Just like figure~\ref{fig:interfence-left}
     interference occurs, but in this superposition the probability on the right side of the plot is higher.}
 \end{figure}
 
@@ -1598,7 +1598,7 @@ For the Mass you can just use a normal float.
 And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-types}.
 
 \section{SuperPosition}
-To construct a super position you can add this to your main function
+To construct a superposition you can add this to your main function
 \begin{rustcode}
 let wave_function = wave_function_builder::SuperPosition::new(
     &/*potential*/,
@@ -1656,10 +1656,10 @@ This function will plot the probability $\|\Psi(x)\|^{2}$ of the wave function.
 
 \subsection{SuperPosition}
 \subsubsection{plot\_superposition}
-This function plots the superposition analogous to \rustinline{plot_wavefunction} for super positions.
+This function plots the superposition analogous to \rustinline{plot_wavefunction} for superpositions.
 
 \subsubsection{plot\_probability\_superposition}
-Plots the probability $\|Psi(x)\|^{2}$ of the super position analogous to~\rustinline{plot_probability}.
+Plots the probability $\|Psi(x)\|^{2}$ of the superposition analogous to~\rustinline{plot_probability}.
 
 \section{Potentials}\label{sec:potentials}
 \begin{description}
@@ -1937,7 +1937,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 9 measured; 35 filtered out; fin
 \renewcommand{\lstlistingname}{Code Snippet} % Listing->Code
 
 \subsection{Perf}
-\bashinline{perf stat -d -d -d -repeat 100} on super position of energies 1 through 9 of $x^{2}$.
+\bashinline{perf stat -d -d -d -repeat 100} on superposition of energies 1 through 9 of $x^{2}$.
 \begin{lstlisting}
 # started on Sat Nov 19 22:21:53 2022
 
