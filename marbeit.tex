@@ -721,8 +721,8 @@ Solving the Schrödinger equation is an eigenvalue problem. This means that only
   \int_{C}\sqrt{2m(E - V(x))}dx = \pi(n + 1/2)\label{eq:energy-cond}
 \end{align}
 where $C$ is the set of all values for $x$ in the classically allowed region, $m$ the mass, $V(x)$ the potential and $E$ the energy of the particle. $n$ is used to specify which energy level should be
-calculated. It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation. \cite{hall2013quantum} also states that the equations from
-section~\ref{meth:wkb:approximation-scheme} have to agree, up to a multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
+calculated. It can be interpreted such that the oscillating part of the wave function has to involve only complete or half oscillations. \cite{hall2013quantum} also states that the equations from
+section~\ref{meth:wkb:approximation-scheme} have to agree, up to multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
 
 To solve this problem for an arbitrary potential in a computer, the condition can be rewritten to equation~\ref{eq:prog_cond} such that the implementation is easier on a computer.
 \begin{align}
@@ -734,12 +734,12 @@ To solve this problem for an arbitrary potential in a computer, the condition ca
   \cfrac{2 \int_{-\infty}^{\infty}p(x) dx - \pi}{2\pi} \mod{1} = 0
 \end{align}
 where $p(x)$ is the momentum, $m$ the mass, $V(x)$ the potential and $E$ the energy of the particle.
-Because~\ref{eq:prog_cond} is not continuous, Newton's method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
-specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
+Because~\ref{eq:prog_cond} is not continuous, Newton's method can't be applied. Furthermore the bounds of integration have to be finite, this means the user of the program will have to
+specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ outside of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
 
 \begin{rustcode}[caption={
-    The implementation checks for discontinuities in the first the interval \rustinline{(0.0, ENERGY_STEP)} is checked, if there are not enough zeros the next interval is checked. This is repeated until $n$ zeros have been found.
-It's also possible that equation~\ref{eq:prog_cond} is negative before the 0th energy therefore it is also checked for sign changes.
+    The implementation checks for discontinuities as follows: the first interval \rustinline{(0.0, ENERGY_STEP)} is checked, if there are not enough zeros the next interval is checked. This is repeated until $n$ zeros have been found.
+It's also possible that equation~\ref{eq:prog_cond} is negative before the 0th energy, therefore it is also checked for sign changes.
 }]
 pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: (f64, f64)) -> f64 {
     const ENERGY_STEP: f64 = 10.0;
@@ -777,13 +777,13 @@ pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: 
 The struct \rustinline{SommerfeldCond} is a \rustinline{Func<f64, f64>} that evaluates~\ref{eq:prog_cond}.
 
 \subsection{Accuracy}
-For a benchmark the values below, will be used.
+For a benchmark the following values, will be used.
 \begin{align*}
   m = 1 \\
   V(x) = x^{2} \\
   (-\infty, \infty) \approx (-200, 200).
 \end{align*}
-To get the actual values the Wolfram Language with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, it can calculate the integral analytically and precisely.
+To get the actual values the \emph{Wolfram Language} with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, it can calculate the integral analytically and precisely.
 In Rust \rustinline{main} can be rewritten to code snippet~\ref{code:main-energy-calc}.
 \begin{rustcode}[caption={
 Main function that calculates energies 0-50 of square potential and writes the results to \bashinline{energy.txt}.
@@ -826,7 +826,7 @@ csv = StringReplace[csv, "," -> " "]
 Export["output/energies_exact.dat", csv]
 \end{wslcode}
 These programs will output two files \bashinline{energies_approx.dat}~(Appendix~\ref{dat:energy-rs}) for the implementation in Rust and \bashinline{energies_exact.dat}~(Appendix~\ref{dat:energy-wsl}) for
-WolframScript. As a ruff estimate an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$ is expected, because the program checks for energies with that step size.
+WolframScript. As a rough estimate an error of $\pm \cfrac{10}{64000} \approx \pm 1.56 \cdot 10^{-4}$ is expected, because the program checks for energies with that step size.
 
 \begin{figure}[H]
   \centering
@@ -842,38 +842,38 @@ A point $x$ where $V(x) = E$ is called a turning point. It is assumed that the W
   \label{eq:valid}
   -\cfrac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
 \end{align}
-In order to do the actual calculation we need a range were the Airy function is valid.
+In order to do the actual calculation we need a range where the Airy function is valid.
 From equation~\ref{eq:valid} it can inferred that the Airy function is valid where
 \begin{align}
   \label{eq:valid-airy}
   -\cfrac{a}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
 \end{align}
-Further on it can assumed that the Airy function is only valid in a closed interval, this means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
+Further on it can assumed that the Airy function is only valid in a closed interval, which means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
 
-The left boundary point must have a positive and the right a negative derivative. This means  after calculating the roots, they can be group together by there derivatives.
+The left boundary point must have a positive and the right a negative derivative. This means  after calculating the roots, they can be group together by their derivatives.
 \\
-In order to find all roots a modified version of Newton's method. When we find a solution, $x_{0}$ we can divide the original function by $(x - x_{0})$ this means that Newton's method wont be able to find $x_{0}$ again.
+In order to find all roots a modified version of Newton's method. When we find a solution $x_{0}$ we can divide the original function by $(x - x_{0})$. This means that Newton's method won't be able to find $x_{0}$ again.
 \\
 \label{sec:view}
-To later plot the wave function we will define the so called ``view''. This is the interval which the user has to see in the end.
+To later plot the wave function we will define the so-called ``view''. This is the interval which the user has to see in the end.
 It is defined to be
 \begin{align*}
   t_{l} < t_{r} \\
   \left(t_{l} - f_{view} (t_{r} - t_{l}), t_{r} - f_{view} (t_{r} - t_{l})\right)
 \end{align*}
-where $t_{l}$ is the left and $t_{r}$ the right most turning point. $f_{view}$ is a user defined constant.
+where $t_{l}$ is the left- and $t_{r}$ the rightmost turning point. $f_{view}$ is a user defined constant.
 These two points will be calculated by applying Newton's method to $V(x) - E$ with initial guesses at \rustinline{APPROX_INF}.
 
 Further on since we check for roots inside the interval of the view, we don't
 have a good first guess where the turning point might be. Because of this we will make $1000$
 guesses evenly distributed over the interval and invent an algorithm that can rate how good of a guess a point could be.
-Newton's method works well if the value of $f(x)$ is small and $f'(x)$ is neither to small nor to big.
+Newton's method works well if the value of $f(x)$ is small and $f'(x)$ is neither too small nor too big.
 As a rating function
 \[
   \label{eq:rating-newton}
   \sigma(x) = \cfrac{|f(x)| }{ -\exp\left({{\left(\deriv{f}{x}(x)\right)}^{2} + 1}\right)}
 \]
-is used, where lower is better. This function is just an educated guess, but it has to have some properties, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
+is used, where lower is better. This function is just an educated guess, but there are some properties it has to have. In particular, as the derivative of $f$ tends to 0, $\sigma(x)$ should diverge to infinity.
 \[\lim_{\deriv{f}{x} \to 0} \sigma(x) = \infty\]
 If $f(x) = 0$ found an actual root has been found in the first guess meaning that $\sigma(x)$
 should be 0. Formula~\ref{eq:rating-newton} doesn't satisfy this property since it's
@@ -891,9 +891,9 @@ undefined if $f'(x) = 0$ and $f(x) = 0$, but the definition can be extended
   \includegraphics[width=0.9\textwidth]{plots/newton_rating_func.pdf}
   \caption{Logarithmic heat diagram of $\sigma(x)$, darker/bluer is better}\label{fig:simga-heat}
 \end{figure}
-As we can see in figure~\ref{fig:simga-heat} where darker/bluer values are better than yellow/red areas that $\sigma(x)$ indeed has all of the desired properties.
+As we can see in figure~\ref{fig:simga-heat} where darker/bluer values are better than yellow/red areas, $\sigma(x)$ indeed has all of the desired properties.
 \\
-After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newton's method with it. We do this process 256 times by default. In theory we could therefore use the WKB approximation for potentials with up to 256 turning points.
+After we rated all, of the 1000 guesses we can pick the best one as a first guess and use the modified Newton's method with it. We do this process 256 times by default. In theory we could therefore use the WKB approximation for potentials with up to 256 turning points.
 
 \begin{rustcode}
 fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
@@ -925,7 +925,7 @@ fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
     return unique_zeros;
 }
 \end{rustcode}
-Here \rustinline{make_guess} uses $\sigma(x)$ and returns the best guess. \rustinline{Newton'sMethodFindNewZero} is the modified version of Newton's method where all the roots are stored and its
+Here \rustinline{make_guess} uses $\sigma(x)$, and returns the best guess. \rustinline{Newton'sMethodFindNewZero} is the modified version of Newton's method where all the roots are stored and its
 implementation of \rustinline{Func<f64, f64>} is just defined as
 \begin{align}
   \label{eq:newton-modified}
@@ -934,32 +934,32 @@ implementation of \rustinline{Func<f64, f64>} is just defined as
 Where the set $Z$ is the set of all the zeros that have been found previously.
 After the 256 iterations, all the zeros that aren't in the view are filtered out.
 Equation~\ref{eq:newton-modified} is implemented in \rustinline{Newton'sMethodFindNewZero}.
-Unfortunately this procedure can't be implement asynchronously since you have to know all
+Unfortunately this procedure can't be implemented asynchronously since you have to know all
 previous zeros before you can find a new one.
 
 Once the zeros have been found they are grouped such that the previously mentioned
-derivative of the validity function (\ref{eq:valid-airy}) must be positive if the boundary
-point is on the left and negative when its on the right side of the turning point.
-It could be the case that if the turning point is in the view that one of the boundary points
-is actually outside the view. For this the Regula falsi method is used with the initial
+derivative of the validity function (\ref{eq:valid-airy}) must be positive, if the boundary
+point is on the left and negative when it's on the right side of the turning point.
+It could be the case, that if the turning point is in the view that one of the boundary points
+is actually outside the view. For this the Regula falsi method is used, with the initial
 guess of the turning point. We will do this for both the left and right most turning point
 if there was only one boundary found.
 
 \section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
-There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down in to ever smaller sub-problems that then can be
+There are mainly three approximation methods used to solve for the actual wave function itself. There is perturbation theory which breaks the problem down into ever smaller sub-problems that then can be
 solved exactly. This can be achieved by adding something to the Hamiltonian operator $\hat{H}$ which can then be solved exactly. But \textit{perturbation theory is inefficient compared to other approximation
 methods when calculated on a computer} \citep[Introduction]{van2014density}.
 
-The second is Density functional field theory, it would be interesting to add to the program in the future, but it would require major changes in the architecture.
+The second is Density functional field theory. This would be interesting to add to the program in the future, but it would require major changes in the architecture.
 \\
 
-The program uses the third method WKB approximation, it is applicable to a wide verity of linear differential equations and works very well in the case of the Schrödinger equation.
+The program uses the third method, WKB approximation. It is applicable to a wide variety of linear differential equations and works very well in the case of the Schrödinger equation.
 Originally it was developed by Wentzel, Kramers and Brillouin in 1926. It gives an approximation to the eigenfunctions of the Hamiltonian $\hat{H}$ in one dimension. The approximation is best
 understood as applying to a fixed range of energies as $\hbar$ tends to zero \citep[p.~305]{hall2013quantum}. Even though in Planck units $\hbar = 1$ the approximation is still valid because it
-actually assumes that other terms independent to $\hbar$ tend to 0.
+actually assumes that other terms independent of $\hbar$ tend to 0.
 \\
 
-WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solution. The tree parts are described as
+WKB splits $\Psi(x)$ into three parts that can be connected to form the full solution. The three parts are described as
 \begin{align}
 \label{eq:wkb:momentum}
   p(x) = \sqrt{2m(|E - V(x)|)} \\
@@ -987,11 +987,11 @@ where
 Since equation~\ref{eq:wkb:t} might have more than one solution for turning points $t$,  each one of them has to be considered individually and in the end all of them have to be joined together.
 
 The factor of $1/2$ in equation~\ref{eq:wkb:exp} is analogous to \citep[eq. 92]{robert2020wkb}. This means that it's only valid if the turning points aren't ``too close together''~\citep{robert2020wkb}.
-This will be a problem later when we look at some solutions. \cite{robert2020wkb} also mansions that there are extensions to WKB that can handle these cases. It would be interesting to add those to the
+This will be a problem later when we look at some solutions. \cite{robert2020wkb} also mentions that there are extensions to WKB that can handle these cases. It would be interesting to add those to the
 program in the future.
 
-Unfortunately there seems to be some kind of error in equation~\ref{eq:wkb:osc} when two different turning points are used the result at least according to~\cite{hall2013quantum} should be the same.
-But there functions did not join nicely in the middle of the two turning points. To maintain smoothness only one turning point was there for used. This issue will be discussed in
+Unfortunately there seems to be some kind of error in equation~\ref{eq:wkb:osc} when two different turning points are used; here the result at least according to~\cite{hall2013quantum} should be the same.
+But there functions did not join nicely in the middle of the two turning points. To maintain smoothness only one turning point was therefore used. This issue will be discussed in
 section~\ref{sec:osc_turnging_point_problem}.
 
 \begin{figure}[H]
@@ -999,7 +999,7 @@ section~\ref{sec:osc_turnging_point_problem}.
   \includegraphics[width=.9\textwidth]{plots/square9half.pdf}
   \caption{Left half of wave function with $N_{Energy} = 9 \Rightarrow E \approx 13.4$, $m = 2$, $V(x) = x^{2}$}\label{fig:wave_parts}
 \end{figure}
-In figure~\ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponential decaying part $\psi^{WKB}_{exp} (x)$, equation~\ref{eq:wkb:exp} is a calculated according to
+In figure~\ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponentially decaying part $\psi^{WKB}_{exp} (x)$, equation~\ref{eq:wkb:exp} is calculated according to
 ~\cite[p. 317, Claim 15.7]{hall2013quantum} where $b$ and $a$ are different solutions for $t$ of equation~\ref{eq:wkb:t}. The absolute symbol makes it possible to not
 differentiate between the case where $x < t$ and $x > t$.
 \subsection{Validity}
@@ -1014,7 +1014,7 @@ If this is the case this would imply that~\ref{eq:wkb:exp} can't be valid.
 
 We will assume that this contradiction is wrong and assume that WKB is valid if
 \[
-  \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| < |V(x) - E|
+  \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| \ll |V(x) - E|
 \]
 
 \subsection{Implementation}
@@ -1051,7 +1051,7 @@ pub fn get_exp_sign(&self) -> f64 {
         .signum()
 }
 \end{rustcode}
-It calculates the limit of the sign of the oscillating region as $x$ approaches the turning point.
+It calculates the sign of the limit of the oscillating region as $x$ approaches the turning point.
 \[
   \text{sgn}\left(\lim_{x \to t^{\pm}} \psi^{WKB}_{osc}(x)\right)
 \]
@@ -1060,7 +1060,7 @@ It calculates the limit of the sign of the oscillating region as $x$ approaches 
 The constructor\rustinline{AiryWaveFunction::new} calculates all the turning points in the view and then creates an \rustinline{AiryWaveFunction} for each of them.
 These functions are then returned as a pair of the instance and the corresponding turning point.
 
-Just like in the case of the WKB functions, the Airy implementation also implements the \rustinline{self.op} which can be used to implement the osculating region with two turning points
+Just as with the WKB functions, the Airy implementation also implements the \rustinline{self.op} which can be used to implement the osculating region with two turning points
 
 
 \section{Wave Function Parts}\label{sec:wave-func-parts}
@@ -1074,8 +1074,8 @@ pub trait WaveFunctionPart: Func<f64, Complex64> + Sync + Send {
 \end{rustcode}
 These parts all need to implement the \rustinline{Func<_>} trait and are only valid in the range returned by \rustinline{WaveFunctionPart::range}.
 
-As previously mentioned the architecture has originally been designed around the assumption that both turning points will be used in the oscillating region.
-Because of this there is a specialization of this structs that can work with so called ``operations''.
+As previously mentioned, the architecture has originally been designed around the assumption that both turning points will be used in the oscillating region.
+Because of this there is a specialization of this trait that can work with so called ``operations''.
 Operations were used to make the transition between the two parts of the osculating regions smoother.
 An operation is just a function $f: \mathbb{C} \to \mathbb{C}$ that will be applied over the whole function.
 The author decided not to change the architecture to the new method because the program could in theory be extended further.
@@ -1104,17 +1104,16 @@ The term ``priority'' is used to say how far up the if statement the function is
 Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
 because of this the WKB part has the least priority.
 
-As we can see, the check if the joints are even enabled happens here. Because \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
+As we can see, the check if the joints are even enabled happens here, because \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
 remove the branches that are always false automatically (see Appendix~\ref{test:branch-elim}). This means that in theory the program should run a little faster if \rustinline{ENABLE_AIRY_JOINTS} is
 disabled. This has to be taken into account when benchmarking.
 
 \subsection{PureWkb}
-In the case that there are no turning points or none were found. The program will still try to calculate a wave function. This is done by taking
+In the case that there are no turning points or none were found, the program will still try to calculate a wave function. This is done by taking
 \rustinline{APPROX_INF} as the turning points. This can be done because no Airy functions will be used. In this case the turning points just act as a bound of
 integration.
 
-From experience the results are inaccurate but still usable. At least in the case where the turning points were missed by Newton's method the WKB parts were fairly accurate, but unsurprisingly diverged at
-the turning points because there were no Airy functions.
+From experience the results are inaccurate but still usable. At least in the case where the turning points were missed by Newton's method, the WKB parts were fairly accurate, but unsurprisingly diverged at the turning points because there were no Airy functions.
 
 The struct \rustinline{PureWkb} works the same as \rustinline{ApproxPart} but only implements the WKB functions
 It does not contain any Airy functions or joints.
@@ -1125,12 +1124,12 @@ To combine all the \rustinline{WaveFunctionPart} structs, we will define the
 and construct all the \rustinline{WaveFunctionPart} structs.
 
 First we need to calculate the energy for the given parameters that are passed to the
-constructor. Note the this energy will also be printed to the terminal.
+constructor. Note that this energy will also be printed to the terminal.
 \begin{rustcode}
 let energy = energy::nth_energy(n_energy, mass, &potential, approx_inf);
 println!("{} Energy: {:.9}", Ordinal(n_energy).to_string(), energy);
 \end{rustcode}
-Using the energy we can calculate the view as described in section~\ref{sec:view}.
+Using the energy, we can calculate the view as described in section~\ref{sec:view}.
 \begin{rustcode}
 (
     lower_bound * (upper_bound - lower_bound) * view_factor,
@@ -1138,9 +1137,9 @@ Using the energy we can calculate the view as described in section~\ref{sec:view
 )
 \end{rustcode}
 
-Once we've got the view, we can calculate all the turning points and there Airy functions along with them, using \rustinline{AiryWaveFunction::new()}.
+Once we've got the view, we can calculate all the turning points and their Airy functions along with them, using \rustinline{AiryWaveFunction::new()}.
 In the case that there are turning points we can then go through each turning point and
-also copy it's neighbors. For the outer most turning points we will take
+also copy its neighbors. For the outermost turning points we will take
 \rustinline{approx_inf} as its neighbor.
 
 With these groups of 3 we can construct a \rustinline{WkbWaveFunction} for each of the
@@ -1151,9 +1150,9 @@ the turning points, but there arise discontinuities at the transition region. Be
 it has been decided that only the left turning point will be used.\label{sec:osc_turnging_point_problem}
 
 Unfortunately in this method even though the function is continuous it will not be symmetric
-about the mid point of the oscillating region. This has the effect that the probabilities will
-be lower on the right none the less they should have the same probability.
-Because of the architecture of the program the oscillating part will still be split into two
+about the midpoint of the oscillating region. This has the effect that the probabilities will
+be lower on the right although they should have the same probability.
+Because of the architecture of the program, the oscillating part will still be split into two
 distinct regions.
 
 While iterating over the turning points we can also calculate the ranges in which the
@@ -1165,7 +1164,7 @@ Once we have all the \rustinline{WkbWaveFunction} instances we need to group the
 \begin{minipage}{\textwidth}
 \noindent Finally we need to apply the \rustinline{scaling} which may be one of the following options (where $a \in \mathbb{C}$):
 \begin{description}\label{sec:scaling-type}
-    \item[None] The solution wont be multiplied by anything.
+    \item[None] The solution won't be multiplied by anything.
     \item[Mul(a)] The solution will be multiplied by $a$.
   \item[Renormalize(a)] $\Psi(x)$ will be renormalized such that
         $
@@ -1174,17 +1173,17 @@ Once we have all the \rustinline{WkbWaveFunction} instances we need to group the
 \end{description}
 \end{minipage}
 \\[3ex]
-In the case that no turning points are found WKB will be inaccurate. But for completeness we
-will assume that \rustinline{approx_inf} is a turning point. Then we can insert two
-\rustinline{WkbWaveFunction} instances without the Airy functions. This behavior is
+In the case that no turning points are found, WKB will be inaccurate. But for completeness we
+will assume that \rustinline{approx_inf} is a turning point. Then two
+\rustinline{WkbWaveFunction} instances without the Airy functions can be inserted. This behavior is
 implemented in \rustinline{PureWkb}.
-Afterwards we apply the same scaling procedure (\ref{sec:scaling-type}) as if there were turning points.
+Afterwards the same scaling procedure (\ref{sec:scaling-type}) is applied as if there were turning points.
 
-In this case you'll also get a warning in the terminal that no turning points were found.
-Because the results can be inaccurate.
+In this case you'll also get a warning in the terminal that no turning points were found,
+because the results can be inaccurate.
 
 \subsection{Superposition}
-Because the superposition principal is also applicable to energies it is possible that
+Because the superposition principle is also applicable to energies, it is possible that
 $\Psi(x)$ is a sum of wave functions with different energies.
 
 On the implementation side this means that we can create a struct \rustinline{SuperPosition}
