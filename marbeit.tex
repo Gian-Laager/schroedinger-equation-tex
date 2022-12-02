@@ -224,7 +224,7 @@ To learn more about Rust, see the excellent documentation at \url{https://doc.ru
 \section{Interpretation of Quantum Mechanics}
 The author believes in the many worlds interpretation of Hugh Everett. \emph{``The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
 the fundamental entity, obeying at all times a deterministic wave equation.''} \citep[p. 115]{dewitt2015many}. This means that the observer is also quantum mechanical and gets entangled with one particular
-state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is some what different to the popular explanation of many worlds but has the same results and is, at least to the author,
+state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is somewhat different to the popular explanation of many worlds but has the same results and is, at least to the author,
 more reasonable.
 
 An important point for the author also was that the theory accepts quantum mechanics as it is and doesn't make unreasonable assumptions such as that the observer plays an important role.
@@ -392,9 +392,9 @@ In Appendix~\ref{fig:uml-arch} is a diagram of the architecture.
 Since the current version of Rust does not support manual implementations of \rustinline{std::ops::Fn} a custom trait will be defined for functions \rustinline{Func<A, R>} where \rustinline{A} is the type
 of the argument and \rustinline{R} is the return type. Later this trait will be used to implement functions for integration, evaluation and more utilities.
 
-The \rustinline{WaveFunction} struct is at the heart of the program, it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a
+The \rustinline{WaveFunction} struct is at the heart of the program, as it contains all the functionality to build wave functions. It is composed of \rustinline{WaveFunctionPart} which represent either a
 \rustinline{Joint}, \rustinline{PureWkb} or an \rustinline{ApproxPart} which will be discussed in detail in section~\ref{sec:wave-func-parts}. With the \rustinline{range} function it can be checked when a
-part is valid that is to say when it can be evaluated without a large error.
+part is valid, that is to say, when it can be evaluated without a large error.
 
 \section{Newton's Method}
 Newton's method, also called the Newton-Raphson method, is a root-finding algorithm that uses the first few terms of the Taylor series of a function $f(x)$ in the vicinity of a suspected root
@@ -411,8 +411,8 @@ The sequence needs a first guess of where the root could be which will be the va
 Visually this looks like figure~\ref{fig:newton-ilust} where $f(x) = (x-2)(x-1)(x+1)$ was taken as an example.
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
-	\caption{Illustration of Newton's method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$ the black line ($g(x)$) is a tangent to $f(x)$ at
-      $(guess, f(guess))$ the next guess will be where the tangent intersects the x-axis (solution of $g(x) = 0$). This will converges quicker then other methods such as Regula falsi}
+	\caption{Illustration of Newton's method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$. The black line ($g(x)$) is a tangent to $f(x)$ at
+      $(guess, f(guess))$, the next guess will be where the tangent intersects the x-axis (solution of $g(x) = 0$). This converges more quickly then other methods such as Regula falsi}
 	\label{fig:newton-ilust}
 \end{figure}
 .
@@ -445,7 +445,7 @@ where
 
 An extension to the function in snippet~\ref{code:newtons-method} is implemented in the struct \rustinline{Newton'sMethodFindNewZero} which can be used to find multiple roots.
 
-From the structure of the algorithm it is tempting to implement it recursively, but by using a loop it is much faster since there are no unnecessary function calls and the precision can (at least in
+From the structure of the algorithm it is tempting to implement it recursively, but using a loop is much faster since there are no unnecessary function calls and the precision can (at least in
 theory) be $0$ without causing a stack overflow.
 
 \section{Regula Falsi with Bisection}
@@ -465,9 +465,9 @@ repeated until a fresh hold is crossed for the accuracy and the result will be t
 
 \section{Derivatives}
 Derivatives can be calculated numerically as in the C++ library Boost \citep{boost:calculating-derivative}.
-The author implemented a analytical system for calculating derivatives in Go. This project used an interface an interface with two methods function and derivative. After wards functions for operations like
-multiplication, addition, etc. were added. In these operations the functions derivative was build based on the operation. This process of writing functions is tedious and the performance is worse then in
-the numerical implementation in rust (snippet~\ref{code:derivative}).
+The author implemented a analytical system for calculating derivatives in Go. This project used an interface with two methods: \rustinline{function} and \rustinline{derivative}. Afterwards functions for
+operations like multiplication, addition, etc. were added. In these operations the function's derivative was built based on the operation. This process of writing functions is tedious and the performance
+is worse than in the numerical implementation in rust (snippet~\ref{code:derivative}).
 
 \begin{minipage}{\textwidth}
 \begin{rustcode}[label=code:derivative, caption={
@@ -500,13 +500,13 @@ where
 \end{minipage}
 
 \section{Integration}
-The same principles apply to integrals as to derivatives, it wouldn't be a great benefit to
+The same principles apply to integrals as to derivatives, and so it wouldn't be a great benefit to
 implement an analytic integration system. Integrals would also be much more difficult to
-implement than derivatives since integrals can not be broken down in to many smaller
+implement than derivatives since integrals can not be broken down into many smaller
 integrals that can be computed easily. Instead it would have to be solved as is.
 
-One approach would be to use the same method as with the derivative, take the definition with the limit and use a small value. But this method can be improved, since integrals calculate
-areas under curves a trapeze is more efficient and accurate then the rectangle that results
+One approach would be to use the same method as with the derivative, take the definition with the limit and use a small value. But this method can be improved: since integrals calculate
+areas under curves a trapeze is more efficient and accurate than the rectangle that results
 from the definition.
 
 \begin{figure}[h]
@@ -531,8 +531,8 @@ error because certain objects can't be shared across threads. In particular the 
 The implementation of the integral approximation consists of two functions as shown in code snippet~\ref{code:evaluate_function_between} and \ref{code:integrate}.
 
 \begin{rustcode}[caption = {
-    \rustinline{Point} stores both the input, x and the output, y of a function
-    and Such that functions with states, like wave functions that store parameters, can be integrated
+    \rustinline{Point} stores both the input x and the output y of a function
+    and In order functions with states, like wave functions that store parameters, can be integrated,
     there is a trait \rustinline{Func<A, R>}. The \rustinline{evaluate_function_between} then evaluates the function \rustinline{f} in the interval $(a,b)$ in parallel.
     The type bonds of the function assure that as many data types of \rustinline{X} and \rustinline{Y} can be calculated.
     This function is used to implement the actual integration and to evaluate the points of the wave function.
@@ -582,8 +582,8 @@ where
 \end{rustcode}
 
 \begin{rustcode}[caption = {
-The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
-take more time to create a new thread then to actually do the calculation, these 1000 values are called a \emph{batch}.
+The actual integration happens in \rustinline{integrate}, which calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it
+would take more time to create a new thread than to actually do the calculation, these 1000 values are called a \emph{batch}.
 This parameter was chosen for the author's computer and 1000 might not be optimal for all CPUs.
 After all batches have been calculated the boundaries between batches also have to be considered therefore they are added in the end with \rustinline{rest}.
     }, label=code:integrate]
@@ -641,7 +641,7 @@ The approximation that will be used splits $\Psi(x)$ into multiple parts that do
   close together at $x = \frac{\pi}{2}.$}\label{fig:cos_taylor}
 \end{figure}
 
-Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now the two functions have to joined at $x = \pi / 2$ such that its a mathematically smooth transition.
+Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor series of cosine. Now the two functions have to be joined at $x = \pi / 2$ in such a way that it's a mathematically smooth transition.
 \begin{align}
   \label{joint:f}
   f(x) = 1 - \cfrac{x^{2}}{2} \\
@@ -649,7 +649,7 @@ Lets consider an example, in figure \ref{fig:cos_taylor} we can see two Taylor s
   g(x) = \cfrac{(x - \pi)^{2}}{2} -  1
 \end{align}
 
-As a first guess lets join $f(x)$ and $g(x)$ with a step function, this means that the joint function $h(x)$ will be
+As a first guess let's join $f(x)$ and $g(x)$ with a step function, this means that the joint function $h(x)$ will be
 \[
   h(x) =  \left\{
     \begin{array}{ll}
@@ -671,7 +671,7 @@ Using the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum}
     \alpha = \cfrac{\pi}{2} - \cfrac{\delta}{2} \\
     \chi(x) = \sin^{2}\left(x \cfrac{\pi}{2}\right)
 \end{align*}
-a much better result can be obtained
+a much better result can be obtained:
 \[
   h(x) =  \left\{
     \begin{array}{ll}
@@ -681,7 +681,7 @@ a much better result can be obtained
     \end{array}
     \right.
 \]
-which is mathematically smooth as can be see in figure~\ref{fig:joint-cos-hall} (proof in Appendix~\ref{proof:joint}).
+which is mathematically smooth as can be seen in figure~\ref{fig:joint-cos-hall} (proof in Appendix~\ref{proof:joint}).
 \begin{figure}[H]
   \centering
   \includegraphics[width=.9\textwidth]{plots/hall_joint.pdf}
