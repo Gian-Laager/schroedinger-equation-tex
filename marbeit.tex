@@ -20,6 +20,7 @@
 \usepackage{paracol}
 \usepackage{subfigure}
 \usepackage{quoting}
+\usepackage{capt-of}
 
 \usetikzlibrary{graphs} %für Graphen (also auch Neuronale Netze) in tikz
 
@@ -358,7 +359,7 @@ Most of the metrics produced \emph{will not} be used. Below there's an example o
     \end{lstlisting}
     \begin{description}
       \item[CPUs utilized] This states how many ``percent'' of the \emph{CPU} were actually used, important to note is that ``CPU'' in this case means hardware thread. In the case of the test machine, it
-            has 8 cores with 2 threads each, therefor in theory this number could be as high as 16.0. The goal would be to use as much of the CPU as possible but one has to be cautious because other
+            has 8 cores with 2 threads each, therefore in theory this number could be as high as 16.0. The goal would be to use as much of the CPU as possible but one has to be cautious because other
             processes besides \emph{schroedinger\_approx} are also running and use some part of the CPU.
 
       \item[context-switches] This factor is handled by the Linux kernel. The kernel \emph{switches} between processes that can run on a thread of the CPU. In this case most of the context switches were
@@ -384,7 +385,7 @@ This struct will measure the time it takes the code to complete. It will also ru
 
 While \emph{perf} captures the big picture, it's possible to \emph{zoom} in to the individual components of the system with Rust benchmarks.
 
-\chapter{Methods}
+\chapter{Methods}\label{chap:methods}
 This chapter is about the implementation details and which algorithms and mathematics are used behind the scenes. Some smaller details of the code will not be discussed.
 
 \section{Program Architecture}
@@ -586,7 +587,7 @@ where
 The actual integration happens in \rustinline{integrate}, it calculates the areas of the trapezes between the points passed to it. For optimization 1000 trapezes are calculated per thread because it would
 take more time to create a new thread then to actually do the calculation, these 1000 values are called a \emph{batch}.
 This parameter was chosen for the author's computer and 1000 might not be optimal for all CPUs.
-After all batches have been calculated the boundaries between batches also have to be considered therefor they are added in the end with \rustinline{rest}.
+After all batches have been calculated the boundaries between batches also have to be considered therefore they are added in the end with \rustinline{rest}.
     }, label=code:integrate]
 pub fn integrate<
     X: Sync + std::ops::Add<Output = X> + std::ops::Sub<Output = X> + Copy,
@@ -713,6 +714,7 @@ impl Func<f64, Complex64> for Joint {
 In the proof it has been assumed that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code this assumption will not be checked, since it would have a major impact on performance to check the derivative on every point.
 
 \chapter{Calculation}
+In this chapter discusses the calculations in the program utilizing the methods described in chapter~\ref{chap:methods}.
 \section{Energy Levels}\label{sec:energy-calculation}
 Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the condition described by \cite[eq. 15.31]{hall2013quantum}.
 \begin{align}
@@ -720,7 +722,9 @@ Solving the Schrödinger equation is an eigenvalue problem. This means that only
   C = \left\{x \in \mathbb{R}~|~V(x) < E \right\}\\
   \int_{C}\sqrt{2m(E - V(x))}dx = \pi(n + 1/2)\label{eq:energy-cond}
 \end{align}
-It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation. \cite{hall2013quantum} also states that the equations from section~\ref{meth:wkb:approximation-scheme} have to agree, up to a multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
+where $C$ is the set of all values for $x$ in the classically allowed region, $m$ the mass, $V(x)$ the potential and $E$ the energy of the particle. $n$ is used to specify which energy level should be
+calculated. It can be interpreted such that the oscillating part of the wave function has to complete all half oscillation. \cite{hall2013quantum} also states that the equations from
+section~\ref{meth:wkb:approximation-scheme} have to agree, up to a multiplication by a constant which will be the case iff equation~\ref{eq:energy-cond} is satisfied.
 
 To solve this problem for an arbitrary potential in a computer, the condition can be rewritten to equation~\ref{eq:prog_cond} such that the implementation is easier on a computer.
 \begin{align}
@@ -731,12 +735,13 @@ To solve this problem for an arbitrary potential in a computer, the condition ca
                       \right. \\\label{eq:prog_cond}
   \cfrac{2 \int_{-\infty}^{\infty}p(x) dx - \pi}{2\pi} \mod{1} = 0
 \end{align}
-Unfortunately~\ref{eq:prog_cond} is not continuous which means that Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
+where $p(x)$ is the momentum, $m$ the mass, $V(x)$ the potential and $E$ the energy of the particle.
+Because~\ref{eq:prog_cond} is not continuous, Newtons method can't be applied. Further on the bounds of integration have to be finite, this means the user of the program will have to
 specify a value for the constant \rustinline{APPROX_INF} where any value for $x$ out side of that range should satisfy $V(x) > E$. But it shouldn't be to big since the \rustinline{integrate} function can only evaluate a relatively small number (default 64000) of trapezes before the performance will suffer enormously. The default value for \rustinline{APPROX_INF} is \rustinline{(-200.0, 200.0)}.
 
 \begin{rustcode}[caption={
     The implementation checks for discontinuities in the first the interval \rustinline{(0.0, ENERGY_STEP)} is checked, if there are not enough zeros the next interval is checked. This is repeated until $n$ zeros have been found.
-It's also possible that equation~\ref{eq:prog_cond} is negative before the 0th energy therefor it is also checked for sign changes.
+It's also possible that equation~\ref{eq:prog_cond} is negative before the 0th energy therefore it is also checked for sign changes.
 }]
 pub fn nth_energy<F: Fn(f64) -> f64 + Sync>(n: usize, mass: f64, pot: &F, view: (f64, f64)) -> f64 {
     const ENERGY_STEP: f64 = 10.0;
@@ -781,10 +786,10 @@ For a benchmark the values below, will be used.
   (-\infty, \infty) \approx (-200, 200).
 \end{align*}
 To get the actual values the Wolfram Language with \emph{WolframScript} was used. \emph{Wolfram Language} is the programing language behind \emph{Mathematica}\footnote{State of the art technical computing program~\citep{wolfram2022description}}, it can calculate the integral analytically and precisely.
-In Rust \rustinline{main} can be rewritten to
+In Rust \rustinline{main} can be rewritten to code snippet~\ref{code:main-energy-calc}.
 \begin{rustcode}[caption={
 Main function that calculates energies 0-50 of square potential and writes the results to \bashinline{energy.txt}.
-}]
+}, label=code:main-energy-calc]
 fn main() {
     let output_dir = Path::new("output");
 
@@ -890,7 +895,7 @@ undefined if $f'(x) = 0$ and $f(x) = 0$, but the definition can be extended
 \end{figure}
 As we can see in figure~\ref{fig:simga-heat} where darker/bluer values are better than yellow/red areas that $\sigma(x)$ indeed has all of the desired properties.
 \\
-After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newtons method with it. We do this process 256 times by default. In theory we could therefor use the WKB approximation for potentials with up to 256 turning points.
+After we rated all of the 1000 guesses we can pick the best one as a first guess and use the modified Newtons method with it. We do this process 256 times by default. In theory we could therefore use the WKB approximation for potentials with up to 256 turning points.
 
 \begin{rustcode}
 fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
@@ -966,10 +971,20 @@ WKB splits $\Psi(x)$ into tree parts that can be connected to form the full solu
   \psi^{WKB}_{exp}(x)= \cfrac{c_{1}}{2 \sqrt{p(x)}} \exp\left(-\left|\int_{x}^{t}p(y) dy\right|\right) \\
 \label{eq:wkb:osc}
   \psi^{WKB}_{osc} (x)= \cfrac{c_{1}}{\sqrt{p(x)}} \cos\left(\int_{x}^{t}p(y) dy + \delta \right) \\
-  u_{1} = -2 m \cfrac{dV}{dx}(t) \\
+  u_{1} := -2 m \cfrac{dV}{dx}(t) \\
 \label{eq:airy}
   \psi^{Airy}(x) = \cfrac{c_{1} \sqrt{\pi}}{\sqrt[6]{u_{1}}} \operatorname{Ai}\left(\sqrt[3]{u_{1}} (t - x)\right).
 \end{align}
+where
+\begin{description}
+    \item[$p(x)$] Momentum of the particle.
+    \item[$t$] A solution for a turning point.
+    \item[$c_{1}$] Constant, a.e. any number in $\mathbb{C}$.
+    \item[$\psi^{WKB}_{exp}$] Classically forbidden part of the WKB approximation, a.e the exponential part.
+    \item[$\psi^{WKB}_{osc}$] Classically allowed part of the WKB approximation, a.e the oscillating part.
+    \item[$\operatorname{Ai}()$] First variant of the Airy functions~\cite{math:airy}. It arises from solving the Schrödinger equation analytically at the turning points~\cite[section
+            15.5]{hall2013quantum}. Note from here on out this function will be referred to as \emph{the Airy function}.
+\end{description}
 
 Since equation~\ref{eq:wkb:t} might have more than one solution for turning points $t$,  each one of them has to be considered individually and in the end all of them have to be joined together.
 
@@ -1310,7 +1325,7 @@ This is probably one of the simplest super position that can be made. In 3D it l
 \centering
 \includegraphics[width=\textwidth]{plots/super-square-10_1-11_1+i.pdf}
 \caption{\label{fig:interfence-left}Wave function of square potential, super position of $1$ times 10th energy and $1+\mi$ times 11th energy. The function has a higher probability towards the left which
-  is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefor this is an example of quantum interference. The two wave functions
+  is interesting because both the wave functions for the 10th and 11th energy are symmetrical with resect to the y-axis. Therefore this is an example of quantum interference. The two wave functions
   interact in such a way that the state on the left is far more likely.}
 \end{figure}
 The same quantum interference as shown in figure~\ref{fig:interfence-left} can be inverted such that a position on the right is more likely by changing the factor of $1+\mi$ to $-1+\mi$ as shown in
@@ -2001,7 +2016,7 @@ Note that
   \deriv{\chi}{x}(\alpha + \delta) = 0 \\
   \chi(\alpha + \delta) = 1
 \end{align}
-therefor
+therefore
 \begin{align}
   \deriv{(f \sqcup g)}{x}(\alpha) = \deriv{f}{x}(\alpha) + 0 \left(\deriv{g}{x}(\alpha) - \deriv{f}{x}(\alpha)\right) + 0 (g(x) - f(x)) = \deriv{f}{x}(\alpha)
 \end{align}
