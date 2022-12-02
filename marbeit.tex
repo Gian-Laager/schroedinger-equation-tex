@@ -1166,10 +1166,10 @@ Once we have all the \rustinline{WkbWaveFunction} instances we need to group the
 \begin{description}\label{sec:scaling-type}
     \item[None] The solution won't be multiplied by anything.
     \item[Mul(a)] The solution will be multiplied by $a$.
-  \item[Renormalize(a)] $\Psi(x)$ will be renormalized such that
-        $
-            \int_{-\infty}^{\infty} |a \Psi(x)|^{2} dx = 1
-        $. This can be useful to add a phase to the wave function.
+    \item[Renormalize(a)] $\Psi(x)$ will be renormalized such that
+            $
+                \int_{-\infty}^{\infty} |a \Psi(x)|^{2} dx = 1
+            $. This can be useful to add a phase to the wave function.
 \end{description}
 \end{minipage}
 \\[3ex]
@@ -1423,7 +1423,7 @@ In the end I gained a deeper understanding of this weird world we're living in a
 This section is a guide on how to install \emph{schroedinger\_approx} on your computer. Please follow the section for your operating system.
 \subsection{Linux}
 \subsubsection{Ubuntu}
-Run the following command to install the dependencies
+Run the following command to install the dependencies:
 \begin{bashcode}
 sudo apt-get install gnuplot build-essential git libclang-dev
 sudo snap go --classic
@@ -1437,10 +1437,10 @@ After you've run the script above to install all the dependencies, you can go to
 \begin{bashcode}
 git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
 \end{bashcode}
-to download the code form GitHub.
+to download the code from GitHub.
 
 \subsubsection{Arch Linux}
-Run the following command to install all the dependencies
+Run the following command to install all the dependencies:
 \begin{bashcode}
 sudo pacman -Sy gnuplot go git clang
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -1453,12 +1453,12 @@ After you've run the script above to install all the dependencies, you can go to
 \begin{bashcode}
 git clone https://github.com/Gian-Laager/Schroedinger-Approximation.git
 \end{bashcode}
-to download the code form GitHub.
+to download the code from GitHub.
 
 \subsection{macOS}
 The following instructions have only been tested under \emph{macOS Ventura 13.0.1} on an Intel CPU. This means the instructions might not work for Apple silicon.
 \\[3ex]
-First you'll need to install the package manager \emph{Homebrew}, it can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
+First you'll need to install the package manager \emph{Homebrew}, which can be used to install software without downloading all the installers manually. To install it open the \emph{Terminal} program, paste the command below and press enter.
 \begin{bashcode}
 /bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 \end{bashcode}
@@ -1466,7 +1466,7 @@ First you'll need to install the package manager \emph{Homebrew}, it can be used
 Then you should be asked for your password, type your password (no text will be written while you type your password) and press enter.
 Next it will ask you to continue the installation, press enter. This step will take a while because it has to download \emph{Xcode}.
 \\[3ex]
-After we've installed Homebew, we can install the dependencies of \emph{schroedinger\_approx} with the command
+After we've installed Homebrew, we can install the dependencies of \emph{schroedinger\_approx} with the command
 \begin{bashcode}
 brew install gnuplot go gcc
 \end{bashcode}
@@ -1479,7 +1479,7 @@ rustup toolchain add nightly
 \end{bashcode}
 This will ask you to confirm the installation, type \emph{1} and enter.
 \\[3ex]
-After we've installed all re dependencies you can go to \url{https://github.com/Gian-Laager/Schroedinger-Approximation} and click the green \emph{Code} button,
+After we've installed all the dependencies you can go to \url{https://github.com/Gian-Laager/Schroedinger-Approximation} and click the green \emph{Code} button,
 where you can download the code as a ZIP file.
 
 
@@ -1496,7 +1496,7 @@ wsl --install
 and reboot once it's finished.
 \\[3ex]
 After rebooting open \emph{Ubuntu}, this will start the installation automatically. Then
-follow the instructions of the terminal. Once your logged in run the commands
+follow the instructions of the terminal. Once you're logged in run the commands
 \begin{bashcode}
 sudo apt-get update
 sudo apt-get install build-essential libclang-dev
@@ -1519,12 +1519,13 @@ After downloading the latest version on \emph{sourceforge} run the installer. In
 to true.
 \\[3ex]
 Now you can download the \emph{schroedinger\_approx} from \url{https://github.com/Gian-Laager/Schroedinger-Approximation}.
-Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choise.
-Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this
+Click the green \emph{Code} button and download the code as a ZIP file and extract it to a directory of your choice.
+Then you can \emph{drag and drop} the directory to the Ubuntu terminal. This should look something like this:
 \begin{bashcode}
 C:\Users\gianl\OneDrive\Desktop\Schroedinger-Approximation-master
 \end{bashcode}
-You then need to replace all the \bashinline{\} to \bashinline{/} and change \bashinline{C:} to \bashinline{/mnt/c} (if you have another letter use it's lowercase at \bashinline{/mnt/<your letter>}) and add a \bashinline{cd} at the front. For the example above it would look like this
+You then need to replace all the \bashinline{\} to \bashinline{/} and change \bashinline{C:} to \bashinline{/mnt/c} (if you have another letter use it's lowercase at \bashinline{/mnt/<your letter>}) and
+add a \bashinline{cd} at the front. For the example above it would look like this:
 \begin{bashcode}
 cd /mnt/c/Users/gianl/OneDrive/Desktop/Schroedinger-Approximation-master
 \end{bashcode}
@@ -1587,7 +1588,7 @@ When you only have one energy level you should use \rustinline{WaveFunction::new
     );
 \end{rustcode}
 The example above has to be placed right after the \rustinline{fn main()} line.
-You have to replace all the commentaries (\rustinline{/*...*/}) with the values you want.
+You have to replace all the comments (\rustinline{/*...*/}) with the values you want.
 For the first you can choose a potential from section~\ref{sec:potentials} for this you
 can type \rustinline{potentials::/*potential*/}.
 \\
@@ -1595,7 +1596,7 @@ For the Mass you can just use a normal float.
 \\
 ``nth energy '' must be a positive integer (including 0) and is the nth energy level of the potential.
 \\
-And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-types}.
+And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-type}.
 
 \section{Superposition}
 To construct a superposition you can add this to your main function
@@ -1624,7 +1625,7 @@ Just like in section~\ref{sec:manual:wave-func} you have to replace all the comm
 \\
 ``// ...'' you can add as many energies as your computer can handle.
 \\
-And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-types}.
+And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-type}.
 
 \section{Plotting}
 For all the plotting methods mentioned below you'll need an output directory in which the files will be placed.
@@ -1707,13 +1708,13 @@ Plots the probability $\|Psi(x)\|^{2}$ of the superposition analogous to~\rustin
 \end{description}
 
 \subsection{Custom Potentials}\label{sec:custom-potentials}
-To create a custom potential you'll have to define a function like shown below.
+To create a custom potential you'll have to define a function as shown below.
 \begin{rustcode}
 fn my_potential(x: f64) -> f64 {
     return /*some calculation*/;
 }
 \end{rustcode}
-\rustinline{my_potential} is the name that you can choose and have to use later when you're passing it to \rustinline{WaveFunction::new}.
+\rustinline{my_potential} a name that you can choose and have to use later when you're passing it to \rustinline{WaveFunction::new}.
 \rustinline{/*some calculation*/} can be any Rust code that results in a \rustinline{f64}.
 \\
 \subsubsection{Examples}
