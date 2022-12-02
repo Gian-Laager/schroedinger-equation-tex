@@ -1402,15 +1402,15 @@ should give reasonably good results for most potentials.
 \chapter{Conclusion}
 In the end the program could be extended and improved almost indefinitely. Unfortunately I had to stop improving it at some point to actually write this paper about how the program works.
 Looking back at the goals, the program is quite fast for low and even ``medium'' energies while still being able to calculate solutions for complex potentials. The accuracy can be tuned a little bit
-with the constants, but they don't offer a grate flexibility.
+with the constants, but they don't offer a great flexibility.
 
 One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
-impact on the user interface which is probably the worse part of the program. It is only accessible to programmers and can't be used to it's full potential when the user doesn't know Rust, a systems
+impact on the user interface which is probably the weakest part of the program. It is only accessible to programmers and can't be used to it's full potential if the user doesn't know Rust, a systems
 programming language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
 someone would like to.
 
-I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities in
-side the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program too more then one dimension.
+I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities
+inside the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program to more then one dimension.
 \\[3ex]
 In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
 
