@@ -212,10 +212,10 @@ approximate solutions of $\psi(x)$: perturbation theory, density functional fiel
 is extremely difficult to implement for a computer. WKB on the other hand is much better since it is to some degree a step-by-step manual.
 
 \section{Rust}
-Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented paradigms. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
+Rust is one of the newer programing languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented paradigms. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
 be able to write concurrent code without deadlocks and data races. This means calculations can utilize the full potential of the CPU without countless hours of debugging.
 
-Functional programming languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
+Functional programing languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
 
 Rust as of the time of writing this document is not yet standardized, meaning the code provided might no longer be correct with one of the newer Rust versions.
 
@@ -1195,6 +1195,7 @@ the individual \rustinline{WaveFunction} structs.
 
 \chapter{Results}
 In this chapter some of the plots calculated by the program are analyzed and discussed.
+You can reproduce all the results yourself or calculate according to the manual in the appendix~\ref{sec:manual}.
 
 \section{Wave Functions}
 \subsection{Hall Example}\label{sec:resutl:hall}
@@ -1405,8 +1406,8 @@ Looking back at the goals, the program is quite fast for low and even ``medium''
 with the constants, but they don't offer a great flexibility.
 
 One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
-impact on the user interface which is probably the weakest part of the program. It is only accessible to programmers and can't be used to it's full potential if the user doesn't know Rust, a systems
-programming language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
+impact on the user interface which is probably the weakest part of the program. It is only accessible to programers and can't be used to it's full potential if the user doesn't know Rust, a systems
+programing language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
 someone would like to.
 
 I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities
