@@ -199,7 +199,7 @@ behave like waves, he developed a wave equation which describes how the waves mo
   \mi\hbar {\cfrac {\partial }{\partial t}}\Psi (x,t)=\left[-{\cfrac {\hbar ^{2}}{2m}}{\cfrac {\partial ^{2}}{\partial x^{2}}}+V(x,t)\right]\Psi (x,t)
 \end{align*}
 
-The time independent version that is going to be used later, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a
+The time independent version that will be used, ignores the change over time and is much simpler to solve since it is \emph{\textbf{only}} an ordinary differential equation instead of a
 partial differential equation.
 \begin{center}
 \begin{math}
@@ -207,9 +207,9 @@ partial differential equation.
 \end{math}
 \end{center}
 
-Even with the time independent equation it is very difficult to get analytical solutions, because of this there are mainly three approaches to
-approximate solutions of $\psi(x)$, perturbation theory, density functional field theory and WKB approximation. Perturbation theory's goal is to give an analytical approximation which means it
-is extremely difficult to implement for a computer. WKB on the other hand is much better since it is to some degree a step by step manual.
+Even with the time independent equation it is very difficult to get analytical solutions. Because of this there are mainly three approaches to
+approximate solutions of $\psi(x)$: perturbation theory, density functional field theory and WKB approximation. Perturbation theory's goal is to give an analytical approximation which means it
+is extremely difficult to implement for a computer. WKB on the other hand is much better since it is to some degree a step-by-step manual.
 
 \section{Rust}
 Rust is one of the newer programming languages and attempts to replace C/C++ which are notoriously difficult to work with. It supports both functional and object-oriented paradigms. It is much safer in terms of memory and promises the same performance as C. One of the goals of Rust is fearless concurrency which means everybody should
@@ -217,17 +217,17 @@ be able to write concurrent code without deadlocks and data races. This means ca
 
 Functional programming languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
 
-Rust as of the time of writing this document is not yet standardized meaning the code provided might no longer be correct with one of the newer Rust versions.
+Rust as of the time of writing this document is not yet standardized, meaning the code provided might no longer be correct with one of the newer Rust versions.
 
-To learn more about Rust, it has excellent documentation on \url{https://doc.rust-lang.org/book/}.
+To learn more about Rust, see the excellent documentation at \url{https://doc.rust-lang.org/book/}.
 
 \section{Interpretation of Quantum Mechanics}
 The author believes in the many worlds interpretation of Hugh Everett. \emph{``The wave interpretation. This is the position proposed in the present thesis, in which the wave function itself is held to be
 the fundamental entity, obeying at all times a deterministic wave equation.''} \citep[p. 115]{dewitt2015many}. This means that the observer is also quantum mechanical and gets entangled with one particular
-state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is some what different to the popular explanation of many worlds but has the same results and is, at least to the author
+state of the system that is being measured \citep[p. 116]{dewitt2015many}. This is some what different to the popular explanation of many worlds but has the same results and is, at least to the author,
 more reasonable.
 
-An important point for the author also was that the theory accepts quantum mechanics as it is and doesn't make unreasonable assumption such as that the observer plays an important role.
+An important point for the author also was that the theory accepts quantum mechanics as it is and doesn't make unreasonable assumptions such as that the observer plays an important role.
 
 On top of that this interpretation also discards the need for an ``observation'' in the program which would also be mathematically impossible \citep[p. 111]{dewitt2015many}.
 
@@ -247,12 +247,12 @@ $\mi$ is the imaginary unit,
 $z$ is the general form of a complex number where $\{a,b\} \in \mathbb{R}$,
 $\compconj{z}$ is the complex conjugate
 and $\|z\|^{2}$ is the norm square of $z$.
-The last equation is the Euler's formula, it rotates a number in the complex plane by $\theta$ radians. The angle $\theta$ is also called the \emph{argument} of a complex number and corresponds to the \emph{color} mentioned in section~\ref{sec:complex-color-plots}.
+The last equation is Euler's formula, it rotates a number in the complex plane by $\theta$ radians. The angle $\theta$ is also called the \emph{argument} of a complex number and corresponds to the \emph{color} mentioned in section~\ref{sec:complex-color-plots}.
 
-The complex plane is similar to the real number line, every complex number can be represented as a point on this plane where $\operatorname{Re}(z)$ is the x-coordinate and $\operatorname{Im}(z)$ is the y-coordinate.
+The complex plane is similar to the real number line, every complex number $z$ can be represented as a point on this plane where $\operatorname{Re}(z)$ is the x-coordinate and $\operatorname{Im}(z)$ is the y-coordinate.
 
 \section{GNU Plot}
-Gnuplot is a cross platform plotting program that has all the features needed to plot the wave functions. \bashinline{schroedinger-approx} will output a file \bashinline{data.txt} and the corresponding GNU Plot scripts to plot the wave function.
+Gnuplot is a cross-platform plotting program that has all the features needed to plot the wave functions. \bashinline{schroedinger-approx} will output a file \bashinline{data.txt} and the corresponding GNU Plot scripts to plot the wave function.
 
 \subsection{Usage}
 To plot a wave function you can type \bashinline{gnuplot} in a terminal in the output directory. This will open a prompt. You can then run one of the following commands.
@@ -265,18 +265,17 @@ To plot a wave function you can type \bashinline{gnuplot} in a terminal in the o
 
 \end{description}
 
-If you'd like to learn more about Gnuplot you can read there user manual on \url{http://www.gnuplot.info/}
+If you'd like to learn more about Gnuplot you can read the user manual at \url{http://www.gnuplot.info/}
 
 \section{Reading Complex Plots}\label{sec:complex-color-plots}
 In the case of this paper we will try to plot a function
 \[
   f: \mathbb{R} \to \mathbb{C}.
 \]
-This means that the resulting plot will be 3 dimensional. The two main visualizations would be just to plot a 3D surface or add the argument of the complex number as a color.
+This means that the resulting plot will be 3-dimensional. The two main visualizations would be just to plot a 3D surface or add the argument of the complex number as a color.
 The first method works better if one can interact with the structure. However this is not really possible in a PDF or on a paper. This is why both options will be implemented.
 
 For example on the next page the plot from the title page is plotted both as a 3D plot and color plot for comparison.
-\pagebreak[4]
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-3d.pdf}
@@ -288,9 +287,8 @@ For example on the next page the plot from the title page is plotted both as a 3
   \includegraphics[width=0.7\textwidth]{plots/super-square-9-12-15-color.pdf}
   \caption{Color plot of superposition of $V(x) = x^2$ and energies 9, 12 and 15. Although it takes time to get used to, this plot is much clearer compared to figure~\ref{fig:title-wave-3d}.}
 \end{figure}
-\pagebreak[4]
 As shown in figure~\ref{fig:title-wave-3d}, the 3D plot is basically unusable since there is no depth. This would usually be fixed with lighting but it would be very difficult to apply lighting on a line
-such that one could actually see the depth. In the color plot every thing seems to be clear. Except that the values of the phase can't be read precisely.
+such that one could actually see the depth. In the color plot everything seems to be clear, except that the values of the phase can't be read precisely.
 
 When plotting the function yourself the author would still recommend the 3D plot because it's clearer when you can move it around.
 
@@ -312,7 +310,7 @@ Working in Planck units means that all fundamental constants are equal to 1.
 \]
 This means that the constants will usually cancel out.
 
-To convert to SI units one can just multiply powers of the constants such that there unit results in one of the base units.
+To convert to SI units one can just multiply powers of the constants such that their unit results in one of the base units.
 \begin{align*}
 l_{\text{Planck}} = l_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{3}}}  && 1~\text{m}_{\text{Planck}}  \approx 1.616255(18) \cdot 10^{-35}~\text{m}  && \text{\citep{CODATAValuePlanckLength}} \\
 m_{\text{Planck}} = m_{\text{SI}} \sqrt{\cfrac{c \hbar}{G}}      && 1~\text{kg}_{\text{Planck}} \approx  2.176434(24) \cdot 10^{-8}~\text{kg} && \text{\citep{CODATAValuePlanckMass}} \\
@@ -325,7 +323,7 @@ The program will take all of its in- and outputs in Planck units.
 
 \section{Benchmarking}
 Benchmarking is the process where one tests the performance of software. In the case of \emph{schroeding\_approx} the goal would be to test the individual parts and
-find out where improvements are possible. And in a later step if the supposed improvements actually improved the performance. For this the two tools described below will be used.
+find out where improvements are possible, and in a later step whether the supposed improvements actually improved the performance. For this the two tools described below will be used.
 
 \subsection{perf}
 \emph{perf} is a collection of performance analysis tools for Linux~\citep{perf2022manula}. It will later be used to measure the performance of \emph{schroedinger\_approx}.
@@ -333,10 +331,10 @@ In its manual page \citep{perf2022manula} it's described as:
 \begin{quoting}
 Performance counters for Linux are a new kernel-based subsystem that provide a framework for all things performance analysis. It covers hardware level (CPU/PMU, Performance Monitoring Unit) features and software features (software counters, tracepoints) as well.
 \end{quoting}
-In particular \bashinline{perf stat} and \bashinline{perf record} will be used.
+In particular, \bashinline{perf stat} and \bashinline{perf record} will be used.
 \\[3ex]
-The outputs produced by \bashinline{perf stat} are fairly technical can measure performance on the CPU level.
-Most of the metrics produced \emph{will not} be used. Below there's an example output of a benchmark of \emph{schroedinger\_approx}.
+The outputs produced by \bashinline{perf stat} are fairly technical and can measure performance on the CPU level.
+Most of the metrics produced \emph{will not} be used. An example reproduced of a benchmark of \emph{schroedinger\_approx} is reproduced below.
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}
@@ -358,7 +356,7 @@ Most of the metrics produced \emph{will not} be used. Below there's an example o
         5.147335000 seconds sys
     \end{lstlisting}
     \begin{description}
-      \item[CPUs utilized] This states how many ``percent'' of the \emph{CPU} were actually used, important to note is that ``CPU'' in this case means hardware thread. In the case of the test machine, it
+      \item[CPUs utilized] This states how many percent of the \emph{CPU} were actually used, important to note is that ``CPU'' in this case means hardware thread. In the case of the test machine, it
             has 8 cores with 2 threads each, therefore in theory this number could be as high as 16.0. The goal would be to use as much of the CPU as possible but one has to be cautious because other
             processes besides \emph{schroedinger\_approx} are also running and use some part of the CPU.
 
@@ -366,11 +364,11 @@ Most of the metrics produced \emph{will not} be used. Below there's an example o
             happening inside \emph{schroedinger\_approx} itself because behind the scene it uses a thread pool. In general it is an indicator of how efficiently the kernel can handle the multi threading in
             a program.
       \item[page-faults] This is an ``error'' that happens inside the CPU when a process is trying to access memory that is not yet loaded into the cache of the CPU. When the number of page faults per
-            second is high, the process's memory layout is not good and should be optimized. These kind of optimizations are very hard to do.
+            second is high, the process's memory layout is not good and should be optimized. Such optimizations are very hard to do.
 
       \item[branch-misses] Modern CPUs don't actually execute the assembly directly but they perform \emph{speculative execution}. This means the CPU ``guesses'' ahead if for example an if-statement will
-            be true and then already do the calculations before the instruction pointer actually reached the branch. Even though the CPU is pretty good at ``guessing'' if it's wrong it has to throw away
-            all those calculation, this is called a \emph{branch miss}. The code can be made faster if the percentage of branch misses is low (< 0.05\%), this can be done by writing ``predictable'' code
+            be true and then already do the calculations before the instruction pointer actually reached the branch. Even though the CPU is pretty good at ``guessing'', if it's wrong it has to throw away
+            all those calculation; this is called a \emph{branch miss}. The code can be made faster if the percentage of branch misses is low (< 0.05\%). this can be done by writing ``predictable'' code
             which requires intensive testing.
       \item[time elapsed] This is the time the program was running. This is similar to the \bashinline{time} command.
 
