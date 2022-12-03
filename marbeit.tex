@@ -243,7 +243,7 @@ In quantum mechanics it's customary to work with complex numbers. Complex number
   \|z\|^{2} = a^{2} + b^{2} \\
   e^{\theta \mi} = \cos(\theta) + \mi \sin(\theta)
 \end{align*}
-$\mi$ is the imaginary unit,
+where $\mi$ is the imaginary unit,
 $z$ is the general form of a complex number where $\{a,b\} \in \mathbb{R}$,
 $\compconj{z}$ is the complex conjugate
 and $\|z\|^{2}$ is the norm square of $z$.
@@ -318,7 +318,8 @@ t_{\text{Planck}} = t_{\text{SI}} \sqrt{\cfrac{G \hbar}{c^{5}}} && 1~\text{s}_{\
 \end{align*}
 \hspace*{\fill}~\citep[Table 1]{gaarder2016gravitational} \\
 \\
-The program will take all of its in- and outputs in Planck units.
+All equations from now on will be in terms of Planck units and
+the program will take all of its in- and outputs in Planck units.
 
 
 \section{Benchmarking}
@@ -411,7 +412,8 @@ The sequence needs a first guess of where the root could be which will be the va
 Visually this looks like figure~\ref{fig:newton-ilust} where $f(x) = (x-2)(x-1)(x+1)$ was taken as an example.
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{plots/newtons-method.pdf}
-	\caption{Illustration of Newton's method, $f(x) = (x-1)(x-2)(x+1)$.The blue line indicates the initial guess which in this case is $2.5$. The black line ($g(x)$) is a tangent to $f(x)$ at
+	\caption{Illustration of Newton's method, $f(x) = (x-2)(x-1)(x+1)$.The blue line
+      indicates the initial guess which in this case is $2.5$. The $g(x)$ is a tangent to $f(x)$ at
       $(guess, f(guess))$, the next guess will be where the tangent intersects the x-axis (solution of $g(x) = 0$). This converges more quickly then other methods such as Regula falsi}
 	\label{fig:newton-ilust}
 \end{figure}
@@ -443,7 +445,7 @@ where
 }
 \end{rustcode}
 
-An extension to the function in snippet~\ref{code:newtons-method} is implemented in the struct \rustinline{Newton'sMethodFindNewZero} which can be used to find multiple roots.
+The struct \rustinline{Newton'sMethodFindNewZero} is an extension to the function in snippet~\ref{code:newtons-method}, it can be used to find multiple roots.
 
 From the structure of the algorithm it is tempting to implement it recursively, but using a loop is much faster since there are no unnecessary function calls and the precision can (at least in
 theory) be $0$ without causing a stack overflow.
@@ -677,7 +679,7 @@ a much better result can be obtained:
     \begin{array}{ll}
       f(x) & x < \alpha \\
       g(x) & x > \alpha + \delta \\
-      f(x) + (g(x) - f(x))\chi(\cfrac{x-\alpha}{\delta}) & else
+      f(x) + (g(x) - f(x))\chi(\cfrac{x-\alpha}{\delta}) & \text{else}
     \end{array}
     \right.
 \]
@@ -685,7 +687,7 @@ which is mathematically smooth as can be seen in figure~\ref{fig:joint-cos-hall}
 \begin{figure}[H]
   \centering
   \includegraphics[width=.9\textwidth]{plots/hall_joint.pdf}
-  \caption{Plot of h(x) with Hall joint. The function is smooth and has a slight \emph{bump} at $x = \frac{\pi}{2}$}\label{fig:joint-cos-hall}
+  \caption{Plot of h(x) with Hall joint. The function is smooth and has a slight \emph{bump} at $x = \frac{\pi}{2}$.}\label{fig:joint-cos-hall}
 \end{figure}
 
 \subsection{Implementation in Rust}
@@ -997,7 +999,7 @@ section~\ref{sec:osc_turnging_point_problem}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=.9\textwidth]{plots/square9half.pdf}
-  \caption{Left half of wave function with $N_{Energy} = 9 \Rightarrow E \approx 13.4$, $m = 2$, $V(x) = x^{2}$}\label{fig:wave_parts}
+  \caption{Left half of wave function with $N_{Energy} = 9 \Rightarrow E \approx 9.49$, $m = 2$, $V(x) = x^{2}$}\label{fig:wave_parts}
 \end{figure}
 In figure~\ref{fig:wave_parts} the three parts are visualized. The purple section on the left is the exponentially decaying part $\psi^{WKB}_{exp} (x)$, equation~\ref{eq:wkb:exp} is calculated according to
 ~\cite[p. 317, Claim 15.7]{hall2013quantum} where $b$ and $a$ are different solutions for $t$ of equation~\ref{eq:wkb:t}. The absolute symbol makes it possible to not
@@ -1195,7 +1197,7 @@ the individual \rustinline{WaveFunction} structs.
 
 \chapter{Results}
 In this chapter some of the plots calculated by the program are analyzed and discussed.
-You can reproduce all the results yourself or calculate according to the manual in the appendix~\ref{sec:manual}.
+You can reproduce all the results yourself according to the manual in appendix~\ref{sec:manual}.
 
 \section{Wave Functions}
 \subsection{Hall Example}\label{sec:resutl:hall}
@@ -1203,7 +1205,7 @@ As a first result let's replicate the example from Hall with the 39th energy of 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{plots/square-39.pdf}
-  \caption{Wave function of 39th energy with $V(x) = x^{2}$, $m = 1$ and $f_{view}=0.1$.}
+  \caption{Wave function of 39th energy with $V(x) = x^{2}$, $m = 1.$}
 \end{figure}
 This result is very similar to the plot~\cite[fig. 15.5]{hall2013quantum}. The only difference is the joint between the Airy function and the exponential WKB part. In our case the two functions don't
 meet as nicely.
@@ -1594,7 +1596,7 @@ can type \rustinline{potentials::/*potential*/}.
 \\
 For the Mass you can just use a normal float.
 \\
-``nth energy '' must be a positive integer (including 0) and is the nth energy level of the potential.
+``nth energy'' must be a positive integer (including 0) and is the nth energy level of the potential.
 \\
 And as for the scaling type, choose one of the options described at the end of section~\ref{sec:scaling-type}.
 
