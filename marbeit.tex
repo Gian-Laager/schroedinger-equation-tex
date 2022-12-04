@@ -217,7 +217,7 @@ be able to write concurrent code without deadlocks and data races. This means ca
 
 Functional programing languages are especially useful for mathematical problems, because they are based on the same mathematics as the problem.
 
-Rust as of the time of writing this document is not yet standardized, meaning the code provided might no longer be correct with one of the newer Rust versions.
+Rust as of the time of writing this document is not yet standardized, meaning the code provided might no longer be correct with one of the newer Rust versions. The program was written for version \emph{1.67.0-nightly}.
 
 To learn more about Rust, see the excellent documentation at \url{https://doc.rust-lang.org/book/}.
 
@@ -445,7 +445,7 @@ where
 }
 \end{rustcode}
 
-The struct \rustinline{Newton'sMethodFindNewZero} is an extension to the function in snippet~\ref{code:newtons-method}, it can be used to find multiple roots.
+The struct \rustinline{NewtonsMethodFindNewZero} is an extension to the function in snippet~\ref{code:newtons-method}, it can be used to find multiple roots.
 
 From the structure of the algorithm it is tempting to implement it recursively, but using a loop is much faster since there are no unnecessary function calls and the precision can (at least in
 theory) be $0$ without causing a stack overflow.
@@ -667,7 +667,7 @@ This results in figure~\ref{fig:joint-step} which is obviously not smooth.
   \caption{Plot of h(x) with step joint. As shown the transition is not smooth and there's a discontinuity at $x = \frac{\pi}{2}$.}\label{fig:joint-step}
 \end{figure}
 
-Using the formula from~\cite[p. 325, section 15.6.4]{hall2013quantum}
+Using the formula from~\cite[section 15.6.4]{hall2013quantum}
 \begin{align*}
     \delta = 0.5 \\
     \alpha = \cfrac{\pi}{2} - \cfrac{\delta}{2} \\
@@ -714,7 +714,7 @@ impl Func<f64, Complex64> for Joint {
 In the proof it has been assumed that $f(x)$ and $g(x)$ are continuous of first order in the interval $(\alpha, \alpha + \delta)$. In the code this assumption will not be checked, since it would have a major impact on performance to check the derivative on every point.
 
 \chapter{Calculation}
-In this chapter discusses the calculations in the program utilizing the methods described in chapter~\ref{chap:methods}.
+This chapter discusses the calculations in the program utilizing the methods described in chapter~\ref{chap:methods}.
 \section{Energy Levels}\label{sec:energy-calculation}
 Solving the Schrödinger equation is an eigenvalue problem. This means that only certain energies will result in physically correct results. For an energy to be valid it has to satisfy the condition described by \cite[eq. 15.31]{hall2013quantum}.
 \begin{align}
@@ -730,7 +730,7 @@ To solve this problem for an arbitrary potential in a computer, the condition ca
 \begin{align}
   p(x) = \left\{\begin{array}{ll}
                   \sqrt{2m(E - V(x))} & V(x) < E \\
-                  0 & else
+                  0 & \text{else}
                 \end{array}
                       \right. \\\label{eq:prog_cond}
   \cfrac{2 \int_{-\infty}^{\infty}p(x) dx - \pi}{2\pi} \mod{1} = 0
@@ -839,7 +839,7 @@ WolframScript. As a rough estimate an error of $\pm \cfrac{10}{64000} \approx \p
 The absolute error is plotted in figure~\ref{fig:energy-error}.  It would be possible to  pick a lower value for \rustinline{ENERGY_STEP} in \bashinline{src/energy.rs:49}, but this will impact the performance for calculating energies with higher numbers for $n$.
 
 \section{Turning Points}
-A point $x$ where $V(x) = E$ is called a turning point. It is assumed that the WKB function is a good approximation in the region where
+A point $x$ where $V(x) = E$ is called a \emph{turning point}. It is assumed that the WKB function is a good approximation in the region where
 \begin{align}
   \label{eq:valid}
   -\cfrac{1}{2m} \deriv{V}{x}(x) \ll (V(x) - E)^{2}.
@@ -850,14 +850,14 @@ From equation~\ref{eq:valid} it can inferred that the Airy function is valid whe
   \label{eq:valid-airy}
   -\cfrac{a}{2m} \deriv{V}{x}(x) - (V(x) - E)^{2} > 0
 \end{align}
-Further on it can assumed that the Airy function is only valid in a closed interval, which means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called turning point boundaries from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
+Further on it can be assumed that the Airy function is only valid in a closed interval, which means that there must be at least two roots of equation~\ref{eq:valid-airy}. These roots will be called \emph{turning point boundaries} from now on. The factor of $a$ is used to emulate the behavior of $\ll$.
 
 The left boundary point must have a positive and the right a negative derivative. This means  after calculating the roots, they can be group together by their derivatives.
 \\
-In order to find all roots a modified version of Newton's method. When we find a solution $x_{0}$ we can divide the original function by $(x - x_{0})$. This means that Newton's method won't be able to find $x_{0}$ again.
+In order to find all roots a modified version of Newton's method is used. When we find a solution $x_{0}$ we can divide the original function by $(x - x_{0})$. This means that Newton's method won't be able to find $x_{0}$ again.
 \\
 \label{sec:view}
-To later plot the wave function we will define the so-called ``view''. This is the interval which the user has to see in the end.
+To later plot the wave function we will define the so-called ``view''. This is the interval which the user gets to see in the end.
 It is defined to be
 \begin{align*}
   t_{l} < t_{r} \\
@@ -901,17 +901,22 @@ After we rated all, of the 1000 guesses we can pick the best one as a first gues
 fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
     let phase_clone = phase.clone();
     let validity_func = Arc::new(move |x: f64| {
-        1.0 / (2.0 * phase_clone.mass).sqrt() * derivative(&|t| (phase_clone.potential)(t), x).abs()
+        1.0 / (2.0 * phase_clone.mass).sqrt()
+            * derivative(&|t| (phase_clone.potential)(t), x).abs()
+            * VALIDITY_LL_FACTOR
             - ((phase_clone.potential)(x) - phase_clone.energy).pow(2)
     });
-    let mut zeros = Newton'sMethodFindNewZero::new(validity_func, ACCURACY, 1e4 as usize);
+    let mut zeros = NewtonsMethodFindNewZero::new(validity_func, ACCURACY, 1e4 as usize);
 
-    (0..MAX_TURNING_POINTS).into_iter().for_each(|_| {
+    for _ in 0..MAX_TURNING_POINTS {
         let modified_func = |x| zeros.modified_func(x);
 
         let guess = make_guess(&modified_func, view, 1000);
-        guess.map(|g| zeros.next_zero(g));
-    });
+        let result = guess.map(|g| zeros.next_zero(g)).flatten();
+        if result.is_none() {
+            break;
+        }
+    }
 
     let view = if view.0 < view.1 {
         view
@@ -927,7 +932,7 @@ fn find_zeros(phase: &Phase, view: (f64, f64)) -> Vec<f64> {
     return unique_zeros;
 }
 \end{rustcode}
-Here \rustinline{make_guess} uses $\sigma(x)$, and returns the best guess. \rustinline{Newton'sMethodFindNewZero} is the modified version of Newton's method where all the roots are stored and its
+Here \rustinline{make_guess} uses $\sigma(x)$, and returns the best guess. \rustinline{NewtonsMethodFindNewZero} is the modified version of Newton's method where all the roots are stored and its
 implementation of \rustinline{Func<f64, f64>} is just defined as
 \begin{align}
   \label{eq:newton-modified}
@@ -935,7 +940,7 @@ implementation of \rustinline{Func<f64, f64>} is just defined as
 \end{align}
 Where the set $Z$ is the set of all the zeros that have been found previously.
 After the 256 iterations, all the zeros that aren't in the view are filtered out.
-Equation~\ref{eq:newton-modified} is implemented in \rustinline{Newton'sMethodFindNewZero}.
+Equation~\ref{eq:newton-modified} is implemented in \rustinline{NewtonsMethodFindNewZero}.
 Unfortunately this procedure can't be implemented asynchronously since you have to know all
 previous zeros before you can find a new one.
 
@@ -944,7 +949,7 @@ derivative of the validity function (\ref{eq:valid-airy}) must be positive, if t
 point is on the left and negative when it's on the right side of the turning point.
 It could be the case, that if the turning point is in the view that one of the boundary points
 is actually outside the view. For this the Regula falsi method is used, with the initial
-guess of the turning point. We will do this for both the left and right most turning point
+guess of the turning point. We will do this for both the left- and rightmost turning point
 if there was only one boundary found.
 
 \section{Approximation Scheme}\label{meth:wkb:approximation-scheme}
@@ -982,8 +987,9 @@ where
     \item[$c_{1}$] Constant, a.e. any number in $\mathbb{C}$.
     \item[$\psi^{WKB}_{exp}$] Classically forbidden part of the WKB approximation, a.e the exponential part.
     \item[$\psi^{WKB}_{osc}$] Classically allowed part of the WKB approximation, a.e the oscillating part.
-    \item[$\operatorname{Ai}()$] First variant of the Airy functions~\cite{math:airy}. It arises from solving the Schrödinger equation analytically at the turning points~\cite[section
+    \item[$\operatorname{Ai}()$] First variant of the Airy functions~\citep{math:airy}. It arises from solving the Schrödinger equation analytically at the turning points~\cite[section
             15.5]{hall2013quantum}. Note from here on out this function will be referred to as \emph{the Airy function}.
+    \item[$\psi^{Airy}$] Airy function part around the turning points.
 \end{description}
 
 Since equation~\ref{eq:wkb:t} might have more than one solution for turning points $t$,  each one of them has to be considered individually and in the end all of them have to be joined together.
@@ -1010,13 +1016,9 @@ When we look at the derivation of WKB we will see that equations \ref{eq:wkb:exp
   p(x) = \sqrt{V(x) - E} \\
   \left|\frac{dp}{dx}(x)\right| \ll p^{2}(x)
 \end{align*}
-as~\cite{zwiebach2018lecture} showed in his lecture.
-But this would mean that WKB is only valid iff $V(x) > E$ because $p^{2}(x)$ would be negative otherwise.
-If this is the case this would imply that~\ref{eq:wkb:exp} can't be valid.
-
-We will assume that this contradiction is wrong and assume that WKB is valid if
+as~\cite{zwiebach2018lecture} showed in his lecture. From the formula he derives it can be stated that WKB is valid if and only if
 \[
-  \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| \ll |V(x) - E|
+  \left|\frac{d}{dx}(\sqrt{|V(x) - E|})\right| \ll |V(x) - E|.
 \]
 
 \subsection{Implementation}
@@ -1062,11 +1064,11 @@ It calculates the sign of the limit of the oscillating region as $x$ approaches 
 The constructor\rustinline{AiryWaveFunction::new} calculates all the turning points in the view and then creates an \rustinline{AiryWaveFunction} for each of them.
 These functions are then returned as a pair of the instance and the corresponding turning point.
 
-Just as with the WKB functions, the Airy implementation also implements the \rustinline{self.op} which can be used to implement the osculating region with two turning points
+Just as with the WKB functions, the Airy implementation also implements the \rustinline{self.op} which can be used to implement the osculating region with two turning points.
 
 
 \section{Wave Function Parts}\label{sec:wave-func-parts}
-All the equations of the WKB approximation split into multiple parts. This is also reflected in the program architecture.
+All the equations of the WKB approximation are split into multiple parts. This is also reflected in the program architecture.
 The trait \rustinline{WaveFunctionPart} represents one of these sections.
 \begin{rustcode}
 pub trait WaveFunctionPart: Func<f64, Complex64> + Sync + Send {
@@ -1087,7 +1089,7 @@ The wave function parts that support operations implement the \rustinline{WaveFu
 An \rustinline{ApproxPart} is the function around a turning point. This includes the Airy, oscillating WKB and exponential WKB part.
 At the same time it also handles the joints between the Airy and WKB functions.
 
-Two joints are constructed and they have the highest ``priority'' when evaluating an ApproxPart for a given $x$.
+Two joints are constructed and they have the highest \emph{priority} when evaluating an ApproxPart for a given $x$.
 
 \begin{rustcode}
 fn eval(&self, x: f64) -> Complex64 {
@@ -1102,8 +1104,7 @@ fn eval(&self, x: f64) -> Complex64 {
     }
 }
 \end{rustcode}
-The term ``priority'' is used to say how far up the if statement the function is. Or in other words, functions with a higher priority are preferred. Because the joints overlap with both the ranges of the
-Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
+The term \emph{priority} is used to say how far up the if statement the function is. Or in other words, functions with a higher priority are preferred. Because the joints overlap with both the ranges of the Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
 because of this the WKB part has the least priority.
 
 As we can see, the check if the joints are even enabled happens here, because \newline \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
@@ -1143,7 +1144,6 @@ Once we've got the view, we can calculate all the turning points and their Airy 
 In the case that there are turning points we can then go through each turning point and
 also copy its neighbors. For the outermost turning points we will take
 \rustinline{approx_inf} as its neighbor.
-
 With these groups of 3 we can construct a \rustinline{WkbWaveFunction} for each of the
 turning points. However there were issues when dividing the oscillating part of the wave
 function was split into two parts with different turning points. As previously mentioned according
@@ -1151,9 +1151,6 @@ to~\cite{hall2013quantum} it should be mathematically indistinguishable when usi
 the turning points, but there arise discontinuities at the transition region. Because of that
 it has been decided that only the left turning point will be used.\label{sec:osc_turnging_point_problem}
 
-Unfortunately in this method even though the function is continuous it will not be symmetric
-about the midpoint of the oscillating region. This has the effect that the probabilities will
-be lower on the right although they should have the same probability.
 Because of the architecture of the program, the oscillating part will still be split into two
 distinct regions.
 
@@ -1242,7 +1239,7 @@ also been observed for other potentials with the 0th energy.
 \end{minipage}
 \vspace*{3ex}
 
-This occurs because the joints of the right and left half overlap to form the ``spike'' in
+This occurs because the joints of the right and left half overlap, to form the ``spike'' in
 the middle. Unfortunately this can't be fixed, because one could try to either increase
 \rustinline{VALIDITY_LL_FACTOR} to make the two Airy functions overlap which wont be a
 perfect fit either. Or it would be possible to decrease \rustinline{AIRY_TRANSITION_FRACTION} which would make the joints smaller, but this would
@@ -1254,7 +1251,7 @@ in a superposition of the same energy with destructive interference.
 \[
   \Psi_{super}(x) = 1 \cdot \Psi(x) - 1 \cdot \Psi(x) = 0
 \]
-In theory this is possible but can't be physically valid because the Schrödinger equation
+In theory this is possible (proof appendix~\ref{proof:zero-wave-function}) but can't be physically valid because the Schrödinger equation
 does not show the full picture. In quantum field theory the wave function would always
 oscillate in some way.
 \begin{figure}[H]
@@ -1311,7 +1308,7 @@ approximation that handles these cases. When this extension has been implemented
 
 \subsection{Superposition}
 While some wave functions with superposition of energy seem to be chaotic, others are in some way beautiful because of their symmetries.
-Unfortunately the color plots usually don't make the symmetries that arise when plotted in 3D obvious.
+Unfortunately the color plots usually don't make the symmetries, that arise when plotted in 3D obvious.
 
 \begin{minipage}{\textwidth}
 \begin{figure}[H]
@@ -1408,12 +1405,18 @@ Looking back at the goals, the program is quite fast for low and even ``medium''
 with the constants, but they don't offer a great flexibility.
 
 One of the core design decisions was to follow the UNIX philosophy to some degree and personally I think this has been achieved with the flexible architecture. But as usual the UNIX philosophy has an
-impact on the user interface which is probably the weakest part of the program. It is only accessible to programers and can't be used to it's full potential if the user doesn't know Rust, a systems
+impact on the user interface which is probably the weakest part of the program. It is only accessible to programmers and can't be used to it's full potential if the user doesn't know Rust, a systems
 programing language that is not very similar to popular programing languages like Python. If I have time I will definitely improve the user experience without taking away the freedom to edit the code if
 someone would like to.
 
 I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities
 inside the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program to more then one dimension.
+\\[3ex]
+Shortly before I had to finish this paper I realized that there was an interesting corresponds between the Dirac formalism and the architecture of the program. This happened by accident and the
+implementation could be slightly changed such that \rustinline{Superposition} structs represent vectors in Hilbert space. In this case \rustinline{WaveFunction} structs would act as a set of bases
+vectors. If one would manage to proof that the states produced from different energies of \rustinline{WaveFunction} are orthogonal in Hilbert space, the Dirac formalism could in theory be used to its
+full extend. The problem with this idea is what the dual vector space to the superpositions should be and how it should be represented. The dual space can be constructed with the inner product, but the
+question remains on how to define an inner product on two wave functions.
 \\[3ex]
 In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
 
@@ -2000,7 +2003,7 @@ define \hspace*{\fill}~\citep{hall2013quantum}
   \chi(x) = \sin^{2}\left(\cfrac{\pi(x - \alpha)}{2\delta}\right) \\
   (f \sqcup g)(x) = f(x) + (g(x) - f(x)) \chi(x)
 \end{align}
-and proof that
+and prove that
 \begin{align}
   \label{eq:deriv-f}
   \cfrac{d(f \sqcup g)}{dx}(\alpha) = \cfrac{df}{dx}(\alpha) \\
@@ -2036,9 +2039,9 @@ and
   \frac{1}{2m} \cdot 0 + V(x) \cdot 0 = E \cdot 0 \\
   0 = 0~\blacksquare
 \end{align}
-There for $\Psi(x) = 0$ is a solution for all energies and all potentials.
+Therefore $\Psi(x) = 0$ is a solution for all energies and all potentials.
 \section{Branch Elimination}\label{test:branch-elim}
-To check if branches with a constant condition of \rustinline{false} gets removed we will use ``Compiler Explorer'' on \url{https://godbolt.org/}.
+To check if branches with a constant condition of \rustinline{false} get removed we will use ``Compiler Explorer'' on \url{https://godbolt.org/}.
 This is an online tool to generate the assembly of source code.
 The settings used for this test are ``Rust'' for the language, ``rustc 1.65.0'' for the compiler with flags ``-O''.
 \\[1ex]
