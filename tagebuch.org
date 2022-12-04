@@ -1,4 +1,331 @@
-#+title: Tagebuch
+#+title: Arbeits Tagebuch
+#+OPTIONS: num:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: date:nil
 
-* 24.8.22 19:30 -
-- Start implementation according to Hall
+* 20.5.
+- Started repo and setup C++ project
+
+* 24.5.
+- Initial research
+- Found WKB Approximation Wikipedia
+
+* 26.5.
+- MIT lectures on WKB method and quantum mechanics
+
+* 6.6.
+- First test for serial and parallel integration.
+- Major problems with multi threading
+
+- Switched to Go programing language, implemented parallel integration and first WKB implementation according to Wikipedia
+
+* 7.6.
+- Fixed problem with bounds of integration and got good looking results
+- Problems relating coefficients of oscillating and exponential part.
+
+* 9.6.
+- Attempt to implement caching system for integral after suggestion by Mr. Romer.
+- Great performance and precision results when benchmarking
+
+* 10.6
+ - fixed integral after debugging
+
+* 12.6
+- First implementation with Airy functions
+- Assumption that Airy functions have to match exactly -> solve for constants with matrix
+- Airy functions don't match nicely
+- Implemented function for probability
+
+* 14.6.
+- Problems with Go because the code gets messy
+- Complete rewrite in Rust
+
+* 16.6.
+- Attempt to implement Airy functions with Taylor series, not working
+- Research Fourier transformation to implement Airy functions
+
+* 19.6.
+- Added Go library for Airy functions to Rust
+
+* 29.6.
+- Moved Airy functions to separate struct
+
+* 2.7.
+- Implementation of Newton's method for finding turning points
+- Unit test for Newton's method
+- Working Newton's method
+
+* 3.7
+- Build script for Go library
+- Iterative Newton's method faster than recursive method
+- Mathematical foundations for finding turning points and grouping
+- Finding turning points with Newton's method
+
+* 10.7.
+- Code for two turning points
+- Problems in the middle of the functions; phase wrong?
+- Refactoring
+
+* 15.6.
+- Problem when one turning point boundary is outside the view
+- Various methods to solve problem
+
+* 17.7.
+- Regula falsi for calculating turning points outside the view
+
+* 20.7.
+- Using actual energies
+- Better results
+* 2.8.
+- Fixed issue in Airy functions
+
+* 12.8.
+- Start Probe Kapitel
+- Newton's method
+
+* 15.8.
+- WKB approximation for Probe Kapitel
+
+* 18.8.
+- Integration for Probe Kapitel and correcting
+
+* 11.9.
+- Generalized Integration
+- Switch from Wikipedia to Hall, better results.
+- Still problems in the middle of the two osculating WKB parts.
+- Attempt to fix with sign changes (not working)
+- Invented system to generate "optimal" guess for Newton's method
+
+* 20.9.
+- Found parentheses error in phase
+- Experimenting with various sign changes to fix problem at x = 0
+
+* 25.9.
+- Started algorithm to calculate energies
+- Calculations to find solutions with integers
+
+* 26.9.
+- Decision use check periodically for discontinuities
+
+* 28.9.
+- Implementation to find energies for any potential
+- Added automatic calculation for view
+
+- Added automatic creation of WKB parts -> Possible to calculate potentials with more than two turning points
+
+* 29.9.
+- Changed energy form Hall to correct Sommerfeld condition
+- Still problems in the middle of oscillating parts
+
+* 1.10.
+- Extended definition of Hall to complex solutions
+- Reworked memory model of phase to Arc.
+
+* 4.10.
+- Research on joints for functions
+- Hall example does not work
+
+* 6.10
+- First implementation of WaveFunctionBuilder
+- Experiments with different architectures.
+- Developed own methods for joints with sin^2() and cos^2()
+
+* 8.10.
+- Implementation of exact solution in WolframScript
+- Results strangely diverge and don't have the spirals observed in schroedinger_approx's solutions -> Super Position?
+
+* 9.10.
+- Thought: Neural network back propagation for minimal error in Wolfram solutions, my neuronal network library?
+- Mathematics to fix problem in the middle of oscillating parts:
+  + choose between 4 operations: +, -, conj, -conj.
+  + minimal error will be used
+
+- One of these ops will be used on each function.
+
+- Reworked structure of wave function builder
+
+* 10.10.
+- with_op implementation, added "operations" to each wave function part, each of them gets rotate such that theres a minimal error both
+  in the derivative and the actual value.
+- Works for square potential
+- Added joints between WKB parts, results look better.
+- Operations don't influence probability, but joints do create an error.
+- Replaced messy main function with wave function builder
+- fixed error in Joints
+- Added Super Position of multiple energies
+- Results look very strange but may be correct
+- fixed boundary issue with 10th energy of x^2
+- added different scaling types
+- save time by exiting find\_zeros when proposed guess is the same
+
+* 12.10.
+- Invested system to find optimal delta, to fix issue in the middle of oscillating WKB parts
+
+* 13.10.
+- Added joints between WKB functions
+- Added plotting wave function parts separately
+- Fixed joints between WKB functions because joint was not favored over Airy or WKB part
+- Added plots module for a clear API in the main function
+- Improved phase offset calculation
+
+* 14.10.
+- Wrote transition regions section
+- Energy levels, compared exact values from WolframScript with approximate values
+
+* 16.10.
+- Finished energy levels and changed derivative implementation to Boost variant
+
+* 18.10.
+- Started turning points section
+
+* 22.10.
+- Finished turning points
+- Started newtons rating function
+
+* 24.10.
+- Improved rating function and correct mathematical definition
+- Wrote Vorwort and Many Worlds interpretation
+- Researched original paper of Many Worlds to cite
+- Researched original Schrödingers cat article
+
+* Vacation
+
+
+* 31.10.
+- Rewrite of Validity
+- Reviewed lecture by Zwiebach
+
+* 1.11.
+- Added code as a symlink
+- Started section Wave Function
+
+* 3.11.
+- Improved calculation of phase offset
+- Finished wave function and superposition
+- Started program manual, documenting the process of using the program
+
+* 7.11.
+- Research for "matching condition", found notes of Robert G. Littlejohn, not exact same notation
+- Fixed problem of none matching osculating parts after suggestion by Mr. Romer.
+- Compared the new method and the old one, new is better but has problems at the right turning points
+- BETA TEST CODE LOCK, started release in git
+- up until now I changed to code while I was working on the paper which meant I sometimes had to rewrite entire sections because of changes in the code
+
+* 9.11.
+- Changed view to match the paper
+- refactoring
+
+
+
+* 11.11.
+- Specified Goals more precicely
+- Updated integral for the new code
+
+* 12.11.
+- Finally fixed energy calculation because of a missing * 2, even though I knew something was wrong with the energies it took me 2 months until I noticed the arithmetic mistake.
+- Changed graphics to correct energy levels
+
+* 13.11.
+- Finished updating all the plots to the correct energy calculations
+- Added implementation to approximation scheme
+- Added wave function parts
+- Checked assembly of branching with constants in Rust, to ensure no performance penalty because of an option
+- Added section PureWKB
+- Reformatted lstlistings
+
+- improved get_exp_sign
+- refactoring
+- designed graphics for "Reading Complex Plots" with p5js
+
+* 14.11.
+- Corrected Vorwort
+- Wrote Results section and piloted examples
+- updated code of appendix to latest commit
+
+* 15.11.
+- fixed view, now works as described in the paper
+- Calculating energies of super positions in parallel after test on Robotiks server where not the full CPU could be utilized
+- Send first version of Methods chapter to Christopher Golling for corrections and tips
+
+* 17.11.
+- Corrected methods chapter according to Christopher
+- Started VMs for installation instructions on Arch, Ubuntu and Windows
+- Installation was easy on Arch and Ubuntu but I ran into a linking error on Windows
+- Reset my old MacBook for instructions on macOS
+* 18.11.
+- Reworked Windows instructions for WSL because of unresolvable linking errors of the Go library
+- Moved installation section of Gnuplot to the respective OS
+- Moved installation instructions for Rust to the respective OS
+
+- Added Newton's method division by zero check
+- Removed unused dependencies
+
+* 19.11.
+- Revised Preliminaries
+- Added more wave functions to Results
+
+- Corrected spelling mistakes in the code
+* 21.11.
+- Added benchmarks, some of them took hours to complete so I ran it over night
+
+* 22.11.
+- Corrected mistakes in the benchmarks and tested both on Robotiks server and laptop over night
+
+* 23.11.
+- Revised Methods chapter
+- Analyzed benchmarks, and minor tested renormalization and energy searching more closely
+
+* 26.11.
+- added benchmarks to paper
+- Improved exact.wsl script and compared results with approximations
+- written conclusion
+- added LGPL-3 licence to code
+- refactoring
+- first draft
+
+* 28.11.
+- improvements of Methods chapter
+
+* 29.11.
+- Checking character limit, I had to remove a lot of the code because I initially had 100'000 characters
+- Still 62'000 characters without code
+- First draft of Abstract, searching for good plot for "Visualisierung".
+
+* 30.11.
+- Send version to Abigail to correct the language
+- Moved manual to appendix after discussion with Mr. Romer
+
+* 1.12.
+- Reading through the work my self chapter by chapter and correcting as I go along
+- Moved section Turning Points before Approximation Scheme because turning points are necessary for the approximation
+- Revised calculation chapter
+- Fixed mistake in color plots where the order of the arguments in atan2 was wrong
+- Replotting affected plots
+- Revised calculations according to Christopher
+
+* 2.12.
+- Received corrections from Abigail
+- Fixing language for the rest of the evening
+
+* 3.12.
+- Replotting some graphs because axis labels were missing
+- Correcting Abstract
+- Amend this document
+- Digging deep into the abstract mathematical ideas of modern quantum mechanics (Youtube: XylyXyly, QED Prerequisite Topics)
+  + "Understanding" interesting correspondences between Hilbert space and space time described by Stephen Wolfram's hypergraph theory
+  + Question: Are wave functions with different energies orthogonal in Hilbert space?
+
+* 4.12.
+- Last edits
+
+* 5.12.
+- Print
+
+* Self Reflection on the Working Process
+I think my working process was quite good. But one of the problems was that I focused to much on the formalism presented in Wikipedia, to be fair the same equations were also used in the Lectures of Zwiebach.
+Once I switched to Hall the results became much better. Also it was good that I tried multiple programing languages, helped me find the right tool. Even though I had to debug for hours and tried various
+mathematical models I think it would have been better if I had a look at the actual solutions rather then guessing the properties that the wave function should have; this was why I insisted on the spiral
+for so long. Initially I tried to write unit test but this was very difficult because I did not know how the solutions should look like.
+
+I didn't enjoy writing the paper which meant I frequently tried something new in the program, which meant the sections I had already written in the paper were outdated. In the end I had to force my self
+to stop working on the code and actually finish the paper itself.
