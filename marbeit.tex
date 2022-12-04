@@ -123,10 +123,10 @@ Gian Laager\\
 	\includegraphics[width=0.9\textwidth]{plots/super-square-9-12-15-title.pdf}
 \end{center}
 \vspace{0.05\textheight}
-Matura thesis\\
+Matura Thesis\\
 Kantonsschule Glarus\\[3ex]
 Supervisor: Linus Romer\\
-Referent: Dr. Elena Borisova
+Accessor: Dr. Elena Borisova
 \end{center}
 \end{titlepage}
 
@@ -335,7 +335,7 @@ Performance counters for Linux are a new kernel-based subsystem that provide a f
 In particular, \bashinline{perf stat} and \bashinline{perf record} will be used.
 \\[3ex]
 The outputs produced by \bashinline{perf stat} are fairly technical and can measure performance on the CPU level.
-Most of the metrics produced \emph{will not} be used. An example reproduced of a benchmark of \emph{schroedinger\_approx} is reproduced below.
+Most of the metrics produced \emph{will not} be used. An example reproduced of a benchmark of \emph{schroedinger\_approx} is reproduced on the next page.
 
 \begin{minipage}{\textwidth}
     \begin{lstlisting}
@@ -689,7 +689,7 @@ which is mathematically smooth as can be seen in figure~\ref{fig:joint-cos-hall}
   \includegraphics[width=.9\textwidth]{plots/hall_joint.pdf}
   \caption{Plot of h(x) with Hall joint. The function is smooth and has a slight \emph{bump} at $x = \frac{\pi}{2}$.}\label{fig:joint-cos-hall}
 \end{figure}
-
+\pagebreak[4]
 \subsection{Implementation in Rust}
 In the program the struct \rustinline{Joint} implements the formula from \cite{hall2013quantum}.
 As in the example the two functions $f(x)$ and $g(x)$, which will be renamed to \rustinline{left} and \rustinline{right}, have to be joined at $\alpha$ over a range of $\delta$. The variables $\alpha$ and $\delta$ are from now on called \rustinline{cut} and \rustinline{delta}.
@@ -1106,7 +1106,7 @@ The term ``priority'' is used to say how far up the if statement the function is
 Airy and WKB function is important that they are given a higher priority. Further on the range of the Airy part is also included in the WKB range
 because of this the WKB part has the least priority.
 
-As we can see, the check if the joints are even enabled happens here, because \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
+As we can see, the check if the joints are even enabled happens here, because \newline \rustinline{ENABLE_AIRY_JOINTS} is a constant. The compiler will
 remove the branches that are always false automatically (see Appendix~\ref{test:branch-elim}). This means that in theory the program should run a little faster if \rustinline{ENABLE_AIRY_JOINTS} is
 disabled. This has to be taken into account when benchmarking.
 
@@ -1160,7 +1160,7 @@ distinct regions.
 While iterating over the turning points we can also calculate the ranges in which the
 functions are valid.
 
-Once we have all the \rustinline{WkbWaveFunction} instances we need to group them with the \rustinline{AiryWaveFunction} instances. Using those pairs we can finally construct all the
+Once we have all the \rustinline{WkbWaveFunction} instances they need to group with the \rustinline{AiryWaveFunction} instances. Using those pairs we can finally construct all the
 \rustinline{ApproxPart} instances.
 
 \begin{minipage}{\textwidth}
@@ -1720,10 +1720,10 @@ fn my_potential(x: f64) -> f64 {
 \rustinline{/*some calculation*/} can be any Rust code that results in a \rustinline{f64}.
 \\
 \subsubsection{Examples}
-Negative bell curve ($-e^{-x^{2}} + 1$)
+Hyperbolic cosine
 \begin{rustcode}
-fn neg_bell(x: f64) -> f64 {
-    return -(-x.powi(2)).exp();
+fn hyperbolic_cos(x: f64) -> f64 {
+    return x.cosh();
 }
 \end{rustcode}
 
