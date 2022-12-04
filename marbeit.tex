@@ -1412,11 +1412,11 @@ someone would like to.
 I might also add a time dependent wave function that uses something simple like Euler's method on the initial WKB solution. In general there are still many things for which there are already utilities
 inside the current version of the program. For example, there's an implementation for multidimensional variant of Newton's method that could be used to extend the program to more then one dimension.
 \\[3ex]
-Shortly before I had to finish this paper I realized that there was an interesting corresponds between the Dirac formalism and the architecture of the program. This happened by accident and the
-implementation could be slightly changed such that \rustinline{Superposition} structs represent vectors in Hilbert space. In this case \rustinline{WaveFunction} structs would act as a set of bases
-vectors. If one would manage to proof that the states produced from different energies of \rustinline{WaveFunction} are orthogonal in Hilbert space, the Dirac formalism could in theory be used to its
-full extend. The problem with this idea is what the dual vector space to the superpositions should be and how it should be represented. The dual space can be constructed with the inner product, but the
-question remains on how to define an inner product on two wave functions.
+Shortly before I had to finish this paper I realized that there was an interesting corresponds between the Dirac formalism~\citep{xylyxylyx2021dirac} and the architecture of the program. This happened by
+accident and the implementation could be slightly changed such that \rustinline{Superposition} structs represent vectors in Hilbert space. In this case \rustinline{WaveFunction} structs would act as a
+set of bases vectors. If one would manage to proof that the states produced from different energies of \rustinline{WaveFunction} are orthogonal in Hilbert space, the Dirac formalism could in theory be
+used to its full extend. The problem with this idea is what the dual vector space to the superpositions should be and how it should be represented. The dual space can be constructed with the inner
+product, but the question remains on how to define an inner product on two wave functions.
 \\[3ex]
 In the end I gained a deeper understanding of this weird world we're living in and the beauty of the things that can arise from complex mathematics.
 
